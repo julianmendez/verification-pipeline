@@ -1,0 +1,25 @@
+
+/**
+ * This is the main entry point.
+ */
+
+class Main
+
+  abstract
+
+  help = "" +
+    "\nEmotional Reasoning" +
+    "\n" +
+    "\nCopyright 2026 Julian Alfredo Mendez" +
+    "\n" +
+    "\nhttps://github.com/julianmendez/emotional-reasoning" +
+    "\n" +
+    "\nEmotional Reasoning is a project that instantiates the Tiles framework." +
+    "\n" +
+    "\n"
+
+  main (arguments : Array [String] ) : Unit =
+    println (help)
+
+end
+
