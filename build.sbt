@@ -1,4 +1,4 @@
-import sbt.Keys.scalacOptions
+
 
 lazy val scala3_3 = "3.3.5"
 
@@ -55,32 +55,15 @@ lazy val core =
       assembly / assemblyJarName := "core-" + version.value + ".jar"
     )
 
-lazy val examples =
-  project
-    .withId("examples")
-    .in(file("examples"))
-    .aggregate(core)
-    .dependsOn(core)
-    .settings(
-      commonSettings,
-      /**
-       * YAML 1.2 parser
-       * [[https://bitbucket.org/asomov/snakeyaml-engine]]
-       * [[https://repo1.maven.org/maven2/org/snakeyaml/snakeyaml-engine/]]
-       */
-      libraryDependencies += "org.snakeyaml" % "snakeyaml-engine" % "2.9",
-      assembly / assemblyJarName := "examples-" + version.value + ".jar"
-    )
-
 lazy val root =
   project
     .withId("emotion")
     .in(file("."))
-    .aggregate(docs, core, examples)
-    .dependsOn(docs, core, examples)
+    .aggregate(docs, core)
+    .dependsOn(docs, core)
     .settings(
       commonSettings,
-      assembly / mainClass := Some("soda.tiles.emotion.example.main.EntryPoint"),
+      assembly / mainClass := Some("soda.tiles.emotion.main.EntryPoint"),
       assembly / assemblyJarName := "emotion-" + version.value + ".jar"
     )
 
