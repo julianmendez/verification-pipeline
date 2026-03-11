@@ -1,0 +1,28 @@
+
+class Identifier = String
+
+
+class Action = Identifier
+
+
+class FluentName = Identifier
+
+
+class FluentValue = Boolean
+
+
+class Fluent
+
+  abstract
+    name : FluentName
+    value : FluentValue
+
+end
+
+
+class FluentSet = Set [Fluent]
+
+
+class ActionSet = Set [Action]
+
+
