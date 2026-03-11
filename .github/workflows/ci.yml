@@ -1,0 +1,39 @@
+---
+# CI configuration
+# https://docs.github.com/en/actions/guides/building-and-testing-java-with-maven
+# https://github.com/actions/checkout
+# https://github.com/actions/setup-java
+# https://github.com/coursier/setup-action
+
+name: Scala CI
+
+on:
+- push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java:
+        - 11.0.24
+        - 21.0.5
+        scala:
+        - 3.3.5
+        - 3.6.4
+    steps:
+    - name: Check out
+      uses: actions/checkout@v6
+    - name: Set up Java
+      uses: actions/setup-java@v5
+      with:
+        java-version: ${{ matrix.java }}
+        distribution: temurin
+    - name: Setup Scala with sbt
+      uses: coursier/setup-action@v2
+      with:
+        apps: sbt
+    - name: Build with sbt
+      run: sbt '++ ${{ matrix.scala }}' scalaVersion sbtVersion version clean compile test package assembly
+
+
