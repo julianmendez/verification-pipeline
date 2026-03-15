@@ -1,0 +1,58 @@
+
+class Verifier
+
+  abstract
+
+  verify (instant : Instant) : Boolean =
+    match instant
+      case CausesIfRule (input_set , action , output_set) ==> verifyCausesIfRule (instant) (input_set) (action) (output_set)
+      case IfRule (input_set , output_set) ==> verifyIfRule (instant) (input_set) (output_set)
+      case TriggersRule (input_set , action) ==> verifyTriggersRule (instant) (input_set) (action)
+      case AllowsRule (input_set , action) ==> verifyAllowsRule (instant) (input_set) (action)
+      case InhibitsRule (input_set , action) ==> verifyInhibitsRule (instant) (input_set) (action)
+      case NoConcurrencyRule (action_set) ==> verifyNoConcurrencyRule (instant) (action_set)
+      case DefaultRule (input_fluent) ==> verifyDefaultRule (instant) (input_fluent)
+      case InfluencesIfRule (input_set , action , output_set) ==> verifyInfluencesIfRule (instant) (input_set) (action) (output_set)
+      case InfluencesRule (input_set , output_set) ==> verifyInfluencesRule (instant) (input_set) (output_set)
+      case FacilitatesRule (input_set , action) ==> verifyFacilitatesRule (instant) (input_set) (action)
+      case ContravenesRule (input_set , action) ==> verifyContravenesRule (instant) (input_set) (action)
+      case ForbidsToCauseRule (input_set , output_set) ==> verifyForbidsToCauseRule (instant) (input_set) (output_set)
+
+  verifyCausesIfRule (t : Instant) (input : FluentSet) (action : Action) (output : FluentSet) : Boolean =
+    true
+
+  verifyIfRule (t : Instant) (input : FluentSet) (output : FluentSet) : Boolean =
+    true
+
+  verifyTriggersRule (t : Instant) (input : FluentSet) (action : Action) : Boolean =
+    true
+
+  verifyAllowsRule (t : Instant) (input : FluentSet) (action : Action) : Boolean =
+    true
+
+  verifyInhibitsRule (t : Instant) (input : FluentSet) (action : Action) : Boolean =
+    true
+
+  verifyNoConcurrencyRule (t : Instant) (action : ActionSet) : Boolean =
+    true
+
+  verifyDefaultRule (t : Instant) (input : Fluent) : Boolean =
+    true
+
+  verifyInfluencesIfRule (t : Instant) (input : FluentSet) (action : Action) (output : FluentSet) : Boolean =
+    true
+
+  verifyInfluencesRule (t : Instant) (input : FluentSet) (output : FluentSet) : Boolean =
+    true
+
+  verifyFacilitatesRule (t : Instant) (input : FluentSet) (action : Action) : Boolean =
+    true
+
+  verifyContravenesRule (t : Instant) (input : FluentSet) (action : Action) : Boolean =
+    true
+
+  verifyForbidsToCauseRule (t : Instant) (input : FluentSet) (output : FluentSet) : Boolean =
+    true
+
+end
+
