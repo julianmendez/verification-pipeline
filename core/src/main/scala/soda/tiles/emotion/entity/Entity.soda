@@ -26,3 +26,18 @@ class FluentSet = Set [Fluent]
 class ActionSet = Set [Action]
 
 
+datatype FluentOrActionSet
+  FluentSetType : (fluent_set : FluentSet) -> FluentOrActionSet
+  ActionSetType : (action_set : ActionSet) -> FluentOrActionSet
+
+
+class Instant
+
+  abstract
+    input : FluentSet
+    actions : ActionSet
+    output : FluentSet
+
+end
+
+

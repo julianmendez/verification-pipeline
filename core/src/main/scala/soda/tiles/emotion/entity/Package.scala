@@ -1,7 +1,7 @@
 package soda.tiles.emotion.entity
 
 /*
- * This package contains classes to model a fairness scenario.
+ * This package contains classes to model entities.
  */
 
 
@@ -34,6 +34,32 @@ object Fluent {
 type FluentSet = Set [Fluent]
 
 type ActionSet = Set [Action]
+
+sealed trait FluentOrActionSet
+
+case class FluentSetType (fluent_set : FluentSet) extends FluentOrActionSet
+
+case class ActionSetType (action_set : ActionSet) extends FluentOrActionSet
+
+
+trait Instant
+{
+
+  def   input : FluentSet
+  def   actions : ActionSet
+  def   output : FluentSet
+
+}
+
+case class Instant_ (input : FluentSet, actions : ActionSet, output : FluentSet) extends Instant
+
+object Instant {
+  def mk (input : FluentSet) (actions : ActionSet) (output : FluentSet) : Instant =
+    Instant_ (input, actions, output)
+}
+
+
+
 
 
 
