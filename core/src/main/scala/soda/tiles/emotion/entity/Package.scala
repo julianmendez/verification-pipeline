@@ -63,9 +63,6 @@ object Instant {
 
 
 
-
-
-
 sealed trait Rule
 
 case class CausesIfRule (input : FluentSet , action : Action , output : FluentSet) extends Rule

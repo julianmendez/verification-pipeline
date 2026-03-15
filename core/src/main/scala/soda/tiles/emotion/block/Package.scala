@@ -113,57 +113,62 @@ trait Verifier
 
 
 
-  def verify (instant : Instant) : Boolean =
+  def verify (instant : Instant) (inhibited : ActionSet) : Boolean =
     instant match  {
-      case CausesIfRule (input_set , action , output_set) => verifyCausesIfRule (instant) (input_set) (action) (output_set)
+      case CausesIfRule (input_set , action , output_set) => verifyCausesIfRule (instant) (inhibited) (input_set) (action) (output_set)
       case IfRule (input_set , output_set) => verifyIfRule (instant) (input_set) (output_set)
-      case TriggersRule (input_set , action) => verifyTriggersRule (instant) (input_set) (action)
-      case AllowsRule (input_set , action) => verifyAllowsRule (instant) (input_set) (action)
+      case TriggersRule (input_set , action) => verifyTriggersRule (instant) (inhibited) (input_set) (action)
+      case AllowsRule (input_set , action) => verifyAllowsRule (instant) (inhibited) (input_set) (action)
       case InhibitsRule (input_set , action) => verifyInhibitsRule (instant) (input_set) (action)
       case NoConcurrencyRule (action_set) => verifyNoConcurrencyRule (instant) (action_set)
       case DefaultRule (input_fluent) => verifyDefaultRule (instant) (input_fluent)
-      case InfluencesIfRule (input_set , action , output_set) => verifyInfluencesIfRule (instant) (input_set) (action) (output_set)
-      case InfluencesRule (input_set , output_set) => verifyInfluencesRule (instant) (input_set) (output_set)
-      case FacilitatesRule (input_set , action) => verifyFacilitatesRule (instant) (input_set) (action)
-      case ContravenesRule (input_set , action) => verifyContravenesRule (instant) (input_set) (action)
+      case InfluencesIfRule (input_set , action , output_set) => verifyCausesIfRule (instant) (inhibited) (input_set) (action) (output_set)
+      case InfluencesRule (input_set , output_set) => verifyIfRule (instant) (input_set) (output_set)
+      case FacilitatesRule (input_set , action) => verifyAllowsRule (instant) (inhibited) (input_set) (action)
+      case ContravenesRule (input_set , action) => verifyInhibitsRule (instant) (input_set) (action)
       case ForbidsToCauseRule (input_set , output_set) => verifyForbidsToCauseRule (instant) (input_set) (output_set)
     }
 
-  def verifyCausesIfRule (t : Instant) (input : FluentSet) (action : Action) (output : FluentSet) : Boolean =
-    true
+  def verifyCausesIfRule (instant : Instant) (inhibited : ActionSet) (input : FluentSet) (action : Action) (output : FluentSet) : Boolean =
+    if ( (input .forall (fluent => instant .input .contains (fluent) )
+        && (instant .actions .contains (action) )
+        && (! (inhibited .contains (action) ) ) )
+    ) (output .forall (fluent => instant .output .contains (fluent) ) )
+    else true
 
-  def verifyIfRule (t : Instant) (input : FluentSet) (output : FluentSet) : Boolean =
-    true
+  def verifyIfRule (instant : Instant) (input : FluentSet) (output : FluentSet) : Boolean =
+    if ( (input .forall (fluent => instant .input .contains (fluent) ) )
+    ) (output .forall (fluent => instant .input .contains (fluent) ) )
+    else true
 
-  def verifyTriggersRule (t : Instant) (input : FluentSet) (action : Action) : Boolean =
-    true
+  def verifyTriggersRule (instant : Instant) (inhibited : ActionSet) (input : FluentSet) (action : Action) : Boolean =
+    if ( (input .forall (fluent => instant .input .contains (fluent) )
+      && (! (inhibited .contains (action) ) ) )
+    ) (instant .actions .contains (action) )
+    else true
 
-  def verifyAllowsRule (t : Instant) (input : FluentSet) (action : Action) : Boolean =
-    true
+  def verifyAllowsRule (instant : Instant) (inhibited : ActionSet) (input : FluentSet) (action : Action) : Boolean =
+    if ( (input .forall (fluent => instant .input .contains (fluent) )
+      && (instant .actions .contains (action) )
+      && (! (inhibited .contains (action) ) ) )
+    ) true
+    else true
 
-  def verifyInhibitsRule (t : Instant) (input : FluentSet) (action : Action) : Boolean =
-    true
+  def verifyInhibitsRule (instant : Instant) (input : FluentSet) (action : Action) : Boolean =
+    if ( (input .forall (fluent => instant .input .contains (fluent) ) )
+    ) ! (instant .actions .contains (action) )
+    else true
 
-  def verifyNoConcurrencyRule (t : Instant) (action : ActionSet) : Boolean =
-    true
+  def verifyNoConcurrencyRule (instant : Instant) (actions : ActionSet) : Boolean =
+    (actions .intersect (instant .actions) .toList .length) <= 1
 
-  def verifyDefaultRule (t : Instant) (input : Fluent) : Boolean =
-    true
+  def verifyDefaultRule (instant : Instant) (fluent : Fluent) : Boolean =
+    instant .input .contains (fluent)
 
-  def verifyInfluencesIfRule (t : Instant) (input : FluentSet) (action : Action) (output : FluentSet) : Boolean =
-    true
-
-  def verifyInfluencesRule (t : Instant) (input : FluentSet) (output : FluentSet) : Boolean =
-    true
-
-  def verifyFacilitatesRule (t : Instant) (input : FluentSet) (action : Action) : Boolean =
-    true
-
-  def verifyContravenesRule (t : Instant) (input : FluentSet) (action : Action) : Boolean =
-    true
-
-  def verifyForbidsToCauseRule (t : Instant) (input : FluentSet) (output : FluentSet) : Boolean =
-    true
+  def verifyForbidsToCauseRule (instant : Instant) (input : FluentSet) (output : FluentSet) : Boolean =
+    if ( (input .forall (fluent => instant .input .contains (fluent) ) )
+    ) (output .forall (fluent => ! instant .output .contains (fluent) ) )
+    else true
 
 }
 
