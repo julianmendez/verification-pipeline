@@ -42,7 +42,7 @@ case class FluentSetType (fluent_set : FluentSet) extends FluentOrActionSet
 case class ActionSetType (action_set : ActionSet) extends FluentOrActionSet
 
 
-trait Instant
+trait Transition
 {
 
   def   input : FluentSet
@@ -51,11 +51,11 @@ trait Instant
 
 }
 
-case class Instant_ (input : FluentSet, actions : ActionSet, output : FluentSet) extends Instant
+case class Transition_ (input : FluentSet, actions : ActionSet, output : FluentSet) extends Transition
 
-object Instant {
-  def mk (input : FluentSet) (actions : ActionSet) (output : FluentSet) : Instant =
-    Instant_ (input, actions, output)
+object Transition {
+  def mk (input : FluentSet) (actions : ActionSet) (output : FluentSet) : Transition =
+    Transition_ (input, actions, output)
 }
 
 

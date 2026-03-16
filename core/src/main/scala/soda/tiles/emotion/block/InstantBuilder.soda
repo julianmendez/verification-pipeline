@@ -7,12 +7,12 @@ class SlidingWindow
     s0 : Option [FluentSet]
     a : Option [ActionSet]
     s1 : Option [FluentSet]
-    accum : Seq [Instant]
+    accum : Seq [Transition]
 
 end
 
 
-class InstantBuilder
+class TransitionBuilder
 
   abstract
 
@@ -48,14 +48,14 @@ class InstantBuilder
           else SlidingWindow .mk (false) (sw .s0) (sw .a) (sw .s1) (sw .accum)
 
   _empty_sliding_window : SlidingWindow =
-    SlidingWindow .mk (true) (None) (None) (None) (Seq [Instant] () )
+    SlidingWindow .mk (true) (None) (None) (None) (Seq [Transition] () )
 
-  _postprocess (sw : SlidingWindow) : Option [Seq [Instant] ] =
+  _postprocess (sw : SlidingWindow) : Option [Seq [Transition] ] =
     if (sw .defined) and (sw .s0 .isEmpty) and (sw .a .isEmpty) and (sw .s1 .isEmpty)
     then Some (sw .accum)
     else None
 
-  make_instants (seq : Seq [FluentOrActionSet] ) : Option [Seq [Instant] ] =
+  make_instants (seq : Seq [FluentOrActionSet] ) : Option [Seq [Transition] ] =
     _postprocess (
       fold (seq) (_empty_sliding_window) (_process_window)
     )

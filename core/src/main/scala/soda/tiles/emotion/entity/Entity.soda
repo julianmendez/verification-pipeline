@@ -31,7 +31,7 @@ datatype FluentOrActionSet
   ActionSetType : (action_set : ActionSet) -> FluentOrActionSet
 
 
-class Instant
+class Transition
 
   abstract
     input : FluentSet

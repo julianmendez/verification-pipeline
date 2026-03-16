@@ -23,7 +23,7 @@ import
   soda.tiles.emotion.entity.InfluencesIfRule
   soda.tiles.emotion.entity.InfluencesRule
   soda.tiles.emotion.entity.InhibitsRule
-  soda.tiles.emotion.entity.Instant
+  soda.tiles.emotion.entity.Transition
   soda.tiles.emotion.entity.NoConcurrencyRule
   soda.tiles.emotion.entity.TriggersRule
 
