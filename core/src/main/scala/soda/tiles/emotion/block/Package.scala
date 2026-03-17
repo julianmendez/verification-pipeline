@@ -26,6 +26,44 @@ import   soda.tiles.emotion.entity.Transition
 import   soda.tiles.emotion.entity.NoConcurrencyRule
 import   soda.tiles.emotion.entity.TriggersRule
 
+trait Preprocessor
+{
+
+
+
+  lazy val empty_set : ActionSet = Set [Action] ()
+
+  def find (transition : Transition) : ActionSet =
+    transition match  {
+      case CausesIfRule (input_set , action , output_set) => empty_set
+      case IfRule (input_set , output_set) => empty_set
+      case TriggersRule (input_set , action) => empty_set
+      case AllowsRule (input_set , action) => empty_set
+      case InhibitsRule (input_set , action) => _get_actions (transition) (input_set) (action)
+      case NoConcurrencyRule (action_set) => empty_set
+      case DefaultRule (input_fluent) => empty_set
+      case InfluencesIfRule (input_set , action , output_set) => empty_set
+      case InfluencesRule (input_set , output_set) => empty_set
+      case FacilitatesRule (input_set , action) => empty_set
+      case ContravenesRule (input_set , action) => _get_actions (transition) (input_set) (action)
+      case ForbidsToCauseRule (input_set , output_set) => empty_set
+    }
+
+  private def _get_actions (transition : Transition) (input : FluentSet) (action : Action) : ActionSet =
+    if ( (input .forall (fluent => transition .input .contains (fluent) ) )
+    ) empty_set .+ (action)
+    else empty_set
+
+}
+
+case class Preprocessor_ () extends Preprocessor
+
+object Preprocessor {
+  def mk : Preprocessor =
+    Preprocessor_ ()
+}
+
+
 
 
 trait SlidingWindow
