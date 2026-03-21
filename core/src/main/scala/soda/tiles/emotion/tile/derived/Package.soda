@@ -1,4 +1,4 @@
-package soda.tiles.emotion.block
+package soda.tiles.emotion.tile.derived
 
 /*
  * This package contains classes to model the blocks.
