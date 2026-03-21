@@ -41,3 +41,8 @@ class Transition
 end
 
 
+class Trajectory = Seq [FluentOrActionSet]
+
+
+class Instance = Trajectory
+

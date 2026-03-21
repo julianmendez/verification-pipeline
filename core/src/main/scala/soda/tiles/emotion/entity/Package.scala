@@ -58,7 +58,9 @@ object Transition {
     Transition_ (input, actions, output)
 }
 
+type Trajectory = Seq [FluentOrActionSet]
 
+type Instance = Trajectory
 
 
 
@@ -89,4 +91,78 @@ case class ContravenesRule (input : FluentSet , action : Action) extends Rule
 
 case class ForbidsToCauseRule (input : FluentSet , output : FluentSet) extends Rule
 
+
+type RuleSet = Seq [Rule]
+
+type Context = RuleSet
+
+
+/*
+directive lean
+import Soda.tiles.emotion.entity.Entity
+*/
+
+trait TilePair [A , B ]
+{
+
+  def   fst : A
+  def   snd : B
+
+}
+
+case class TilePair_ [A, B] (fst : A, snd : B) extends TilePair [A, B]
+
+object TilePair {
+  def mk [A, B] (fst : A) (snd : B) : TilePair [A, B] =
+    TilePair_ [A, B] (fst, snd)
+}
+
+trait TileTriple [A , B , C ]
+{
+
+  def   fst : A
+  def   snd : B
+  def   trd : C
+
+}
+
+case class TileTriple_ [A, B, C] (fst : A, snd : B, trd : C) extends TileTriple [A, B, C]
+
+object TileTriple {
+  def mk [A, B, C] (fst : A) (snd : B) (trd : C) : TileTriple [A, B, C] =
+    TileTriple_ [A, B, C] (fst, snd, trd)
+}
+
+trait TileMessage [A ]
+{
+
+  def   context : RuleSet
+  def   instance : Trajectory
+  def   contents : A
+
+}
+
+case class TileMessage_ [A] (context : RuleSet, instance : Trajectory, contents : A) extends TileMessage [A]
+
+object TileMessage {
+  def mk [A] (context : RuleSet) (instance : Trajectory) (contents : A) : TileMessage [A] =
+    TileMessage_ [A] (context, instance, contents)
+}
+
+trait TileMessageBuilder
+{
+
+
+
+  def build [A ] (context : Context) (instance : Instance) (contents : A) : TileMessage [A] =
+    TileMessage .mk (context) (instance) (contents)
+
+}
+
+case class TileMessageBuilder_ () extends TileMessageBuilder
+
+object TileMessageBuilder {
+  def mk : TileMessageBuilder =
+    TileMessageBuilder_ ()
+}
 
