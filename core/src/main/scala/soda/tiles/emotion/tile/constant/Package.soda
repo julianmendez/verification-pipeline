@@ -1,0 +1,14 @@
+package soda.tiles.emotion.tile.constant
+
+/*
+ * This package contains classes to model the tiles.
+ */
+
+import
+  soda.tiles.emotion.entity.Context
+  soda.tiles.emotion.entity.Instance
+  soda.tiles.emotion.entity.TileMessage
+  soda.tiles.emotion.entity.TileMessageBuilder
+  soda.tiles.emotion.entity.TilePair
+  soda.tiles.emotion.entity.TileTriple
+
