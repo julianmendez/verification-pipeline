@@ -1,0 +1,142 @@
+---
+- fluents:
+    need:
+    - ne-high
+    - ne-low
+    - ne-undecided
+    goal:
+    - go-high
+    - go-low
+    - go-undecided
+    accountability:
+    - ac-self
+    - ac-other
+    - ac-environment
+    - ac-undecided
+    control:
+    - co-high
+    - co-low
+    - co-undecided
+- actions:
+  - perceive-threat
+  - receive-support
+  - achieve-goal
+  - make-error
+  - no-action
+- rules:
+  - CausesIfRule:
+    - input:
+      - go-undecided
+    - action: perceive-threat
+    - output:
+      - go-high
+      - ne-high
+      - ac-environment
+      - co-low
+  - CausesIfRule:
+    - input:
+      - ne-high
+    - action: receive-support
+    - output:
+      - ne-low
+      - ac-other
+      - co-high
+  - CausesIfRule:
+    - input:
+      - go-high
+    - action: achieve-goal
+    - output:
+      - ne-low
+      - ac-self
+      - co-high
+  - CausesIfRule:
+    - input:
+      - go-high
+    - action: make-error
+    - output:
+      - ne-high
+      - go-low
+      - ac-self
+      - co-low
+  - FacilitatesRule:
+    - input:
+      - co-high
+    - action: achieve-goal
+  - InhibitsRule:
+    - input:
+      - co-low
+    - action: achieve-goal
+  - ContravenesRule:
+    - input:
+      - ac-environment
+    - action: achieve-goal
+  - CausesIfRule:
+    - input: []
+    - action: no-action
+    - output: []
+  - IfRule:
+    - input: []
+    - output: []
+  - TriggersRule:
+    - input: []
+    - action: no-action
+  - AllowsRule:
+    - input: []
+    - action: no-action
+  - InhibitsRule:
+    - input: []
+    - action: no-action
+  - NoConcurrencyRule:
+    - actions: []
+  - DefaultRule:
+    - input_fluent: go-undecided
+  - InfluencesIfRule:
+    - input: []
+    - action: no-action
+    - output: []
+  - InfluencesRule:
+    - input: []
+    - output: []
+  - FacilitatesRule:
+    - input: []
+    - action: no-action
+  - ContravenesRule:
+    - input: []
+    - action: no-action
+  - ForbidsToCauseRule:
+    - input: []
+    - output: []
+- trajectory:
+  - state:
+    - ne-undecided
+    - go-undecided
+    - ac-undecided
+    - co-undecided
+  - actions:
+    - perceive-threat
+  - state:
+    - ne-high
+    - go-high
+    - ac-environment
+    - co-low
+  - actions:
+    - receive-support
+  - state:
+    - ne-low
+    - go-high
+    - ac-other
+    - co-high
+  - actions:
+    - achieve-goal
+  - state:
+    - ne-low
+    - go-high
+    - ac-self
+    - co-high
+  - actions:
+    - make-error
+  - state:
+    - ne-high
+    - go-low
+    - ac-self
+    - co-low
