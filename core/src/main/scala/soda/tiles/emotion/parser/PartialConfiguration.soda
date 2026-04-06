@@ -1,0 +1,10 @@
+
+class PartialConfiguration
+
+  abstract
+    maybe_fluents : Option [FluentSet]
+    maybe_actions : Option [ActionSet]
+    maybe_rules : Option [RuleSet]
+    maybe_trajectory : Option [Trajectory]
+
+end

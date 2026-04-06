@@ -1,0 +1,36 @@
+
+class RuleSetParser
+
+  abstract
+
+  import
+    scala.jdk.CollectionConverters.CollectionHasAsScala
+    scala.jdk.CollectionConverters.IteratorHasAsScala
+    scala.jdk.CollectionConverters.MapHasAsScala
+
+  identifier = "rules"
+
+  parse_tuple_type (rule_type : String) (part : Any) : Option [Tuple2 [String, java.util.Map [Any, Any] ] ] =
+    match part
+      case m : java.util.Map [Any] [Any] ==> Some (Tuple2 (rule_type , m))
+      case otherwise ==> None
+
+  parse_rule_pair (p : Tuple2 [Any] [Any] ) : Option [Tuple2 [String] [java.util.Map [Any] [Any] ] ] =
+    match p ._1
+      case rule_type : String ==> parse_tuple_type (rule_type) (p ._2)
+      case otherwise ==> None
+
+  parse_rule (part : Any) : Option [Tuple2 [String] [java.util.Map [Any] [Any] ] ] =
+    match part
+      case p : Tuple2 [Any] [Any] ==> parse_rule_pair (p)
+      case otherwise ==> None
+
+  parse_rules (part : Any) : List [Tuple2 [String] [java.util.Map [Any] [Any] ] ] =
+    match part
+      case p : Seq[Any] ==> p .flatMap (lambda r --> parse_rule (r) ) .toList
+      case otherwise ==> List ()
+
+  parse (a : Any) : Option [RuleSet] =
+    None
+
+end

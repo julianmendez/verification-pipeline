@@ -1,3 +1,22 @@
 
 package soda.tiles.emotion.parser
 
+import
+  soda.tiles.emotion.entity.Action
+  soda.tiles.emotion.entity.ActionSet
+  soda.tiles.emotion.entity.ActionSetType
+  soda.tiles.emotion.entity.Configuration
+  soda.tiles.emotion.entity.Identifier
+  soda.tiles.emotion.entity.Instance
+  soda.tiles.emotion.entity.Fluent
+  soda.tiles.emotion.entity.FluentName
+  soda.tiles.emotion.entity.FluentOrActionSet
+  soda.tiles.emotion.entity.FluentSet
+  soda.tiles.emotion.entity.FluentSetType
+  soda.tiles.emotion.entity.FluentValue
+  soda.tiles.emotion.entity.TileMessage
+  soda.tiles.emotion.entity.Trajectory
+  soda.tiles.emotion.entity.Transition
+  soda.tiles.emotion.entity.Rule
+  soda.tiles.emotion.entity.RuleSet
+

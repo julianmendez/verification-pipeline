@@ -1,0 +1,15 @@
+
+class ActionSetParser
+
+  abstract
+
+  identifier = "actions"
+
+  parse_actions (part : Any) : List [String] =
+    ListParser .mk
+      .parse_string_list (part) .getOrElse (List () )
+
+  parse (a : Any) : Option [ActionSet] =
+    None
+
+end

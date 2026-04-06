@@ -1,0 +1,53 @@
+/**
+ * Parser for fluents, actions, rules, and trajectory.
+ */
+
+class YamlParser
+
+  abstract
+
+  import
+    java.io.Reader
+    scala.jdk.CollectionConverters.CollectionHasAsScala
+    scala.jdk.CollectionConverters.IteratorHasAsScala
+    scala.jdk.CollectionConverters.MapHasAsScala
+
+  build_partial_configuration (s : Seq [Any] ) : Option [PartialConfiguration] =
+    if (s .length == 4)
+    then
+      Some (
+        PartialConfiguration .mk (
+          FluentSetParser .mk .parse (s (0) ) ) (
+          ActionSetParser .mk .parse (s (1) ) ) (
+          RuleSetParser .mk .parse (s (2) ) ) (
+          TrajectoryParser .mk .parse (s (3) )
+        )
+      )
+    else None
+
+  build_configuration (c : PartialConfiguration) : Option [Configuration] =
+    if (c .maybe_fluents .isDefined and
+      c .maybe_actions .isDefined and
+      c .maybe_rules .isDefined and
+      c .maybe_trajectory .isDefined)
+    then
+      Some (
+        Configuration .mk (
+          c .maybe_fluents .get) (
+          c .maybe_actions .get) (
+          c .maybe_rules .get) (
+          c .maybe_trajectory .get
+        )
+      )
+    else None
+
+  parse (reader : Reader) : Option [Configuration] =
+    build_partial_configuration (
+      GenericYamlParser .mk
+        .parse (reader)
+        .toList
+    )
+    .flatMap (lambda partial_conf --> build_configuration (partial_conf) )
+
+end
+
