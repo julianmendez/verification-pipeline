@@ -8,6 +8,24 @@ package soda.tiles.emotion.entity
 
 
 
+trait Configuration
+{
+
+  def   fluents : FluentSet
+  def   actions : ActionSet
+  def   rules : RuleSet
+  def   trajectory : Trajectory
+
+}
+
+case class Configuration_ (fluents : FluentSet, actions : ActionSet, rules : RuleSet, trajectory : Trajectory) extends Configuration
+
+object Configuration {
+  def mk (fluents : FluentSet) (actions : ActionSet) (rules : RuleSet) (trajectory : Trajectory) : Configuration =
+    Configuration_ (fluents, actions, rules, trajectory)
+}
+
+
 type Identifier = String
 
 type Action = Identifier
