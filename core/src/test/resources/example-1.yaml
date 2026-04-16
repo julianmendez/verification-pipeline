@@ -1,142 +1,146 @@
 ---
 - fluents:
-    need:
-    - ne-high
-    - ne-low
-    - ne-undecided
-    goal:
-    - go-high
-    - go-low
-    - go-undecided
-    accountability:
-    - ac-self
-    - ac-other
-    - ac-environment
-    - ac-undecided
-    control:
-    - co-high
-    - co-low
-    - co-undecided
+  - fluent: need
+    values:
+    - need_high
+    - need_undecided
+    - need_low
+  - fluent: goal
+    values:
+    - goal_high
+    - goal_undecided
+    - goal_low
+  - fluent: control
+    values:
+    - control_high
+    - control_undecided
+    - control_low
+  - fluent: accountability
+    values:
+    - account_self
+    - account_other
+    - account_environment
+    - account_undecided
 - actions:
-  - perceive-threat
-  - receive-support
-  - achieve-goal
-  - make-error
-  - no-action
+  - perceive_threat
+  - receive_support
+  - achieve_goal
+  - make_error
+  - no_action
 - rules:
-  - CausesIfRule:
-    - input:
-      - go-undecided
-    - action: perceive-threat
-    - output:
-      - go-high
-      - ne-high
-      - ac-environment
-      - co-low
-  - CausesIfRule:
-    - input:
-      - ne-high
-    - action: receive-support
-    - output:
-      - ne-low
-      - ac-other
-      - co-high
-  - CausesIfRule:
-    - input:
-      - go-high
-    - action: achieve-goal
-    - output:
-      - ne-low
-      - ac-self
-      - co-high
-  - CausesIfRule:
-    - input:
-      - go-high
-    - action: make-error
-    - output:
-      - ne-high
-      - go-low
-      - ac-self
-      - co-low
-  - FacilitatesRule:
-    - input:
-      - co-high
-    - action: achieve-goal
-  - InhibitsRule:
-    - input:
-      - co-low
-    - action: achieve-goal
-  - ContravenesRule:
-    - input:
-      - ac-environment
-    - action: achieve-goal
-  - CausesIfRule:
-    - input: []
-    - action: no-action
-    - output: []
-  - IfRule:
-    - input: []
-    - output: []
-  - TriggersRule:
-    - input: []
-    - action: no-action
-  - AllowsRule:
-    - input: []
-    - action: no-action
-  - InhibitsRule:
-    - input: []
-    - action: no-action
-  - NoConcurrencyRule:
-    - actions: []
-  - DefaultRule:
-    - input_fluent: go-undecided
-  - InfluencesIfRule:
-    - input: []
-    - action: no-action
-    - output: []
-  - InfluencesRule:
-    - input: []
-    - output: []
-  - FacilitatesRule:
-    - input: []
-    - action: no-action
-  - ContravenesRule:
-    - input: []
-    - action: no-action
-  - ForbidsToCauseRule:
-    - input: []
-    - output: []
+  - rule: CausesIfRule
+    input:
+    - goal_undecided
+    action: perceive_threat
+    output:
+    - goal_high
+    - need_high
+    - account_environment
+    - control_low
+  - rule: CausesIfRule
+    input:
+    - need_high
+    action: receive_support
+    output:
+    - need_low
+    - account_other
+    - control_high
+  - rule: CausesIfRule
+    input:
+    - goal_high
+    action: achieve_goal
+    output:
+    - need_low
+    - account_self
+    - control_high
+  - rule: CausesIfRule
+    input:
+    - goal_high
+    action: make_error
+    output:
+    - need_high
+    - goal_low
+    - account_self
+    - control_low
+  - rule: FacilitatesRule
+    input:
+    - control_high
+    action: achieve_goal
+  - rule: InhibitsRule
+    input:
+    - control_low
+    action: achieve_goal
+  - rule: ContravenesRule
+    input:
+    - account_environment
+    action: achieve_goal
+  - rule: CausesIfRule
+    input: []
+    action: no_action
+    output: []
+  - rule: IfRule
+    input: []
+    output: []
+  - rule: TriggersRule
+    input: []
+    action: no_action
+  - rule: AllowsRule
+    input: []
+    action: no_action
+  - rule: InhibitsRule
+    input: []
+    action: no_action
+  - rule: NoConcurrencyRule
+    actions: []
+  - rule: DefaultRule
+    input_fluent: goal_undecided
+  - rule: InfluencesIfRule
+    input: []
+    action: no_action
+    output: []
+  - rule: InfluencesRule
+    input: []
+    output: []
+  - rule: FacilitatesRule
+    input: []
+    action: no_action
+  - rule: ContravenesRule
+    input: []
+    action: no_action
+  - rule: ForbidsToCauseRule
+    input: []
+    output: []
 - trajectory:
   - state:
-    - ne-undecided
-    - go-undecided
-    - ac-undecided
-    - co-undecided
+    - need_undecided
+    - goal_undecided
+    - account_undecided
+    - control_undecided
   - actions:
-    - perceive-threat
+    - perceive_threat
   - state:
-    - ne-high
-    - go-high
-    - ac-environment
-    - co-low
+    - need_high
+    - goal_high
+    - account_environment
+    - control_low
   - actions:
-    - receive-support
+    - receive_support
   - state:
-    - ne-low
-    - go-high
-    - ac-other
-    - co-high
+    - need_low
+    - goal_high
+    - account_other
+    - control_high
   - actions:
-    - achieve-goal
+    - achieve_goal
   - state:
-    - ne-low
-    - go-high
-    - ac-self
-    - co-high
+    - need_low
+    - goal_high
+    - account_self
+    - control_high
   - actions:
-    - make-error
+    - make_error
   - state:
-    - ne-high
-    - go-low
-    - ac-self
-    - co-low
+    - need_high
+    - goal_low
+    - account_self
+    - control_low
