@@ -1,0 +1,207 @@
+
+class Example2Instance
+
+  abstract
+
+  fluents : Map [FluentValue] [FluentName] =
+    Map [FluentValue] [FluentName] (
+       ("need_high" , "need") ,
+       ("need_undecided" , "need") ,
+       ("need_low" , "need") ,
+       ("goal_high" , "goal") ,
+       ("goal_undecided" , "goal") ,
+       ("goal_low" , "goal") ,
+       ("control_high" , "control") ,
+       ("control_undecided" , "control") ,
+       ("control_low" , "control") ,
+       ("account_self" , "accountability") ,
+       ("account_other" , "accountability") ,
+       ("account_environment" , "accountability") ,
+       ("account_undecided" , "accountability")
+     )
+
+  actions : ActionSet =
+    Seq [Action] (
+      "endorsement" ,
+      "attribution" ,
+      "affirmation" ,
+      "commitment" ,
+      "justification" ,
+      "challenge"
+    )
+
+  rules : Seq [Rule] = Seq [Rule] (
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "goal_low"
+      ) ,
+      "commitment" ,
+      Seq [FluentValue] (
+        "goal_high"
+      )
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "account_other"
+      ) ,
+      "commitment" ,
+      Seq [FluentValue] (
+        "account_self"
+      )
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "need_high"
+      ) ,
+      "endorsement" ,
+      Seq [FluentValue] (
+        "need_undecided"
+      )
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "control_high"
+      ) ,
+      "endorsement" ,
+      Seq [FluentValue] (
+        "control_undecided"
+      )
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "account_self"
+      ) ,
+      "justification" ,
+      Seq [FluentValue] (
+        "account_environment"
+      )
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "control_undecided"
+      ) ,
+      "justification" ,
+      Seq [FluentValue] (
+        "control_low"
+      )
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "account_environment"
+      ) ,
+      "attribution" ,
+      Seq [FluentValue] (
+        "account_self"
+      )
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "control_low"
+      ) ,
+      "attribution" ,
+      Seq [FluentValue] (
+        "control_undecided"
+      )
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "account_self"
+      ) ,
+      "challenge" ,
+      Seq [FluentValue] (
+        "account_environment"
+      )
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "control_undecided"
+      ) ,
+      "challenge" ,
+      Seq [FluentValue] (
+        "control_low"
+      )
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "need_undecided"
+      ) ,
+      "affirmation" ,
+      Seq [FluentValue] (
+        "need_high"
+      )
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "control_low"
+      ) ,
+      "affirmation" ,
+      Seq [FluentValue] (
+        "control_undecided"
+      )
+    )
+
+trajectory : Seq [IdentifierSet] =
+  Seq [IdentifierSet] (
+    Seq [FluentValue] (
+      "need_high" ,
+      "goal_low" ,
+      "account_other" ,
+      "control_high"
+    ) ,
+    Seq [Action] (
+      "commitment"
+    ) ,
+    Seq [FluentValue] (
+      "need_high" ,
+      "goal_high" ,
+      "account_self" ,
+      "control_high"
+    ) ,
+    Seq [Action] (
+      "endorsement"
+    ) ,
+    Seq [FluentValue] (
+      "need_undecided" ,
+      "goal_high" ,
+      "account_self" ,
+      "control_undecided"
+    ) ,
+    Seq [Action] (
+      "justification"
+    ) ,
+    Seq [FluentValue] (
+      "need_undecided" ,
+      "goal_high" ,
+      "account_environment" ,
+      "control_low"
+    ) ,
+    Seq [Action] (
+      "attribution"
+    ) ,
+    Seq [FluentValue] (
+      "need_undecided" ,
+      "goal_high" ,
+      "account_self" ,
+      "control_undecided"
+    ) ,
+    Seq [Action] (
+      "challenge"
+    ) ,
+    Seq [FluentValue] (
+      "need_undecided" ,
+      "goal_high" ,
+      "account_environment" ,
+      "control_low"
+    ) ,
+    Seq [Action] (
+      "affirmation"
+    ) ,
+    Seq [FluentValue] (
+      "need_high" ,
+      "goal_high" ,
+      "account_environment" ,
+      "control_undecided"
+    )
+  )
+
+end
