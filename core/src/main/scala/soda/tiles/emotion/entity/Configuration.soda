@@ -4,7 +4,7 @@ class Configuration
   abstract
     fluents : FluentSet
     actions : ActionSet
-    rules : RuleSet
+    rules : RuleSeq
     trajectory : Trajectory
 
 end

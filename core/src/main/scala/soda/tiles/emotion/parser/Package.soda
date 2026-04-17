@@ -14,5 +14,5 @@ import
   soda.tiles.emotion.entity.Trajectory
   soda.tiles.emotion.entity.Transition
   soda.tiles.emotion.entity.Rule
-  soda.tiles.emotion.entity.RuleSet
+  soda.tiles.emotion.entity.RuleSeq
 

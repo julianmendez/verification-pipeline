@@ -1,5 +1,5 @@
 
-class RuleSetParser
+class RuleSeqParser
 
   abstract
 
@@ -30,7 +30,7 @@ class RuleSetParser
       case p : Seq[Any] ==> p .flatMap (lambda r --> parse_rule (r) ) .toList
       case otherwise ==> List ()
 
-  parse (a : Any) : Option [RuleSet] =
+  parse (a : Any) : Option [RuleSeq] =
     None
 
 end

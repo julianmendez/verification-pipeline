@@ -15,8 +15,8 @@ datatype Rule
   ForbidsToCauseRule : (input : FluentSet) -> (output : FluentSet) -> Rule
 
 
-class RuleSet = Seq [Rule]
+class RuleSeq = Seq [Rule]
 
 
-class Context = RuleSet
+class Context = RuleSeq
 

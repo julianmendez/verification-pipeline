@@ -12,7 +12,7 @@ import   soda.tiles.emotion.entity.TileMessage
 import   soda.tiles.emotion.entity.Trajectory
 import   soda.tiles.emotion.entity.Transition
 import   soda.tiles.emotion.entity.Rule
-import   soda.tiles.emotion.entity.RuleSet
+import   soda.tiles.emotion.entity.RuleSeq
 
 
 
@@ -222,20 +222,20 @@ trait PartialConfiguration
 
   def   maybe_fluents : Option [FluentSet]
   def   maybe_actions : Option [ActionSet]
-  def   maybe_rules : Option [RuleSet]
+  def   maybe_rules : Option [RuleSeq]
   def   maybe_trajectory : Option [Trajectory]
 
 }
 
-case class PartialConfiguration_ (maybe_fluents : Option [FluentSet], maybe_actions : Option [ActionSet], maybe_rules : Option [RuleSet], maybe_trajectory : Option [Trajectory]) extends PartialConfiguration
+case class PartialConfiguration_ (maybe_fluents : Option [FluentSet], maybe_actions : Option [ActionSet], maybe_rules : Option [RuleSeq], maybe_trajectory : Option [Trajectory]) extends PartialConfiguration
 
 object PartialConfiguration {
-  def mk (maybe_fluents : Option [FluentSet]) (maybe_actions : Option [ActionSet]) (maybe_rules : Option [RuleSet]) (maybe_trajectory : Option [Trajectory]) : PartialConfiguration =
+  def mk (maybe_fluents : Option [FluentSet]) (maybe_actions : Option [ActionSet]) (maybe_rules : Option [RuleSeq]) (maybe_trajectory : Option [Trajectory]) : PartialConfiguration =
     PartialConfiguration_ (maybe_fluents, maybe_actions, maybe_rules, maybe_trajectory)
 }
 
 
-trait RuleSetParser
+trait RuleSeqParser
 {
 
 
@@ -270,16 +270,16 @@ trait RuleSetParser
       case otherwise => List ()
     }
 
-  def parse (a : Any) : Option [RuleSet] =
+  def parse (a : Any) : Option [RuleSeq] =
     None
 
 }
 
-case class RuleSetParser_ () extends RuleSetParser
+case class RuleSeqParser_ () extends RuleSeqParser
 
-object RuleSetParser {
-  def mk : RuleSetParser =
-    RuleSetParser_ ()
+object RuleSeqParser {
+  def mk : RuleSeqParser =
+    RuleSeqParser_ ()
 }
 
 
@@ -330,7 +330,7 @@ trait YamlParser
         PartialConfiguration .mk (
           FluentSetParser .mk .parse (s (0) ) ) (
           ActionSetParser .mk .parse (s (1) ) ) (
-          RuleSetParser .mk .parse (s (2) ) ) (
+          RuleSeqParser .mk .parse (s (2) ) ) (
           TrajectoryParser .mk .parse (s (3) )
         )
       )

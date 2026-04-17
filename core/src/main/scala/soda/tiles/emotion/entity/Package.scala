@@ -13,15 +13,15 @@ trait Configuration
 
   def   fluents : FluentSet
   def   actions : ActionSet
-  def   rules : RuleSet
+  def   rules : RuleSeq
   def   trajectory : Trajectory
 
 }
 
-case class Configuration_ (fluents : FluentSet, actions : ActionSet, rules : RuleSet, trajectory : Trajectory) extends Configuration
+case class Configuration_ (fluents : FluentSet, actions : ActionSet, rules : RuleSeq, trajectory : Trajectory) extends Configuration
 
 object Configuration {
-  def mk (fluents : FluentSet) (actions : ActionSet) (rules : RuleSet) (trajectory : Trajectory) : Configuration =
+  def mk (fluents : FluentSet) (actions : ActionSet) (rules : RuleSeq) (trajectory : Trajectory) : Configuration =
     Configuration_ (fluents, actions, rules, trajectory)
 }
 
@@ -90,9 +90,9 @@ case class ContravenesRule (input : FluentSet , action : Action) extends Rule
 case class ForbidsToCauseRule (input : FluentSet , output : FluentSet) extends Rule
 
 
-type RuleSet = Seq [Rule]
+type RuleSeq = Seq [Rule]
 
-type Context = RuleSet
+type Context = RuleSeq
 
 
 /*
@@ -134,16 +134,16 @@ object TileTriple {
 trait TileMessage [A ]
 {
 
-  def   context : RuleSet
+  def   context : RuleSeq
   def   instance : Trajectory
   def   contents : A
 
 }
 
-case class TileMessage_ [A] (context : RuleSet, instance : Trajectory, contents : A) extends TileMessage [A]
+case class TileMessage_ [A] (context : RuleSeq, instance : Trajectory, contents : A) extends TileMessage [A]
 
 object TileMessage {
-  def mk [A] (context : RuleSet) (instance : Trajectory) (contents : A) : TileMessage [A] =
+  def mk [A] (context : RuleSeq) (instance : Trajectory) (contents : A) : TileMessage [A] =
     TileMessage_ [A] (context, instance, contents)
 }
 

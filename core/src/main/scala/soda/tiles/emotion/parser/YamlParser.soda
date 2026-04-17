@@ -19,7 +19,7 @@ class YamlParser
         PartialConfiguration .mk (
           FluentSetParser .mk .parse (s (0) ) ) (
           ActionSetParser .mk .parse (s (1) ) ) (
-          RuleSetParser .mk .parse (s (2) ) ) (
+          RuleSeqParser .mk .parse (s (2) ) ) (
           TrajectoryParser .mk .parse (s (3) )
         )
       )

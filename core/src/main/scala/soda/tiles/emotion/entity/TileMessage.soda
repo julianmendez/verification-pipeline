@@ -25,7 +25,7 @@ end
 class TileMessage [A : Type]
 
   abstract
-    context : RuleSet
+    context : RuleSeq
     instance : Trajectory
     contents : A
 
