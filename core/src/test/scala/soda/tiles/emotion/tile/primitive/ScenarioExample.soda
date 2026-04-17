@@ -3,21 +3,21 @@ class ScenarioExample
 
   abstract
 
-  fluent_name_0 = "fluent0"
+  fluent_value_0 = "fluent0"
 
-  fluent_name_1 = "fluent1"
+  fluent_value_1 = "fluent1"
 
-  fluent_name_2 = "fluent2"
+  fluent_value_2 = "fluent2"
 
-  fluent_name_3 = "fluent3"
+  fluent_value_3 = "fluent3"
 
-  fluent_0 = Fluent .mk (fluent_name_0) (true)
+  fluent_0 = fluent_value_0
 
-  fluent_1 = Fluent .mk (fluent_name_1) (false)
+  fluent_1 = fluent_value_1
 
-  fluent_2 = Fluent .mk (fluent_name_2) (true)
+  fluent_2 = fluent_value_2
 
-  fluent_3 = Fluent .mk (fluent_name_3) (false)
+  fluent_3 = fluent_value_3
 
   action_0 = "action0"
 
@@ -31,13 +31,13 @@ class ScenarioExample
 
   action_set_1_2 = (Seq [Action] (action_1 , action_2) ) .toSet
 
-  fluent_set_0 = (Seq [Fluent] (fluent_0) ) .toSet
+  fluent_set_0 = (Seq [FluentValue] (fluent_0) ) .toSet
 
-  fluent_set_1 = (Seq [Fluent] (fluent_1) ) .toSet
+  fluent_set_1 = (Seq [FluentValue] (fluent_1) ) .toSet
 
-  fluent_set_2 = (Seq [Fluent] (fluent_2) ) .toSet
+  fluent_set_2 = (Seq [FluentValue] (fluent_2) ) .toSet
 
-  fluent_set_0_1 = (Seq [Fluent] (fluent_0 , fluent_1) ) .toSet
+  fluent_set_0_1 = (Seq [FluentValue] (fluent_0 , fluent_1) ) .toSet
 
   if_rule_0 = IfRule (fluent_set_0 , fluent_set_0_1)
 
@@ -49,17 +49,7 @@ class ScenarioExample
 
   context_0 = Seq [Rule] (if_rule_0 , inh_rule_0 , nc_rule_0 , nc_rule_1)
 
-  flac_0 = FluentSetType (fluent_set_0_1)
-
-  flac_1 = ActionSetType (action_set_0_1)
-
-  flac_2 = FluentSetType (fluent_set_0_1)
-
-  flac_3 = ActionSetType (action_set_1_2)
-
-  flac_4 = FluentSetType (fluent_set_0_1)
-
-  instance_0 = Seq [FluentOrActionSet] (flac_0 , flac_1 , flac_2 , flac_3 , flac_4)
+  instance_0 = Seq [IdentifierSet] (fluent_set_0_1 , action_set_0_1 , fluent_set_0_1 , action_set_1_2 , fluent_set_0_1)
 
 end
 

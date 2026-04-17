@@ -7,18 +7,17 @@ package soda.tiles.emotion.tile.primitive
 import   org.scalatest.funsuite.AnyFunSuite
 import   soda.tiles.emotion.entity.Action
 import   soda.tiles.emotion.entity.ActionSet
-import   soda.tiles.emotion.entity.ActionSetType
 import   soda.tiles.emotion.entity.AllowsRule
 import   soda.tiles.emotion.entity.CausesIfRule
 import   soda.tiles.emotion.entity.Context
 import   soda.tiles.emotion.entity.ContravenesRule
 import   soda.tiles.emotion.entity.DefaultRule
 import   soda.tiles.emotion.entity.FacilitatesRule
-import   soda.tiles.emotion.entity.Fluent
-import   soda.tiles.emotion.entity.FluentOrActionSet
 import   soda.tiles.emotion.entity.FluentSet
-import   soda.tiles.emotion.entity.FluentSetType
+import   soda.tiles.emotion.entity.FluentValue
 import   soda.tiles.emotion.entity.ForbidsToCauseRule
+import   soda.tiles.emotion.entity.Identifier
+import   soda.tiles.emotion.entity.IdentifierSet
 import   soda.tiles.emotion.entity.IfRule
 import   soda.tiles.emotion.entity.InfluencesIfRule
 import   soda.tiles.emotion.entity.InfluencesRule
@@ -26,6 +25,7 @@ import   soda.tiles.emotion.entity.InhibitsRule
 import   soda.tiles.emotion.entity.Instance
 import   soda.tiles.emotion.entity.NoConcurrencyRule
 import   soda.tiles.emotion.entity.Rule
+import   soda.tiles.emotion.entity.RuleSeq
 import   soda.tiles.emotion.entity.TileMessage
 import   soda.tiles.emotion.entity.TileMessageBuilder
 import   soda.tiles.emotion.entity.TilePair
@@ -450,21 +450,21 @@ trait ScenarioExample
 
 
 
-  lazy val fluent_name_0 = "fluent0"
+  lazy val fluent_value_0 = "fluent0"
 
-  lazy val fluent_name_1 = "fluent1"
+  lazy val fluent_value_1 = "fluent1"
 
-  lazy val fluent_name_2 = "fluent2"
+  lazy val fluent_value_2 = "fluent2"
 
-  lazy val fluent_name_3 = "fluent3"
+  lazy val fluent_value_3 = "fluent3"
 
-  lazy val fluent_0 = Fluent .mk (fluent_name_0) (true)
+  lazy val fluent_0 = fluent_value_0
 
-  lazy val fluent_1 = Fluent .mk (fluent_name_1) (false)
+  lazy val fluent_1 = fluent_value_1
 
-  lazy val fluent_2 = Fluent .mk (fluent_name_2) (true)
+  lazy val fluent_2 = fluent_value_2
 
-  lazy val fluent_3 = Fluent .mk (fluent_name_3) (false)
+  lazy val fluent_3 = fluent_value_3
 
   lazy val action_0 = "action0"
 
@@ -478,13 +478,13 @@ trait ScenarioExample
 
   lazy val action_set_1_2 = (Seq [Action] (action_1 , action_2) ) .toSet
 
-  lazy val fluent_set_0 = (Seq [Fluent] (fluent_0) ) .toSet
+  lazy val fluent_set_0 = (Seq [FluentValue] (fluent_0) ) .toSet
 
-  lazy val fluent_set_1 = (Seq [Fluent] (fluent_1) ) .toSet
+  lazy val fluent_set_1 = (Seq [FluentValue] (fluent_1) ) .toSet
 
-  lazy val fluent_set_2 = (Seq [Fluent] (fluent_2) ) .toSet
+  lazy val fluent_set_2 = (Seq [FluentValue] (fluent_2) ) .toSet
 
-  lazy val fluent_set_0_1 = (Seq [Fluent] (fluent_0 , fluent_1) ) .toSet
+  lazy val fluent_set_0_1 = (Seq [FluentValue] (fluent_0 , fluent_1) ) .toSet
 
   lazy val if_rule_0 = IfRule (fluent_set_0 , fluent_set_0_1)
 
@@ -496,17 +496,7 @@ trait ScenarioExample
 
   lazy val context_0 = Seq [Rule] (if_rule_0 , inh_rule_0 , nc_rule_0 , nc_rule_1)
 
-  lazy val flac_0 = FluentSetType (fluent_set_0_1)
-
-  lazy val flac_1 = ActionSetType (action_set_0_1)
-
-  lazy val flac_2 = FluentSetType (fluent_set_0_1)
-
-  lazy val flac_3 = ActionSetType (action_set_1_2)
-
-  lazy val flac_4 = FluentSetType (fluent_set_0_1)
-
-  lazy val instance_0 = Seq [FluentOrActionSet] (flac_0 , flac_1 , flac_2 , flac_3 , flac_4)
+  lazy val instance_0 = Seq [IdentifierSet] (fluent_set_0_1 , action_set_0_1 , fluent_set_0_1 , action_set_1_2 , fluent_set_0_1)
 
 }
 

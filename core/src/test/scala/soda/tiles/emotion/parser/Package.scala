@@ -7,21 +7,35 @@ import   java.nio.file.Paths
 import   java.io.StringReader
 import   soda.tiles.emotion.entity.Action
 import   soda.tiles.emotion.entity.ActionSet
-import   soda.tiles.emotion.entity.ActionSetType
+import   soda.tiles.emotion.entity.AllowsRule
+import   soda.tiles.emotion.entity.CausesIfRule
 import   soda.tiles.emotion.entity.Configuration
-import   soda.tiles.emotion.entity.Identifier
-import   soda.tiles.emotion.entity.Instance
-import   soda.tiles.emotion.entity.Fluent
+import   soda.tiles.emotion.entity.Context
+import   soda.tiles.emotion.entity.ContravenesRule
+import   soda.tiles.emotion.entity.DefaultRule
+import   soda.tiles.emotion.entity.FacilitatesRule
 import   soda.tiles.emotion.entity.FluentName
-import   soda.tiles.emotion.entity.FluentOrActionSet
 import   soda.tiles.emotion.entity.FluentSet
-import   soda.tiles.emotion.entity.FluentSetType
 import   soda.tiles.emotion.entity.FluentValue
+import   soda.tiles.emotion.entity.ForbidsToCauseRule
+import   soda.tiles.emotion.entity.Identifier
+import   soda.tiles.emotion.entity.IdentifierSet
+import   soda.tiles.emotion.entity.IfRule
+import   soda.tiles.emotion.entity.InfluencesIfRule
+import   soda.tiles.emotion.entity.InfluencesRule
+import   soda.tiles.emotion.entity.InhibitsRule
+import   soda.tiles.emotion.entity.Instance
+import   soda.tiles.emotion.entity.NoConcurrencyRule
+import   soda.tiles.emotion.entity.Rule
+import   soda.tiles.emotion.entity.RuleSeq
 import   soda.tiles.emotion.entity.TileMessage
+import   soda.tiles.emotion.entity.TileMessageBuilder
+import   soda.tiles.emotion.entity.TilePair
 import   soda.tiles.emotion.entity.Trajectory
 import   soda.tiles.emotion.entity.Transition
-import   soda.tiles.emotion.entity.Rule
-import   soda.tiles.emotion.entity.RuleSet
+import   soda.tiles.emotion.entity.TriggersRule
+
+
 
 trait Example1Instance
 {
@@ -46,7 +60,7 @@ trait Example1Instance
      )
 
   lazy val actions : ActionSet =
-    Seq [Action] (
+    Set [Action] (
       "perceive_threat",
       "receive_support",
       "achieve_goal",
@@ -54,13 +68,13 @@ trait Example1Instance
       "no_action"
     )
 
-  lazy val rules : RuleSet = Seq [Rule] (
+  lazy val rules : RuleSeq = Seq [Rule] (
     CausesIfRule (
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "goal_undecided"
       ) ,
       "perceive_threat" ,
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "goal_high" ,
         "need_high" ,
         "account_environment" ,
@@ -68,11 +82,11 @@ trait Example1Instance
       )
     ) ,
     CausesIfRule (
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "goal_undecided"
       ) ,
       "perceive_threat" ,
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "goal_high" ,
         "need_high" ,
         "account_environment" ,
@@ -80,33 +94,33 @@ trait Example1Instance
       )
     ) ,
     CausesIfRule (
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "need_high"
       ) ,
       "receive_support" ,
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "need_low" ,
         "account_other" ,
         "control_high"
       )
     ) ,
     CausesIfRule (
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "goal_high"
       ) ,
       "achieve_goal" ,
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "need_low" ,
         "account_self" ,
         "control_high"
       )
     ) ,
     CausesIfRule (
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "goal_high"
       ) ,
       "make_error" ,
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "need_high" ,
         "goal_low" ,
         "account_self" ,
@@ -114,112 +128,112 @@ trait Example1Instance
       )
     ) ,
     FacilitatesRule (
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "control_high"
       ) ,
       "achieve_goal"
     ) ,
     InhibitsRule (
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "control_low"
       ) ,
       "achieve_goal"
     ) ,
     ContravenesRule (
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "account_environment"
       ) ,
       "achieve_goal"
     ) ,
     CausesIfRule (
-      Seq [FluentValue] () ,
+      Set [FluentValue] () ,
       "no_action" ,
-      Seq [FluentValue] ()
+      Set [FluentValue] ()
     ) ,
     IfRule (
-      Seq [FluentValue] () ,
-      Seq [FluentValue] ()
+      Set [FluentValue] () ,
+      Set [FluentValue] ()
     ) ,
     TriggersRule (
-      Seq [FluentValue] () ,
+      Set [FluentValue] () ,
       "no_action"
     ) ,
     AllowsRule (
-      Seq [FluentValue] () ,
+      Set [FluentValue] () ,
       "no_action"
     ) ,
     InhibitsRule (
-      Seq [FluentValue] () ,
+      Set [FluentValue] () ,
       "no_action"
     ) ,
     NoConcurrencyRule (
-      Seq [Action] ()
+      Set [Action] ()
     ) ,
     DefaultRule (
       "goal_undecided"
     ) ,
     InfluencesIfRule (
-      Seq [FluentValue] () ,
+      Set [FluentValue] () ,
       "no_action" ,
-      Seq [FluentValue] ()
+      Set [FluentValue] ()
     ) ,
     InfluencesRule (
-      Seq [FluentValue] () ,
-      Seq [FluentValue] ()
+      Set [FluentValue] () ,
+      Set [FluentValue] ()
     ) ,
     FacilitatesRule (
-      Seq [FluentValue] () ,
+      Set [FluentValue] () ,
       "no_action"
     ) ,
     ContravenesRule (
-      Seq [FluentValue] () ,
+      Set [FluentValue] () ,
       "no_action"
     ) ,
     ForbidsToCauseRule (
-      Seq [FluentValue] () ,
-      Seq [FluentValue] ()
+      Set [FluentValue] () ,
+      Set [FluentValue] ()
     )
   )
 
   lazy val trajectory : Seq [IdentifierSet] =
     Seq [IdentifierSet] (
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "need_undecided" ,
         "goal_undecided" ,
         "account_undecided" ,
         "control_undecided"
       ) ,
-      Seq [Action] (
+      Set [Action] (
         "perceive_threat"
       ) ,
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "need_high" ,
         "goal_high" ,
         "account_environment" ,
         "control_low"
       ) ,
-      Seq [Action] (
+      Set [Action] (
         "receive_support"
       ) ,
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "need_low" ,
         "goal_high" ,
         "account_other" ,
         "control_high"
       ) ,
-      Seq [Action] (
+      Set [Action] (
         "achieve_goal"
       ) ,
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "need_low" ,
         "goal_high" ,
         "account_self" ,
         "control_high"
       ) ,
-      Seq [Action] (
+      Set [Action] (
         "make_error"
       ) ,
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "need_high" ,
         "goal_low" ,
         "account_self" ,
@@ -267,117 +281,118 @@ trait Example2Instance
       "commitment" ,
       "justification" ,
       "challenge"
-    )
+    ) .toSet
 
-  lazy val rules : Seq [Rule] = Seq [Rule] (
+  lazy val rules : RuleSeq = Seq [Rule] (
     InfluencesIfRule (
       Seq [FluentValue] (
         "goal_low"
-      ) ,
+      ) .toSet ,
       "commitment" ,
       Seq [FluentValue] (
         "goal_high"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "account_other"
-      ) ,
+      ) .toSet ,
       "commitment" ,
       Seq [FluentValue] (
         "account_self"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "need_high"
-      ) ,
+      ) .toSet ,
       "endorsement" ,
       Seq [FluentValue] (
         "need_undecided"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "control_high"
-      ) ,
+      ) .toSet ,
       "endorsement" ,
       Seq [FluentValue] (
         "control_undecided"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "account_self"
-      ) ,
+      ) .toSet ,
       "justification" ,
       Seq [FluentValue] (
         "account_environment"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "control_undecided"
-      ) ,
+      ) .toSet ,
       "justification" ,
       Seq [FluentValue] (
         "control_low"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "account_environment"
-      ) ,
+      ) .toSet ,
       "attribution" ,
       Seq [FluentValue] (
         "account_self"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "control_low"
-      ) ,
+      ) .toSet ,
       "attribution" ,
       Seq [FluentValue] (
         "control_undecided"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "account_self"
-      ) ,
+      ) .toSet ,
       "challenge" ,
       Seq [FluentValue] (
         "account_environment"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "control_undecided"
-      ) ,
+      ) .toSet ,
       "challenge" ,
       Seq [FluentValue] (
         "control_low"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "need_undecided"
-      ) ,
+      ) .toSet ,
       "affirmation" ,
       Seq [FluentValue] (
         "need_high"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "control_low"
-      ) ,
+      ) .toSet ,
       "affirmation" ,
       Seq [FluentValue] (
         "control_undecided"
-      )
+      ) .toSet
     )
+  )
 
 lazy val trajectory : Seq [IdentifierSet] =
   Seq [IdentifierSet] (
@@ -386,61 +401,61 @@ lazy val trajectory : Seq [IdentifierSet] =
       "goal_low" ,
       "account_other" ,
       "control_high"
-    ) ,
+    ) .toSet ,
     Seq [Action] (
       "commitment"
-    ) ,
+    ) .toSet ,
     Seq [FluentValue] (
       "need_high" ,
       "goal_high" ,
       "account_self" ,
       "control_high"
-    ) ,
+    ) .toSet ,
     Seq [Action] (
       "endorsement"
-    ) ,
+    ) .toSet ,
     Seq [FluentValue] (
       "need_undecided" ,
       "goal_high" ,
       "account_self" ,
       "control_undecided"
-    ) ,
+    ) .toSet ,
     Seq [Action] (
       "justification"
-    ) ,
+    ) .toSet ,
     Seq [FluentValue] (
       "need_undecided" ,
       "goal_high" ,
       "account_environment" ,
       "control_low"
-    ) ,
+    ) .toSet ,
     Seq [Action] (
       "attribution"
-    ) ,
+    ) .toSet ,
     Seq [FluentValue] (
       "need_undecided" ,
       "goal_high" ,
       "account_self" ,
       "control_undecided"
-    ) ,
+    ) .toSet ,
     Seq [Action] (
       "challenge"
-    ) ,
+    ) .toSet ,
     Seq [FluentValue] (
       "need_undecided" ,
       "goal_high" ,
       "account_environment" ,
       "control_low"
-    ) ,
+    ) .toSet ,
     Seq [Action] (
       "affirmation"
-    ) ,
+    ) .toSet ,
     Seq [FluentValue] (
       "need_high" ,
       "goal_high" ,
       "account_environment" ,
       "control_undecided"
-    )
+    ) .toSet
   )
 
 }

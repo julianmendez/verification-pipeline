@@ -28,117 +28,118 @@ class Example2Instance
       "commitment" ,
       "justification" ,
       "challenge"
-    )
+    ) .toSet
 
-  rules : Seq [Rule] = Seq [Rule] (
+  rules : RuleSeq = Seq [Rule] (
     InfluencesIfRule (
       Seq [FluentValue] (
         "goal_low"
-      ) ,
+      ) .toSet ,
       "commitment" ,
       Seq [FluentValue] (
         "goal_high"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "account_other"
-      ) ,
+      ) .toSet ,
       "commitment" ,
       Seq [FluentValue] (
         "account_self"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "need_high"
-      ) ,
+      ) .toSet ,
       "endorsement" ,
       Seq [FluentValue] (
         "need_undecided"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "control_high"
-      ) ,
+      ) .toSet ,
       "endorsement" ,
       Seq [FluentValue] (
         "control_undecided"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "account_self"
-      ) ,
+      ) .toSet ,
       "justification" ,
       Seq [FluentValue] (
         "account_environment"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "control_undecided"
-      ) ,
+      ) .toSet ,
       "justification" ,
       Seq [FluentValue] (
         "control_low"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "account_environment"
-      ) ,
+      ) .toSet ,
       "attribution" ,
       Seq [FluentValue] (
         "account_self"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "control_low"
-      ) ,
+      ) .toSet ,
       "attribution" ,
       Seq [FluentValue] (
         "control_undecided"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "account_self"
-      ) ,
+      ) .toSet ,
       "challenge" ,
       Seq [FluentValue] (
         "account_environment"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "control_undecided"
-      ) ,
+      ) .toSet ,
       "challenge" ,
       Seq [FluentValue] (
         "control_low"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "need_undecided"
-      ) ,
+      ) .toSet ,
       "affirmation" ,
       Seq [FluentValue] (
         "need_high"
-      )
+      ) .toSet
     ) ,
     InfluencesIfRule (
       Seq [FluentValue] (
         "control_low"
-      ) ,
+      ) .toSet ,
       "affirmation" ,
       Seq [FluentValue] (
         "control_undecided"
-      )
+      ) .toSet
     )
+  )
 
 trajectory : Seq [IdentifierSet] =
   Seq [IdentifierSet] (
@@ -147,61 +148,61 @@ trajectory : Seq [IdentifierSet] =
       "goal_low" ,
       "account_other" ,
       "control_high"
-    ) ,
+    ) .toSet ,
     Seq [Action] (
       "commitment"
-    ) ,
+    ) .toSet ,
     Seq [FluentValue] (
       "need_high" ,
       "goal_high" ,
       "account_self" ,
       "control_high"
-    ) ,
+    ) .toSet ,
     Seq [Action] (
       "endorsement"
-    ) ,
+    ) .toSet ,
     Seq [FluentValue] (
       "need_undecided" ,
       "goal_high" ,
       "account_self" ,
       "control_undecided"
-    ) ,
+    ) .toSet ,
     Seq [Action] (
       "justification"
-    ) ,
+    ) .toSet ,
     Seq [FluentValue] (
       "need_undecided" ,
       "goal_high" ,
       "account_environment" ,
       "control_low"
-    ) ,
+    ) .toSet ,
     Seq [Action] (
       "attribution"
-    ) ,
+    ) .toSet ,
     Seq [FluentValue] (
       "need_undecided" ,
       "goal_high" ,
       "account_self" ,
       "control_undecided"
-    ) ,
+    ) .toSet ,
     Seq [Action] (
       "challenge"
-    ) ,
+    ) .toSet ,
     Seq [FluentValue] (
       "need_undecided" ,
       "goal_high" ,
       "account_environment" ,
       "control_low"
-    ) ,
+    ) .toSet ,
     Seq [Action] (
       "affirmation"
-    ) ,
+    ) .toSet ,
     Seq [FluentValue] (
       "need_high" ,
       "goal_high" ,
       "account_environment" ,
       "control_undecided"
-    )
+    ) .toSet
   )
 
 end

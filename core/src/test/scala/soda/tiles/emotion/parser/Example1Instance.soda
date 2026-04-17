@@ -21,7 +21,7 @@ class Example1Instance
      )
 
   actions : ActionSet =
-    Seq [Action] (
+    Set [Action] (
       "perceive_threat",
       "receive_support",
       "achieve_goal",
@@ -29,13 +29,13 @@ class Example1Instance
       "no_action"
     )
 
-  rules : RuleSet = Seq [Rule] (
+  rules : RuleSeq = Seq [Rule] (
     CausesIfRule (
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "goal_undecided"
       ) ,
       "perceive_threat" ,
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "goal_high" ,
         "need_high" ,
         "account_environment" ,
@@ -43,11 +43,11 @@ class Example1Instance
       )
     ) ,
     CausesIfRule (
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "goal_undecided"
       ) ,
       "perceive_threat" ,
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "goal_high" ,
         "need_high" ,
         "account_environment" ,
@@ -55,33 +55,33 @@ class Example1Instance
       )
     ) ,
     CausesIfRule (
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "need_high"
       ) ,
       "receive_support" ,
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "need_low" ,
         "account_other" ,
         "control_high"
       )
     ) ,
     CausesIfRule (
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "goal_high"
       ) ,
       "achieve_goal" ,
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "need_low" ,
         "account_self" ,
         "control_high"
       )
     ) ,
     CausesIfRule (
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "goal_high"
       ) ,
       "make_error" ,
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "need_high" ,
         "goal_low" ,
         "account_self" ,
@@ -89,112 +89,112 @@ class Example1Instance
       )
     ) ,
     FacilitatesRule (
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "control_high"
       ) ,
       "achieve_goal"
     ) ,
     InhibitsRule (
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "control_low"
       ) ,
       "achieve_goal"
     ) ,
     ContravenesRule (
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "account_environment"
       ) ,
       "achieve_goal"
     ) ,
     CausesIfRule (
-      Seq [FluentValue] () ,
+      Set [FluentValue] () ,
       "no_action" ,
-      Seq [FluentValue] ()
+      Set [FluentValue] ()
     ) ,
     IfRule (
-      Seq [FluentValue] () ,
-      Seq [FluentValue] ()
+      Set [FluentValue] () ,
+      Set [FluentValue] ()
     ) ,
     TriggersRule (
-      Seq [FluentValue] () ,
+      Set [FluentValue] () ,
       "no_action"
     ) ,
     AllowsRule (
-      Seq [FluentValue] () ,
+      Set [FluentValue] () ,
       "no_action"
     ) ,
     InhibitsRule (
-      Seq [FluentValue] () ,
+      Set [FluentValue] () ,
       "no_action"
     ) ,
     NoConcurrencyRule (
-      Seq [Action] ()
+      Set [Action] ()
     ) ,
     DefaultRule (
       "goal_undecided"
     ) ,
     InfluencesIfRule (
-      Seq [FluentValue] () ,
+      Set [FluentValue] () ,
       "no_action" ,
-      Seq [FluentValue] ()
+      Set [FluentValue] ()
     ) ,
     InfluencesRule (
-      Seq [FluentValue] () ,
-      Seq [FluentValue] ()
+      Set [FluentValue] () ,
+      Set [FluentValue] ()
     ) ,
     FacilitatesRule (
-      Seq [FluentValue] () ,
+      Set [FluentValue] () ,
       "no_action"
     ) ,
     ContravenesRule (
-      Seq [FluentValue] () ,
+      Set [FluentValue] () ,
       "no_action"
     ) ,
     ForbidsToCauseRule (
-      Seq [FluentValue] () ,
-      Seq [FluentValue] ()
+      Set [FluentValue] () ,
+      Set [FluentValue] ()
     )
   )
 
   trajectory : Seq [IdentifierSet] =
     Seq [IdentifierSet] (
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "need_undecided" ,
         "goal_undecided" ,
         "account_undecided" ,
         "control_undecided"
       ) ,
-      Seq [Action] (
+      Set [Action] (
         "perceive_threat"
       ) ,
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "need_high" ,
         "goal_high" ,
         "account_environment" ,
         "control_low"
       ) ,
-      Seq [Action] (
+      Set [Action] (
         "receive_support"
       ) ,
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "need_low" ,
         "goal_high" ,
         "account_other" ,
         "control_high"
       ) ,
-      Seq [Action] (
+      Set [Action] (
         "achieve_goal"
       ) ,
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "need_low" ,
         "goal_high" ,
         "account_self" ,
         "control_high"
       ) ,
-      Seq [Action] (
+      Set [Action] (
         "make_error"
       ) ,
-      Seq [FluentValue] (
+      Set [FluentValue] (
         "need_high" ,
         "goal_low" ,
         "account_self" ,
