@@ -2,15 +2,11 @@ package soda.tiles.emotion.parser
 
 import   soda.tiles.emotion.entity.Action
 import   soda.tiles.emotion.entity.ActionSet
-import   soda.tiles.emotion.entity.ActionSetType
 import   soda.tiles.emotion.entity.Configuration
 import   soda.tiles.emotion.entity.Identifier
 import   soda.tiles.emotion.entity.Instance
-import   soda.tiles.emotion.entity.Fluent
 import   soda.tiles.emotion.entity.FluentName
-import   soda.tiles.emotion.entity.FluentOrActionSet
 import   soda.tiles.emotion.entity.FluentSet
-import   soda.tiles.emotion.entity.FluentSetType
 import   soda.tiles.emotion.entity.FluentValue
 import   soda.tiles.emotion.entity.TileMessage
 import   soda.tiles.emotion.entity.Trajectory

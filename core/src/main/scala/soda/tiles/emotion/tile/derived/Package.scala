@@ -7,17 +7,15 @@ package soda.tiles.emotion.tile.derived
 import   soda.lib.Fold
 import   soda.tiles.emotion.entity.Action
 import   soda.tiles.emotion.entity.ActionSet
-import   soda.tiles.emotion.entity.ActionSetType
 import   soda.tiles.emotion.entity.AllowsRule
 import   soda.tiles.emotion.entity.CausesIfRule
 import   soda.tiles.emotion.entity.ContravenesRule
 import   soda.tiles.emotion.entity.DefaultRule
 import   soda.tiles.emotion.entity.FacilitatesRule
-import   soda.tiles.emotion.entity.Fluent
-import   soda.tiles.emotion.entity.FluentOrActionSet
 import   soda.tiles.emotion.entity.FluentSet
-import   soda.tiles.emotion.entity.FluentSetType
+import   soda.tiles.emotion.entity.FluentValue
 import   soda.tiles.emotion.entity.ForbidsToCauseRule
+import   soda.tiles.emotion.entity.IdentifierSet
 import   soda.tiles.emotion.entity.IfRule
 import   soda.tiles.emotion.entity.InfluencesIfRule
 import   soda.tiles.emotion.entity.InfluencesRule
@@ -91,37 +89,25 @@ trait TransitionBuilder
 
   lazy val fold = Fold .mk
 
-  private def _process_input_state (sw : SlidingWindow) (elem : FluentOrActionSet) : SlidingWindow =
-    elem match  {
-      case FluentSetType (s0) => SlidingWindow .mk (sw .defined) (Some (s0) ) (sw .a) (sw .s1) (sw .accum)
-      case ActionSetType (a) => SlidingWindow .mk (false) (sw .s0) (sw .a) (sw .s1) (sw .accum)
-    }
+  private def _process_output_state (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
+    if ( (sw .s1 .isEmpty)
+    ) SlidingWindow .mk (sw .defined) (sw .s0) (sw .a) (Some (elem) ) (sw .accum)
+    else SlidingWindow .mk (false) (sw .s0) (sw .a) (sw .s1) (sw .accum)
 
-  private def _process_action (sw : SlidingWindow) (elem : FluentOrActionSet) : SlidingWindow =
-    elem match  {
-      case ActionSetType (a) => SlidingWindow .mk (sw .defined) (sw .s0) (Some (a) ) (sw .s1) (sw .accum)
-      case FluentSetType (s) => SlidingWindow .mk (false) (sw .s0) (sw .a) (sw .s1) (sw .accum)
-    }
+  private def _process_action (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
+    if ( (sw .a .isEmpty)
+    ) SlidingWindow .mk (sw .defined) (sw .s0) (Some (elem) ) (sw .s1) (sw .accum)
+    else _process_output_state (sw) (elem)
 
-  private def _process_output_state (sw : SlidingWindow) (elem : FluentOrActionSet) : SlidingWindow =
-    elem match  {
-      case FluentSetType (s1) => SlidingWindow .mk (sw .defined) (sw .s0) (sw .a) (Some (s1) ) (sw .accum)
-      case ActionSetType (a) => SlidingWindow .mk (false) (sw .s0) (sw .a) (sw .s1) (sw .accum)
-    }
+  private def _process_input_state (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
+    if ( (sw .s0 .isEmpty)
+    ) SlidingWindow .mk (sw .defined) (Some (elem) ) (sw .a) (sw .s1) (sw .accum)
+    else _process_action (sw) (elem)
 
-  private def _process_window (sw : SlidingWindow) (elem : FluentOrActionSet) : SlidingWindow =
+  private def _process_window (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
     if ( (! (sw .defined) )
     ) sw
-    else
-      if ( (sw .s0 .isEmpty)
-      ) _process_input_state (sw) (elem)
-      else
-        if ( (sw .a .isEmpty)
-        ) _process_action (sw) (elem)
-        else
-          if ( (sw .s1 .isEmpty)
-          ) _process_output_state (sw) (elem)
-          else SlidingWindow .mk (false) (sw .s0) (sw .a) (sw .s1) (sw .accum)
+    else _process_input_state (sw) (elem)
 
   private lazy val _empty_sliding_window : SlidingWindow =
     SlidingWindow .mk (true) (None) (None) (None) (Seq [Transition] () )
@@ -131,7 +117,7 @@ trait TransitionBuilder
     ) Some (sw .accum)
     else None
 
-  def make_instants (seq : Seq [FluentOrActionSet] ) : Option [Seq [Transition] ] =
+  def make_instants (seq : Seq [IdentifierSet] ) : Option [Seq [Transition] ] =
     _postprocess (
       fold (seq) (_empty_sliding_window) (_process_window)
     )
@@ -200,7 +186,7 @@ trait Verifier
   def verifyNoConcurrencyRule (transition : Transition) (actions : ActionSet) : Boolean =
     (actions .intersect (transition .actions) .toList .length) <= 1
 
-  def verifyDefaultRule (transition : Transition) (fluent : Fluent) : Boolean =
+  def verifyDefaultRule (transition : Transition) (fluent : FluentValue) : Boolean =
     transition .input .contains (fluent)
 
   def verifyForbidsToCauseRule (transition : Transition) (input : FluentSet) (output : FluentSet) : Boolean =

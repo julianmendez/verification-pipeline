@@ -51,7 +51,7 @@ class Verifier
   verifyNoConcurrencyRule (transition : Transition) (actions : ActionSet) : Boolean =
     (actions .intersect (transition .actions) .toList .length) <= 1
 
-  verifyDefaultRule (transition : Transition) (fluent : Fluent) : Boolean =
+  verifyDefaultRule (transition : Transition) (fluent : FluentValue) : Boolean =
     transition .input .contains (fluent)
 
   verifyForbidsToCauseRule (transition : Transition) (input : FluentSet) (output : FluentSet) : Boolean =

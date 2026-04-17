@@ -28,37 +28,17 @@ object Configuration {
 
 type Identifier = String
 
-type Action = Identifier
+type IdentifierSet = Set [Identifier]
 
 type FluentName = Identifier
 
-type FluentValue = Boolean
+type FluentValue = Identifier
 
-trait Fluent
-{
+type FluentSet = IdentifierSet
 
-  def   name : FluentName
-  def   value : FluentValue
+type Action = Identifier
 
-}
-
-case class Fluent_ (name : FluentName, value : FluentValue) extends Fluent
-
-object Fluent {
-  def mk (name : FluentName) (value : FluentValue) : Fluent =
-    Fluent_ (name, value)
-}
-
-type FluentSet = Set [Fluent]
-
-type ActionSet = Set [Action]
-
-sealed trait FluentOrActionSet
-
-case class FluentSetType (fluent_set : FluentSet) extends FluentOrActionSet
-
-case class ActionSetType (action_set : ActionSet) extends FluentOrActionSet
-
+type ActionSet = IdentifierSet
 
 trait Transition
 {
@@ -76,7 +56,7 @@ object Transition {
     Transition_ (input, actions, output)
 }
 
-type Trajectory = Seq [FluentOrActionSet]
+type Trajectory = Seq [IdentifierSet]
 
 type Instance = Trajectory
 
@@ -95,9 +75,9 @@ case class AllowsRule (input : FluentSet , action : Action) extends Rule
 
 case class InhibitsRule (input : FluentSet , action : Action) extends Rule
 
-case class NoConcurrencyRule (action : ActionSet) extends Rule
+case class NoConcurrencyRule (actions : ActionSet) extends Rule
 
-case class DefaultRule (input : Fluent) extends Rule
+case class DefaultRule (fluent : FluentValue) extends Rule
 
 case class InfluencesIfRule (input : FluentSet , action : Action , output : FluentSet) extends Rule
 
