@@ -1,19 +1,22 @@
-package soda.tiles.emotion.tile.primitive
 
-/*
- * This package contains tests for the primitive tiles.
- */
+package soda.tiles.emotion.parser
 
 import
   org.scalatest.funsuite.AnyFunSuite
+  org.scalatest.Assertion
+  java.nio.file.Files
+  java.nio.file.Paths
+  java.io.StringReader
   soda.tiles.emotion.entity.Action
   soda.tiles.emotion.entity.ActionSet
   soda.tiles.emotion.entity.AllowsRule
   soda.tiles.emotion.entity.CausesIfRule
+  soda.tiles.emotion.entity.Configuration
   soda.tiles.emotion.entity.Context
   soda.tiles.emotion.entity.ContravenesRule
   soda.tiles.emotion.entity.DefaultRule
   soda.tiles.emotion.entity.FacilitatesRule
+  soda.tiles.emotion.entity.FluentName
   soda.tiles.emotion.entity.FluentSet
   soda.tiles.emotion.entity.FluentValue
   soda.tiles.emotion.entity.ForbidsToCauseRule
@@ -31,4 +34,5 @@ import
   soda.tiles.emotion.entity.TileMessageBuilder
   soda.tiles.emotion.entity.TilePair
   soda.tiles.emotion.entity.Trajectory
+  soda.tiles.emotion.entity.Transition
   soda.tiles.emotion.entity.TriggersRule

@@ -1,0 +1,9 @@
+
+class ConfigurationParser
+
+  abstract
+
+  parse (a : Any) : Option [Configuration] =
+    None
+
+end

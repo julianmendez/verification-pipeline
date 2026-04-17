@@ -52,6 +52,12 @@ lazy val core =
     .in(file("core"))
     .settings(
       commonSettings,
+      /**
+       * YAML 1.2 parser
+       * [[https://bitbucket.org/asomov/snakeyaml-engine]]
+       * [[https://repo1.maven.org/maven2/org/snakeyaml/snakeyaml-engine/]]
+       */
+      libraryDependencies += "org.snakeyaml" % "snakeyaml-engine" % "2.8",
       assembly / assemblyJarName := "core-" + version.value + ".jar"
     )
 

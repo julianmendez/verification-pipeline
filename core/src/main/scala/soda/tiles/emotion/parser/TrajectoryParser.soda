@@ -1,0 +1,16 @@
+
+class TrajectoryParser
+
+  abstract
+
+  identifier = "trajectory"
+
+  parse_trajectory (part : Any) : List [Any] =
+    match part
+      case p : Seq [Any] ==> p .toList
+      case otherwise ==> List ()
+
+  parse (a : Any) : Option [Trajectory] =
+    None
+
+end

@@ -18,34 +18,25 @@ class TransitionBuilder
 
   fold = Fold .mk
 
-  _process_input_state (sw : SlidingWindow) (elem : FluentOrActionSet) : SlidingWindow =
-    match elem
-      case FluentSetType (s0) ==> SlidingWindow .mk (sw .defined) (Some (s0) ) (sw .a) (sw .s1) (sw .accum)
-      case ActionSetType (a) ==> SlidingWindow .mk (false) (sw .s0) (sw .a) (sw .s1) (sw .accum)
+  _process_output_state (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
+    if (sw .s1 .isEmpty)
+    then SlidingWindow .mk (sw .defined) (sw .s0) (sw .a) (Some (elem) ) (sw .accum)
+    else SlidingWindow .mk (false) (sw .s0) (sw .a) (sw .s1) (sw .accum)
 
-  _process_action (sw : SlidingWindow) (elem : FluentOrActionSet) : SlidingWindow =
-    match elem
-      case ActionSetType (a) ==> SlidingWindow .mk (sw .defined) (sw .s0) (Some (a) ) (sw .s1) (sw .accum)
-      case FluentSetType (s) ==> SlidingWindow .mk (false) (sw .s0) (sw .a) (sw .s1) (sw .accum)
+  _process_action (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
+    if (sw .a .isEmpty)
+    then SlidingWindow .mk (sw .defined) (sw .s0) (Some (elem) ) (sw .s1) (sw .accum)
+    else _process_output_state (sw) (elem)
 
-  _process_output_state (sw : SlidingWindow) (elem : FluentOrActionSet) : SlidingWindow =
-    match elem
-      case FluentSetType (s1) ==> SlidingWindow .mk (sw .defined) (sw .s0) (sw .a) (Some (s1) ) (sw .accum)
-      case ActionSetType (a) ==> SlidingWindow .mk (false) (sw .s0) (sw .a) (sw .s1) (sw .accum)
+  _process_input_state (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
+    if (sw .s0 .isEmpty)
+    then SlidingWindow .mk (sw .defined) (Some (elem) ) (sw .a) (sw .s1) (sw .accum)
+    else _process_action (sw) (elem)
 
-  _process_window (sw : SlidingWindow) (elem : FluentOrActionSet) : SlidingWindow =
+  _process_window (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
     if (not (sw .defined) )
     then sw
-    else
-      if (sw .s0 .isEmpty)
-      then _process_input_state (sw) (elem)
-      else
-        if (sw .a .isEmpty)
-        then _process_action (sw) (elem)
-        else
-          if (sw .s1 .isEmpty)
-          then _process_output_state (sw) (elem)
-          else SlidingWindow .mk (false) (sw .s0) (sw .a) (sw .s1) (sw .accum)
+    else _process_input_state (sw) (elem)
 
   _empty_sliding_window : SlidingWindow =
     SlidingWindow .mk (true) (None) (None) (None) (Seq [Transition] () )
@@ -55,7 +46,7 @@ class TransitionBuilder
     then Some (sw .accum)
     else None
 
-  make_instants (seq : Seq [FluentOrActionSet] ) : Option [Seq [Transition] ] =
+  make_instants (seq : Seq [IdentifierSet] ) : Option [Seq [Transition] ] =
     _postprocess (
       fold (seq) (_empty_sliding_window) (_process_window)
     )

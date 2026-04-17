@@ -1,0 +1,23 @@
+
+class FluentSetParser
+
+  abstract
+
+  import
+    scala.jdk.CollectionConverters.CollectionHasAsScala
+    scala.jdk.CollectionConverters.IteratorHasAsScala
+    scala.jdk.CollectionConverters.MapHasAsScala
+
+  identifier = "fluents"
+
+  parse_fluents (part : Any) : List [Tuple2 [String] [List [String] ] ] =
+    match part
+      case p : java.util.Map [Any] [Any] ==>
+        p .asScala .toSeq .flatMap (lambda kv --> ListParser .mk .parse_named_list (kv) ) .toList
+      case otherwise ==> List()
+
+  parse (a : Any) : Option [FluentSet] =
+    None
+
+end
+
