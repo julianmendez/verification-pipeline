@@ -473,3 +473,55 @@ object Example2Instance {
     Example2Instance_ ()
 }
 
+
+case class YamlParserSpec ()
+  extends
+    AnyFunSuite
+{
+
+  def check [A ] (obtained : A) (expected : A) : org.scalatest.compatible.Assertion =
+    assert (obtained == expected)
+
+  def read_file (file_name : String) : String =
+    new String (
+      Files .readAllBytes (
+        Paths .get (getClass .getResource (file_name) .toURI)
+      )
+    )
+
+  lazy val parser = YamlParser .mk
+
+  lazy val example1_name = "/example/example-1.yaml"
+
+  lazy val example1_contents = read_file (example1_name)
+
+  lazy val example1_parsed_instance = parser .parse ( new StringReader (example1_contents) )
+
+  lazy val example1_instance = Example1Instance .mk .instance
+
+  lazy val example2_name = "/example/example-2.yaml"
+
+  lazy val example2_contents = read_file (example2_name)
+
+  lazy val example2_parsed_instance = parser .parse ( new StringReader (example2_contents) )
+
+  lazy val example2_instance = Example2Instance .mk .instance
+
+  test ("TO DO - read example 1") (
+    check (
+      obtained = example1_instance
+    ) (
+      expected = example1_instance
+    )
+  )
+
+  test ("TO DO - read example 2") (
+    check (
+      obtained = example2_instance
+    ) (
+      expected = example2_instance
+    )
+  )
+
+}
+
