@@ -7,6 +7,7 @@ import
   soda.tiles.emotion.entity.Configuration
   soda.tiles.emotion.entity.Identifier
   soda.tiles.emotion.entity.Instance
+  soda.tiles.emotion.entity.FluentMap
   soda.tiles.emotion.entity.FluentName
   soda.tiles.emotion.entity.FluentSet
   soda.tiles.emotion.entity.FluentValue

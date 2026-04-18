@@ -5,6 +5,7 @@ import   soda.tiles.emotion.entity.ActionSet
 import   soda.tiles.emotion.entity.Configuration
 import   soda.tiles.emotion.entity.Identifier
 import   soda.tiles.emotion.entity.Instance
+import   soda.tiles.emotion.entity.FluentMap
 import   soda.tiles.emotion.entity.FluentName
 import   soda.tiles.emotion.entity.FluentSet
 import   soda.tiles.emotion.entity.FluentValue
@@ -60,7 +61,7 @@ object ConfigurationParser {
 }
 
 
-trait FluentSetParser
+trait FluentMapParser
 {
 
 
@@ -78,16 +79,16 @@ trait FluentSetParser
       case otherwise => List()
     }
 
-  def parse (a : Any) : Option [FluentSet] =
+  def parse (a : Any) : Option [FluentMap] =
     None
 
 }
 
-case class FluentSetParser_ () extends FluentSetParser
+case class FluentMapParser_ () extends FluentMapParser
 
-object FluentSetParser {
-  def mk : FluentSetParser =
-    FluentSetParser_ ()
+object FluentMapParser {
+  def mk : FluentMapParser =
+    FluentMapParser_ ()
 }
 
 
@@ -220,17 +221,17 @@ object ListParser {
 trait PartialConfiguration
 {
 
-  def   maybe_fluents : Option [FluentSet]
+  def   maybe_fluents : Option [FluentMap]
   def   maybe_actions : Option [ActionSet]
   def   maybe_rules : Option [RuleSeq]
   def   maybe_trajectory : Option [Trajectory]
 
 }
 
-case class PartialConfiguration_ (maybe_fluents : Option [FluentSet], maybe_actions : Option [ActionSet], maybe_rules : Option [RuleSeq], maybe_trajectory : Option [Trajectory]) extends PartialConfiguration
+case class PartialConfiguration_ (maybe_fluents : Option [FluentMap], maybe_actions : Option [ActionSet], maybe_rules : Option [RuleSeq], maybe_trajectory : Option [Trajectory]) extends PartialConfiguration
 
 object PartialConfiguration {
-  def mk (maybe_fluents : Option [FluentSet]) (maybe_actions : Option [ActionSet]) (maybe_rules : Option [RuleSeq]) (maybe_trajectory : Option [Trajectory]) : PartialConfiguration =
+  def mk (maybe_fluents : Option [FluentMap]) (maybe_actions : Option [ActionSet]) (maybe_rules : Option [RuleSeq]) (maybe_trajectory : Option [Trajectory]) : PartialConfiguration =
     PartialConfiguration_ (maybe_fluents, maybe_actions, maybe_rules, maybe_trajectory)
 }
 
@@ -328,7 +329,7 @@ trait YamlParser
     )
       Some (
         PartialConfiguration .mk (
-          FluentSetParser .mk .parse (s (0) ) ) (
+          FluentMapParser .mk .parse (s (0) ) ) (
           ActionSetParser .mk .parse (s (1) ) ) (
           RuleSeqParser .mk .parse (s (2) ) ) (
           TrajectoryParser .mk .parse (s (3) )

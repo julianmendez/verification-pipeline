@@ -2,7 +2,7 @@
 class Configuration
 
   abstract
-    fluents : FluentSet
+    fluents : FluentMap
     actions : ActionSet
     rules : RuleSeq
     trajectory : Trajectory

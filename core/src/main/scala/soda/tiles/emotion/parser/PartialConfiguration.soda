@@ -2,7 +2,7 @@
 class PartialConfiguration
 
   abstract
-    maybe_fluents : Option [FluentSet]
+    maybe_fluents : Option [FluentMap]
     maybe_actions : Option [ActionSet]
     maybe_rules : Option [RuleSeq]
     maybe_trajectory : Option [Trajectory]

@@ -11,17 +11,17 @@ package soda.tiles.emotion.entity
 trait Configuration
 {
 
-  def   fluents : FluentSet
+  def   fluents : FluentMap
   def   actions : ActionSet
   def   rules : RuleSeq
   def   trajectory : Trajectory
 
 }
 
-case class Configuration_ (fluents : FluentSet, actions : ActionSet, rules : RuleSeq, trajectory : Trajectory) extends Configuration
+case class Configuration_ (fluents : FluentMap, actions : ActionSet, rules : RuleSeq, trajectory : Trajectory) extends Configuration
 
 object Configuration {
-  def mk (fluents : FluentSet) (actions : ActionSet) (rules : RuleSeq) (trajectory : Trajectory) : Configuration =
+  def mk (fluents : FluentMap) (actions : ActionSet) (rules : RuleSeq) (trajectory : Trajectory) : Configuration =
     Configuration_ (fluents, actions, rules, trajectory)
 }
 
@@ -35,6 +35,8 @@ type FluentName = Identifier
 type FluentValue = Identifier
 
 type FluentSet = IdentifierSet
+
+type FluentMap = Map [FluentValue, FluentName]
 
 type Action = Identifier
 

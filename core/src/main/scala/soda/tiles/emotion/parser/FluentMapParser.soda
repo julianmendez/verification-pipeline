@@ -1,5 +1,5 @@
 
-class FluentSetParser
+class FluentMapParser
 
   abstract
 
@@ -16,7 +16,7 @@ class FluentSetParser
         p .asScala .toSeq .flatMap (lambda kv --> ListParser .mk .parse_named_list (kv) ) .toList
       case otherwise ==> List()
 
-  parse (a : Any) : Option [FluentSet] =
+  parse (a : Any) : Option [FluentMap] =
     None
 
 end
