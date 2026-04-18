@@ -202,5 +202,8 @@ class Example1Instance
       )
     )
 
+  instance : Configuration =
+    Configuration .mk (fluents) (actions) (rules) (trajectory)
+
 end
 

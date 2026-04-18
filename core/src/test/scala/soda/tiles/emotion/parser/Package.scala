@@ -241,6 +241,9 @@ trait Example1Instance
       )
     )
 
+  lazy val instance : Configuration =
+    Configuration .mk (fluents) (actions) (rules) (trajectory)
+
 }
 
 case class Example1Instance_ () extends Example1Instance
@@ -457,6 +460,9 @@ lazy val trajectory : Seq [IdentifierSet] =
       "control_undecided"
     ) .toSet
   )
+
+  lazy val instance : Configuration =
+    Configuration .mk (fluents) (actions) (rules) (trajectory)
 
 }
 
