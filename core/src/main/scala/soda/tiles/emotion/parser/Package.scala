@@ -27,20 +27,26 @@ trait ActionSetParser
 
   lazy val identifier = "actions"
 
-  def parse_actions (part : Any) : Option [ActionSet] =
+  def parse_actions_with (part : Any) : Option [ActionSet] =
     part match  {
       case (a , s) =>
         if ( (a == identifier)
         )
-          Some (
-            ListParser .mk
-              .parse_string_list (s)
-              .map ( x => x .toString)
-              .toSet
-          )
+          ListParser .mk
+            .parse_string_list (s)
+            .map ( x => x .toSet)
         else None
       case otherwise =>
         None
+    }
+
+  def parse_actions (part : Any) : Option [ActionSet] =
+    part match  {
+      case s : Seq [Any] =>
+        if ( s .isEmpty
+        ) None
+        else parse_actions_with (s (0) )
+      case otherwise => None
     }
 
   def parse (a : Any) : Option [ActionSet] =
