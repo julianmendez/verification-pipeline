@@ -5,11 +5,22 @@ class ActionSetParser
 
   identifier = "actions"
 
-  parse_actions (part : Any) : List [String] =
-    ListParser .mk
-      .parse_string_list (part) .getOrElse (List () )
+  parse_actions (part : Any) : Option [ActionSet] =
+    match part
+      case (a , s) ==>
+        if (a == identifier)
+        then
+          Some (
+            ListParser .mk
+              .parse_string_list (s)
+              .map (lambda x --> x .toString)
+              .toSet
+          )
+        else None
+      case otherwise ==>
+        None
 
-  parse (a : Any) : Option [ActionSet] =
-    None
+  def parse (a : Any) : Option [ActionSet] =
+    parse_actions (a)
 
 end
