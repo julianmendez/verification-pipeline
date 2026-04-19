@@ -4,6 +4,7 @@ import   soda.tiles.emotion.entity.Action
 import   soda.tiles.emotion.entity.ActionSet
 import   soda.tiles.emotion.entity.Configuration
 import   soda.tiles.emotion.entity.Identifier
+import   soda.tiles.emotion.entity.IdentifierSet
 import   soda.tiles.emotion.entity.Instance
 import   soda.tiles.emotion.entity.FluentMap
 import   soda.tiles.emotion.entity.FluentName
@@ -336,34 +337,49 @@ trait YamlParser
   import   scala.jdk.CollectionConverters.IteratorHasAsScala
   import   scala.jdk.CollectionConverters.MapHasAsScala
 
-  def build_partial_configuration (s : Seq [Any] ) : Option [PartialConfiguration] =
-    if ( (s .length == 4)
-    )
-      Some (
-        PartialConfiguration .mk (
-          FluentMapParser .mk .parse (s (0) ) ) (
-          ActionSetParser .mk .parse (s (1) ) ) (
-          RuleSeqParser .mk .parse (s (2) ) ) (
-          TrajectoryParser .mk .parse (s (3) )
+  lazy val empty_fluents : FluentMap =
+    Map [FluentValue, FluentName] ()
+
+  lazy val empty_actions : ActionSet =
+    Set [Action] ()
+
+  lazy val empty_rules : Seq [Rule] =
+    Seq [Rule] ()
+
+  lazy val empty_trajectory : Seq [IdentifierSet] =
+    Seq [IdentifierSet] ()
+
+  def build_partial_configuration_with (elem : Any) : Option [PartialConfiguration] =
+    elem match  {
+      case s : Seq [Any] =>
+        if ( (s .length == 4)
         )
-      )
+          Some (
+            PartialConfiguration .mk (
+              FluentMapParser .mk .parse (s (0) ) ) (
+              ActionSetParser .mk .parse (s (1) ) ) (
+              RuleSeqParser .mk .parse (s (2) ) ) (
+              TrajectoryParser .mk .parse (s (3) )
+            )
+          )
+        else None
+      case otherwise => None
+    }
+
+  def build_partial_configuration (s : Seq [Any] ) : Option [PartialConfiguration] =
+    if ( (s .length == 1)
+    ) build_partial_configuration_with (s (0) )
     else None
 
   def build_configuration (c : PartialConfiguration) : Option [Configuration] =
-    if ( (c .maybe_fluents .isDefined &&
-      c .maybe_actions .isDefined &&
-      c .maybe_rules .isDefined &&
-      c .maybe_trajectory .isDefined)
-    )
-      Some (
-        Configuration .mk (
-          c .maybe_fluents .get) (
-          c .maybe_actions .get) (
-          c .maybe_rules .get) (
-          c .maybe_trajectory .get
-        )
+    Some (
+      Configuration .mk (
+        c .maybe_fluents .getOrElse (empty_fluents) ) (
+        c .maybe_actions .getOrElse (empty_actions) ) (
+        c .maybe_rules .getOrElse (empty_rules) ) (
+        c .maybe_trajectory .getOrElse (empty_trajectory)
       )
-    else None
+    )
 
   def parse (reader : Reader) : Option [Configuration] =
     build_partial_configuration (
