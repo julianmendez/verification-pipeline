@@ -85,21 +85,80 @@ trait FluentMapParser
 
 
 
-  import   scala.jdk.CollectionConverters.CollectionHasAsScala
-  import   scala.jdk.CollectionConverters.IteratorHasAsScala
-  import   scala.jdk.CollectionConverters.MapHasAsScala
-
   lazy val identifier = "fluents"
 
-  def parse_fluents (part : Any) : List [Tuple2 [String, List [String] ] ] =
+  lazy val keyword_fluent = "fluent"
+
+  lazy val keyword_values = "values"
+
+  def parse_one_fluent_with_values (name : FluentName) (part : Any) : Option [Seq [Tuple2 [FluentValue, FluentName] ] ] =
     part match  {
-      case p : java.util.Map [Any, Any] =>
-        p .asScala .toSeq .flatMap ( kv => ListParser .mk .parse_named_list (kv) ) .toList
-      case otherwise => List()
+      case s : Seq [FluentValue] =>
+        Some (s .map ( elem => (elem , name) ) )
+      case otherwise => None
+    }
+
+  def parse_one_fluent_with (name : FluentName) (part : Any) : Option [Seq [Tuple2 [FluentValue, FluentName] ] ] =
+    part match  {
+      case (key , value) =>
+        if ( (key == keyword_values)
+        ) parse_one_fluent_with_values (name) (value)
+        else None
+      case otherwise => None
+    }
+
+  def parse_one_fluent (first : Any) (second : Any) : Option [Seq [Tuple2 [FluentValue, FluentName] ] ] =
+    first match  {
+      case (key , value) =>
+        if ( (key == keyword_fluent)
+        ) parse_one_fluent_with (value .toString) (second)
+        else None
+      case otherwise => None
+    }
+
+  def parse_sequence_with_elem (s : Seq [Any] ) : Option [Seq [Tuple2 [FluentValue, FluentName] ] ] =
+    if ( (s .length == 2)
+    ) parse_one_fluent (s (0) )  (s (1) )
+    else None
+
+  def parse_sequence_with (part : Any) : Option [Seq [Tuple2 [FluentValue, FluentName] ] ] =
+    part match  {
+      case s : Seq [Any] => parse_sequence_with_elem (s)
+      case otherwise => None
+    }
+
+  def convert_to_map (s : Seq [Option [Seq [Tuple2 [FluentValue, FluentName] ] ] ] ) : Option [FluentMap] =
+    if ( (s .contains (None) )
+    ) None
+    else Some(s .flatten .flatten .toMap)
+
+  def parse_sequence (part : Any) : Option [FluentMap] =
+    part match  {
+      case s : Seq [Any] =>
+        convert_to_map (s .map ( pair =>  parse_sequence_with (pair) ) )
+      case otherwise => None
+    }
+
+  def parse_fluents_with (part : Any) : Option [FluentMap] =
+    part match  {
+      case (a , s) =>
+        if ( (a == identifier)
+        ) parse_sequence (s)
+        else None
+      case otherwise => None
+    }
+
+  def parse_fluents (part : Any) : Option [FluentMap] =
+    part match  {
+      case s : Seq [Any] =>
+        if ( s .isEmpty
+        ) None
+        else parse_fluents_with (s (0) )
+      case otherwise => None
     }
 
   def parse (a : Any) : Option [FluentMap] =
-    None
+    parse_fluents (a)
 
 }
 
