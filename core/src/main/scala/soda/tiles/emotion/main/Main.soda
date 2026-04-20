@@ -28,18 +28,19 @@ class Main
 
   serializer = Serializer .mk
 
-  /** TODO **/
+  instance_builder = InstanceBuilder .mk
 
-  process_configuration (conf : Configuration) : Option [Seq [Boolean] ] =
-    Some (
-      conf
-        .trajectory
-        .map (lambda x --> false)
-    )
+  emotional_reasoning_pipeline = EmotionalReasoningPipeline .mk
+
+  process_configuration (configuration : Configuration) : Seq [Boolean] =
+    emotional_reasoning_pipeline .run (
+      instance_builder
+        .build (configuration)
+    ) .contents
 
   process_maybe_configuration (maybe_conf : Option [Configuration] ) : Option [Seq [Boolean] ] =
     if (maybe_conf .isDefined)
-    then process_configuration (maybe_conf .get)
+    then Some (process_configuration (maybe_conf .get) )
     else None
 
   process_file (file_name : String) : Option [Seq [Boolean] ] =

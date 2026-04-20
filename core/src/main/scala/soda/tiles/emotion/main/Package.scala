@@ -9,7 +9,9 @@ import   java.nio.file.Files
 import   java.nio.file.Paths
 import   java.io.StringReader
 import   soda.tiles.emotion.entity.Configuration
+import   soda.tiles.emotion.entity.InstanceBuilder
 import   soda.tiles.emotion.parser.YamlParser
+import   soda.tiles.emotion.pipeline.EmotionalReasoningPipeline
 
 
 
@@ -45,18 +47,19 @@ trait Main
 
   lazy val serializer = Serializer .mk
 
-  /** TODO **/
+  lazy val instance_builder = InstanceBuilder .mk
 
-  def process_configuration (conf : Configuration) : Option [Seq [Boolean] ] =
-    Some (
-      conf
-        .trajectory
-        .map ( x => false)
-    )
+  lazy val emotional_reasoning_pipeline = EmotionalReasoningPipeline .mk
+
+  def process_configuration (configuration : Configuration) : Seq [Boolean] =
+    emotional_reasoning_pipeline .run (
+      instance_builder
+        .build (configuration)
+    ) .contents
 
   def process_maybe_configuration (maybe_conf : Option [Configuration] ) : Option [Seq [Boolean] ] =
     if ( (maybe_conf .isDefined)
-    ) process_configuration (maybe_conf .get)
+    ) Some (process_configuration (maybe_conf .get) )
     else None
 
   def process_file (file_name : String) : Option [Seq [Boolean] ] =
