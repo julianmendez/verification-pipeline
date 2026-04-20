@@ -21,8 +21,15 @@ import
   soda.tiles.emotion.entity.InfluencesIfRule
   soda.tiles.emotion.entity.InfluencesRule
   soda.tiles.emotion.entity.InhibitsRule
-  soda.tiles.emotion.entity.Transition
   soda.tiles.emotion.entity.NoConcurrencyRule
+  soda.tiles.emotion.entity.Rule
+  soda.tiles.emotion.entity.Transition
+  soda.tiles.emotion.entity.TransitionSeq
+  soda.tiles.emotion.entity.TileMessage
+  soda.tiles.emotion.entity.TileMessageBuilder
+  soda.tiles.emotion.entity.TilePair
+  soda.tiles.emotion.entity.TileTriple
+  soda.tiles.emotion.entity.Trajectory
   soda.tiles.emotion.entity.TriggersRule
 
 

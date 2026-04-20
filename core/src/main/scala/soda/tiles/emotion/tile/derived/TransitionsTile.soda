@@ -12,7 +12,7 @@ class SlidingWindow
 end
 
 
-class TransitionBuilder
+class TransitionsTile
 
   abstract
 
@@ -46,9 +46,17 @@ class TransitionBuilder
     then Some (sw .accum)
     else None
 
-  make_instants (seq : Seq [IdentifierSet] ) : Option [Seq [Transition] ] =
+  make_instants (seq : Seq [IdentifierSet] ) : Option [TransitionSeq] =
     _postprocess (
       fold (seq) (_empty_sliding_window) (_process_window)
+    )
+
+  make_transitions (seq : Trajectory) : TransitionSeq =
+    make_instants (seq) .getOrElse (Seq [Transition] () )
+
+  apply (message : TileMessage [Trajectory] ) : TileMessage [TransitionSeq] =
+    TileMessageBuilder .mk .build (message .context) (message .instance) (
+      make_transitions (message .contents)
     )
 
 end

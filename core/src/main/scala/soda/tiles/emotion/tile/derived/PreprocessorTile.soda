@@ -1,9 +1,14 @@
 
-class Preprocessor
+class PreprocessorTile
 
   abstract
 
   empty_set : ActionSet = Set [Action] ()
+
+  _get_actions (transition : Transition) (input : FluentSet) (action : Action) : ActionSet =
+    if (input .forall (lambda fluent --> transition .input .contains (fluent) ) )
+    then empty_set .+ (action)
+    else empty_set
 
   find (transition : Transition) : ActionSet =
     match transition
@@ -20,10 +25,14 @@ class Preprocessor
       case ContravenesRule (input_set , action) ==> _get_actions (transition) (input_set) (action)
       case ForbidsToCauseRule (input_set , output_set) ==> empty_set
 
-  _get_actions (transition : Transition) (input : FluentSet) (action : Action) : ActionSet =
-    if (input .forall (fluent --> transition .input .contains (fluent) ) )
-    then empty_set .+ (action)
-    else empty_set
+  process_elem (elem : TilePair [Transition] [Rule] ) : TileTriple [Transition] [Rule] [ActionSet]  =
+    TileTriple .mk (elem .fst) (elem .snd) (find (elem .fst) )
+
+  apply (message : TileMessage [Seq [TilePair [Transition] [Rule] ] ] )
+      : TileMessage [Seq [TileTriple [Transition] [Rule] [ActionSet] ] ] =
+    TileMessageBuilder .mk .build (message .context) (message .instance) (
+      message .contents .map (lambda elem --> process_elem (elem) )
+    )
 
 end
 

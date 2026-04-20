@@ -4,19 +4,19 @@ import Soda.tiles.fairness.tool.TileMessage
 
 
 /**
- * This tile returns a sorted sequence of agents, where each agent occurs exactly once.
+ * This tile returns the trajectory.
  */
 
-class AllStateTile
+class TrajectoryTile
 
   abstract
 
-  all_states (message : TileMessage [Boolean] ) : Instance =
+  get_trajectory (message : TileMessage [Boolean] ) : Instance =
     message .instance
 
   apply (message : TileMessage [Boolean] ) : TileMessage [Instance] =
     TileMessageBuilder .mk .build (message .context) (message .instance) (
-      all_states (message)
+      get_trajectory (message)
     )
 
 end
