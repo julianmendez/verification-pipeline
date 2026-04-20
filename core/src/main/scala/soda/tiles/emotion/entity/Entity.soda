@@ -33,6 +33,9 @@ class Transition
 end
 
 
+class TransitionSeq = Seq [Transition]
+
+
 class Trajectory = Seq [IdentifierSet]
 
 
