@@ -1,0 +1,32 @@
+
+/**
+ * This pipeline returns a sequence of Boolean values with the transitions,
+ * where 'true' means that the transition was correct, and 'false' means that the transition was wrong.
+ */
+
+class EmotionalReasoningPipeline
+
+  abstract
+
+  rules_tile = RulesTile .mk
+
+  trajectory_transitions_tile = TrajectoryTransitionsTile .mk
+
+  cross_preprocessor_verifier_tile = CrossPreprocessorVerifierTile .mk
+
+  apply (message : TileMessage [Boolean] ) : TileMessage [Seq [Boolean] ] =
+    cross_preprocessor_verifier_tile .apply (
+      trajectory_transitions_tile .apply (
+        message
+      )
+    ) (
+      rules_tile .apply (
+        message
+      )
+    )
+
+  run (message : TileMessage [Boolean] ) : TileMessage [Seq [Boolean] ] =
+    apply (message)
+
+end
+
