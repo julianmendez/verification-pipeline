@@ -4,19 +4,19 @@ import Soda.tiles.emotion.entity.TileMessage
 
 
 /**
- * This tile returns a sorted sequence of resources, where each resource occurs exactly once.
+ * This tile returns the rules.
  */
 
-class AllRuleTile
+class RulesTile
 
   abstract
 
-  all_rules (message : TileMessage [Boolean] ) : Context =
+  get_rules (message : TileMessage [Boolean] ) : Context =
     message .context
 
   apply (message : TileMessage [Boolean] ) : TileMessage [Context] =
     TileMessageBuilder .mk .build (message .context) (message .instance) (
-      all_rules (message)
+      get_rules (message)
     )
 
 end

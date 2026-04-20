@@ -6,6 +6,11 @@ package soda.tiles.emotion.main
  */
 
 import
-  java.io.FileReader
-
+  java.nio.file.Files
+  java.nio.file.Paths
+  java.io.StringReader
+  soda.tiles.emotion.entity.Configuration
+  soda.tiles.emotion.entity.InstanceBuilder
+  soda.tiles.emotion.parser.YamlParser
+  soda.tiles.emotion.pipeline.EmotionalReasoningPipeline
 

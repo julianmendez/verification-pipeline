@@ -8,60 +8,13 @@ class YamlParser
 
   import
     java.io.Reader
-    scala.jdk.CollectionConverters.CollectionHasAsScala
-    scala.jdk.CollectionConverters.IteratorHasAsScala
-    scala.jdk.CollectionConverters.MapHasAsScala
-
-  empty_fluents : FluentMap =
-    Map [FluentValue] [FluentName] ()
-
-  empty_actions : ActionSet =
-    Set [Action] ()
-
-  empty_rules : Seq [Rule] =
-    Seq [Rule] ()
-
-  empty_trajectory : Seq [IdentifierSet] =
-    Seq [IdentifierSet] ()
-
-  build_partial_configuration_with (elem : Any) : Option [PartialConfiguration] =
-    match elem
-      case s : Seq [Any] ==>
-        if (s .length == 4)
-        then
-          Some (
-            PartialConfiguration .mk (
-              FluentMapParser .mk .parse (s (0) ) ) (
-              ActionSetParser .mk .parse (s (1) ) ) (
-              RuleSeqParser .mk .parse (s (2) ) ) (
-              TrajectoryParser .mk .parse (s (3) )
-            )
-          )
-        else None
-      case otherwise ==> None
-
-  build_partial_configuration (s : Seq [Any] ) : Option [PartialConfiguration] =
-    if (s .length == 1)
-    then build_partial_configuration_with (s (0) )
-    else None
-
-  build_configuration (c : PartialConfiguration) : Option [Configuration] =
-    Some (
-      Configuration .mk (
-        c .maybe_fluents .getOrElse (empty_fluents) ) (
-        c .maybe_actions .getOrElse (empty_actions) ) (
-        c .maybe_rules .getOrElse (empty_rules) ) (
-        c .maybe_trajectory .getOrElse (empty_trajectory)
-      )
-    )
 
   parse (reader : Reader) : Option [Configuration] =
-    build_partial_configuration (
-      GenericYamlParser .mk
-        .parse (reader)
-        .toList
-    )
-    .flatMap (lambda partial_conf --> build_configuration (partial_conf) )
+    ConfigurationParser .mk
+      .parse(
+        GenericYamlParser .mk
+          .parse (reader)
+      )
 
 end
 

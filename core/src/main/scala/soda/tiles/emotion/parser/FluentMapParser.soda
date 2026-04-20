@@ -68,8 +68,8 @@ class FluentMapParser
         else parse_fluents_with (s (0) )
       case otherwise ==> None
 
-  parse (a : Any) : Option [FluentMap] =
-    parse_fluents (a)
+  parse (part : Any) : Option [FluentMap] =
+    parse_fluents (part)
 
 end
 

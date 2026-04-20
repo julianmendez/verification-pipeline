@@ -1,0 +1,13 @@
+package soda.tiles.emotion.pipeline
+
+/*
+ * This package contains classes to model pipelines.
+ */
+
+import
+  soda.tiles.emotion.entity.TileMessage
+  soda.tiles.emotion.tile.composite.CrossPreprocessorVerifierTile
+  soda.tiles.emotion.tile.composite.TrajectoryTransitionsTile
+  soda.tiles.emotion.tile.constant.RulesTile
+
+

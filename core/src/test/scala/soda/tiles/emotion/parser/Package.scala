@@ -1,7 +1,6 @@
 package soda.tiles.emotion.parser
 
 import   org.scalatest.funsuite.AnyFunSuite
-import   org.scalatest.Assertion
 import   java.nio.file.Files
 import   java.nio.file.Paths
 import   java.io.StringReader
@@ -10,30 +9,23 @@ import   soda.tiles.emotion.entity.ActionSet
 import   soda.tiles.emotion.entity.AllowsRule
 import   soda.tiles.emotion.entity.CausesIfRule
 import   soda.tiles.emotion.entity.Configuration
-import   soda.tiles.emotion.entity.Context
 import   soda.tiles.emotion.entity.ContravenesRule
 import   soda.tiles.emotion.entity.DefaultRule
 import   soda.tiles.emotion.entity.FacilitatesRule
 import   soda.tiles.emotion.entity.FluentName
-import   soda.tiles.emotion.entity.FluentSet
 import   soda.tiles.emotion.entity.FluentValue
 import   soda.tiles.emotion.entity.ForbidsToCauseRule
-import   soda.tiles.emotion.entity.Identifier
 import   soda.tiles.emotion.entity.IdentifierSet
 import   soda.tiles.emotion.entity.IfRule
 import   soda.tiles.emotion.entity.InfluencesIfRule
 import   soda.tiles.emotion.entity.InfluencesRule
 import   soda.tiles.emotion.entity.InhibitsRule
-import   soda.tiles.emotion.entity.Instance
 import   soda.tiles.emotion.entity.NoConcurrencyRule
 import   soda.tiles.emotion.entity.Rule
 import   soda.tiles.emotion.entity.RuleSeq
-import   soda.tiles.emotion.entity.TileMessage
-import   soda.tiles.emotion.entity.TileMessageBuilder
-import   soda.tiles.emotion.entity.TilePair
-import   soda.tiles.emotion.entity.Trajectory
-import   soda.tiles.emotion.entity.Transition
 import   soda.tiles.emotion.entity.TriggersRule
+
+
 
 
 
@@ -385,69 +377,69 @@ trait Example2Instance
     )
   )
 
-lazy val trajectory : Seq [IdentifierSet] =
-  Seq [IdentifierSet] (
-    Seq [FluentValue] (
-      "need_high" ,
-      "goal_low" ,
-      "account_other" ,
-      "control_high"
-    ) .toSet ,
-    Seq [Action] (
-      "commitment"
-    ) .toSet ,
-    Seq [FluentValue] (
-      "need_high" ,
-      "goal_high" ,
-      "account_self" ,
-      "control_high"
-    ) .toSet ,
-    Seq [Action] (
-      "endorsement"
-    ) .toSet ,
-    Seq [FluentValue] (
-      "need_undecided" ,
-      "goal_high" ,
-      "account_self" ,
-      "control_undecided"
-    ) .toSet ,
-    Seq [Action] (
-      "justification"
-    ) .toSet ,
-    Seq [FluentValue] (
-      "need_undecided" ,
-      "goal_high" ,
-      "account_environment" ,
-      "control_low"
-    ) .toSet ,
-    Seq [Action] (
-      "attribution"
-    ) .toSet ,
-    Seq [FluentValue] (
-      "need_undecided" ,
-      "goal_high" ,
-      "account_self" ,
-      "control_undecided"
-    ) .toSet ,
-    Seq [Action] (
-      "challenge"
-    ) .toSet ,
-    Seq [FluentValue] (
-      "need_undecided" ,
-      "goal_high" ,
-      "account_environment" ,
-      "control_low"
-    ) .toSet ,
-    Seq [Action] (
-      "affirmation"
-    ) .toSet ,
-    Seq [FluentValue] (
-      "need_high" ,
-      "goal_high" ,
-      "account_environment" ,
-      "control_undecided"
-    ) .toSet
-  )
+  lazy val trajectory : Seq [IdentifierSet] =
+    Seq [IdentifierSet] (
+      Seq [FluentValue] (
+        "need_high" ,
+        "goal_low" ,
+        "account_other" ,
+        "control_high"
+      ) .toSet ,
+      Seq [Action] (
+        "commitment"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "need_high" ,
+        "goal_high" ,
+        "account_self" ,
+        "control_high"
+      ) .toSet ,
+      Seq [Action] (
+        "endorsement"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "need_undecided" ,
+        "goal_high" ,
+        "account_self" ,
+        "control_undecided"
+      ) .toSet ,
+      Seq [Action] (
+        "justification"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "need_undecided" ,
+        "goal_high" ,
+        "account_environment" ,
+        "control_low"
+      ) .toSet ,
+      Seq [Action] (
+        "attribution"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "need_undecided" ,
+        "goal_high" ,
+        "account_self" ,
+        "control_undecided"
+      ) .toSet ,
+      Seq [Action] (
+        "challenge"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "need_undecided" ,
+        "goal_high" ,
+        "account_environment" ,
+        "control_low"
+      ) .toSet ,
+      Seq [Action] (
+        "affirmation"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "need_high" ,
+        "goal_high" ,
+        "account_environment" ,
+        "control_undecided"
+      ) .toSet
+    )
 
   lazy val instance : Configuration =
     Configuration .mk (fluents) (actions) (rules) (trajectory)

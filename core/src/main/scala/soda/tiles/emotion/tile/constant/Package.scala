@@ -8,8 +8,6 @@ import   soda.tiles.emotion.entity.Context
 import   soda.tiles.emotion.entity.Instance
 import   soda.tiles.emotion.entity.TileMessage
 import   soda.tiles.emotion.entity.TileMessageBuilder
-import   soda.tiles.emotion.entity.TilePair
-import   soda.tiles.emotion.entity.TileTriple
 
 
 
@@ -21,29 +19,29 @@ import Soda.tiles.emotion.entity.TileMessage
 */
 
 /**
- * This tile returns a sorted sequence of resources, where each resource occurs exactly once.
+ * This tile returns the rules.
  */
 
-trait AllRuleTile
+trait RulesTile
 {
 
 
 
-  def all_rules (message : TileMessage [Boolean] ) : Context =
+  def get_rules (message : TileMessage [Boolean] ) : Context =
     message .context
 
   def apply (message : TileMessage [Boolean] ) : TileMessage [Context] =
     TileMessageBuilder .mk .build (message .context) (message .instance) (
-      all_rules (message)
+      get_rules (message)
     )
 
 }
 
-case class AllRuleTile_ () extends AllRuleTile
+case class RulesTile_ () extends RulesTile
 
-object AllRuleTile {
-  def mk : AllRuleTile =
-    AllRuleTile_ ()
+object RulesTile {
+  def mk : RulesTile =
+    RulesTile_ ()
 }
 
 
@@ -53,28 +51,28 @@ import Soda.tiles.fairness.tool.TileMessage
 */
 
 /**
- * This tile returns a sorted sequence of agents, where each agent occurs exactly once.
+ * This tile returns the trajectory.
  */
 
-trait AllStateTile
+trait TrajectoryTile
 {
 
 
 
-  def all_states (message : TileMessage [Boolean] ) : Instance =
+  def get_trajectory (message : TileMessage [Boolean] ) : Instance =
     message .instance
 
   def apply (message : TileMessage [Boolean] ) : TileMessage [Instance] =
     TileMessageBuilder .mk .build (message .context) (message .instance) (
-      all_states (message)
+      get_trajectory (message)
     )
 
 }
 
-case class AllStateTile_ () extends AllStateTile
+case class TrajectoryTile_ () extends TrajectoryTile
 
-object AllStateTile {
-  def mk : AllStateTile =
-    AllStateTile_ ()
+object TrajectoryTile {
+  def mk : TrajectoryTile =
+    TrajectoryTile_ ()
 }
 

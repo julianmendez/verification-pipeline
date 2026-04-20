@@ -51,7 +51,7 @@ class TrajectoryParser
         else parse_trajectory_with (s (0) )
       case otherwise ==> None
 
-  parse (a : Any) : Option [Trajectory] =
-    parse_trajectory (a)
+  parse (part : Any) : Option [Trajectory] =
+    parse_trajectory (part)
 
 end

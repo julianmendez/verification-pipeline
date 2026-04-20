@@ -20,16 +20,28 @@ import   soda.tiles.emotion.entity.IfRule
 import   soda.tiles.emotion.entity.InfluencesIfRule
 import   soda.tiles.emotion.entity.InfluencesRule
 import   soda.tiles.emotion.entity.InhibitsRule
-import   soda.tiles.emotion.entity.Transition
 import   soda.tiles.emotion.entity.NoConcurrencyRule
+import   soda.tiles.emotion.entity.Rule
+import   soda.tiles.emotion.entity.Transition
+import   soda.tiles.emotion.entity.TransitionSeq
+import   soda.tiles.emotion.entity.TileMessage
+import   soda.tiles.emotion.entity.TileMessageBuilder
+import   soda.tiles.emotion.entity.TilePair
+import   soda.tiles.emotion.entity.TileTriple
+import   soda.tiles.emotion.entity.Trajectory
 import   soda.tiles.emotion.entity.TriggersRule
 
-trait Preprocessor
+trait PreprocessorTile
 {
 
 
 
   lazy val empty_set : ActionSet = Set [Action] ()
+
+  private def _get_actions (transition : Transition) (input : FluentSet) (action : Action) : ActionSet =
+    if ( (input .forall ( fluent => transition .input .contains (fluent) ) )
+    ) empty_set .+ (action)
+    else empty_set
 
   def find (transition : Transition) : ActionSet =
     transition match  {
@@ -47,18 +59,22 @@ trait Preprocessor
       case ForbidsToCauseRule (input_set , output_set) => empty_set
     }
 
-  private def _get_actions (transition : Transition) (input : FluentSet) (action : Action) : ActionSet =
-    if ( (input .forall (fluent => transition .input .contains (fluent) ) )
-    ) empty_set .+ (action)
-    else empty_set
+  def process_elem (elem : TilePair [Transition, Rule] ) : TileTriple [Transition, Rule, ActionSet]  =
+    TileTriple .mk (elem .fst) (elem .snd) (find (elem .fst) )
+
+  def apply (message : TileMessage [Seq [TilePair [Transition, Rule] ] ] )
+      : TileMessage [Seq [TileTriple [Transition, Rule, ActionSet] ] ] =
+    TileMessageBuilder .mk .build (message .context) (message .instance) (
+      message .contents .map ( elem => process_elem (elem) )
+    )
 
 }
 
-case class Preprocessor_ () extends Preprocessor
+case class PreprocessorTile_ () extends PreprocessorTile
 
-object Preprocessor {
-  def mk : Preprocessor =
-    Preprocessor_ ()
+object PreprocessorTile {
+  def mk : PreprocessorTile =
+    PreprocessorTile_ ()
 }
 
 
@@ -82,7 +98,7 @@ object SlidingWindow {
     SlidingWindow_ (defined, s0, a, s1, accum)
 }
 
-trait TransitionBuilder
+trait TransitionsTile
 {
 
 
@@ -117,41 +133,33 @@ trait TransitionBuilder
     ) Some (sw .accum)
     else None
 
-  def make_instants (seq : Seq [IdentifierSet] ) : Option [Seq [Transition] ] =
+  def make_instants (seq : Seq [IdentifierSet] ) : Option [TransitionSeq] =
     _postprocess (
       fold (seq) (_empty_sliding_window) (_process_window)
     )
 
+  def make_transitions (seq : Trajectory) : TransitionSeq =
+    make_instants (seq) .getOrElse (Seq [Transition] () )
+
+  def apply (message : TileMessage [Trajectory] ) : TileMessage [TransitionSeq] =
+    TileMessageBuilder .mk .build (message .context) (message .instance) (
+      make_transitions (message .contents)
+    )
+
 }
 
-case class TransitionBuilder_ () extends TransitionBuilder
+case class TransitionsTile_ () extends TransitionsTile
 
-object TransitionBuilder {
-  def mk : TransitionBuilder =
-    TransitionBuilder_ ()
+object TransitionsTile {
+  def mk : TransitionsTile =
+    TransitionsTile_ ()
 }
 
 
-trait Verifier
+trait VerifierTile
 {
 
 
-
-  def verify (transition : Transition) (inhibited : ActionSet) : Boolean =
-    transition match  {
-      case CausesIfRule (input_set , action , output_set) => verifyCausesIfRule (transition) (inhibited) (input_set) (action) (output_set)
-      case IfRule (input_set , output_set) => verifyIfRule (transition) (input_set) (output_set)
-      case TriggersRule (input_set , action) => verifyTriggersRule (transition) (inhibited) (input_set) (action)
-      case AllowsRule (input_set , action) => verifyAllowsRule (transition) (inhibited) (input_set) (action)
-      case InhibitsRule (input_set , action) => verifyInhibitsRule (transition) (input_set) (action)
-      case NoConcurrencyRule (action_set) => verifyNoConcurrencyRule (transition) (action_set)
-      case DefaultRule (input_fluent) => verifyDefaultRule (transition) (input_fluent)
-      case InfluencesIfRule (input_set , action , output_set) => verifyCausesIfRule (transition) (inhibited) (input_set) (action) (output_set)
-      case InfluencesRule (input_set , output_set) => verifyIfRule (transition) (input_set) (output_set)
-      case FacilitatesRule (input_set , action) => verifyAllowsRule (transition) (inhibited) (input_set) (action)
-      case ContravenesRule (input_set , action) => verifyInhibitsRule (transition) (input_set) (action)
-      case ForbidsToCauseRule (input_set , output_set) => verifyForbidsToCauseRule (transition) (input_set) (output_set)
-    }
 
   def verifyCausesIfRule (transition : Transition) (inhibited : ActionSet) (input : FluentSet) (action : Action) (output : FluentSet) : Boolean =
     if ( (input .forall (fluent => transition .input .contains (fluent) )
@@ -194,12 +202,36 @@ trait Verifier
     ) (output .forall (fluent => ! transition .output .contains (fluent) ) )
     else true
 
+  def verify (transition : Transition) (inhibited : ActionSet) : Boolean =
+    transition match  {
+      case CausesIfRule (input_set , action , output_set) => verifyCausesIfRule (transition) (inhibited) (input_set) (action) (output_set)
+      case IfRule (input_set , output_set) => verifyIfRule (transition) (input_set) (output_set)
+      case TriggersRule (input_set , action) => verifyTriggersRule (transition) (inhibited) (input_set) (action)
+      case AllowsRule (input_set , action) => verifyAllowsRule (transition) (inhibited) (input_set) (action)
+      case InhibitsRule (input_set , action) => verifyInhibitsRule (transition) (input_set) (action)
+      case NoConcurrencyRule (action_set) => verifyNoConcurrencyRule (transition) (action_set)
+      case DefaultRule (input_fluent) => verifyDefaultRule (transition) (input_fluent)
+      case InfluencesIfRule (input_set , action , output_set) => verifyCausesIfRule (transition) (inhibited) (input_set) (action) (output_set)
+      case InfluencesRule (input_set , output_set) => verifyIfRule (transition) (input_set) (output_set)
+      case FacilitatesRule (input_set , action) => verifyAllowsRule (transition) (inhibited) (input_set) (action)
+      case ContravenesRule (input_set , action) => verifyInhibitsRule (transition) (input_set) (action)
+      case ForbidsToCauseRule (input_set , output_set) => verifyForbidsToCauseRule (transition) (input_set) (output_set)
+    }
+
+  def verify_elem (elem : TileTriple [Transition, Rule, ActionSet] ) : Boolean =
+    verify (elem .fst) (elem .trd)
+
+  def apply (message : TileMessage [Seq [TileTriple [Transition, Rule, ActionSet] ] ] ) : TileMessage [Seq [Boolean] ] =
+    TileMessageBuilder .mk .build (message .context) (message .instance) (
+      message .contents .map ( elem => verify_elem (elem) )
+    )
+
 }
 
-case class Verifier_ () extends Verifier
+case class VerifierTile_ () extends VerifierTile
 
-object Verifier {
-  def mk : Verifier =
-    Verifier_ ()
+object VerifierTile {
+  def mk : VerifierTile =
+    VerifierTile_ ()
 }
 

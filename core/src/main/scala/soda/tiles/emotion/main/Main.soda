@@ -11,15 +11,54 @@ class Main
     "\nEmotional Reasoning" +
     "\n" +
     "\nCopyright 2026 Julian Alfredo Mendez" +
-    "\n" +
-    "\nhttps://github.com/julianmendez/emotional-reasoning" +
+    "\nhttps://julianmendez.github.io/emotional-reasoning" +
     "\n" +
     "\nEmotional Reasoning is a project that instantiates the Tiles framework." +
     "\n" +
+    "\nParameter: FILE_NAME" +
+    "\n" +
+    "\n  FILE_NAME     YAML file containing the instance" +
+    "\n" +
     "\n"
 
+  read_file (file_name : String) : String =
+    @new String (Files .readAllBytes (Paths .get (file_name) ) )
+
+  yaml_parser = YamlParser .mk
+
+  serializer = Serializer .mk
+
+  instance_builder = InstanceBuilder .mk
+
+  emotional_reasoning_pipeline = EmotionalReasoningPipeline .mk
+
+  process_configuration (configuration : Configuration) : Seq [Boolean] =
+    emotional_reasoning_pipeline .run (
+      instance_builder
+        .build (configuration)
+    ) .contents
+
+  process_maybe_configuration (maybe_conf : Option [Configuration] ) : Option [Seq [Boolean] ] =
+    if (maybe_conf .isDefined)
+    then Some (process_configuration (maybe_conf .get) )
+    else None
+
+  process_file (file_name : String) : Option [Seq [Boolean] ] =
+    process_maybe_configuration (
+      yaml_parser .parse ( @new StringReader (read_file (file_name) ) )
+    )
+
+  serialize_output (maybe_output : Option [Seq [Boolean] ] ) : String =
+    match maybe_output
+      case Some (instance) ==> serializer .serialize (instance)
+      case None ==> "Undefined result"
+
+  execute (arguments : List [String] ) : Unit =
+    if (arguments .length > 0)
+    then println (serialize_output (process_file (arguments (0) ) ) )
+    else println (help)
+
   main (arguments : Array [String] ) : Unit =
-    println (help)
+    execute (arguments .toList)
 
 end
-

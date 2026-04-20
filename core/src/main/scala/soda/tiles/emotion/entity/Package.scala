@@ -58,6 +58,8 @@ object Transition {
     Transition_ (input, actions, output)
 }
 
+type TransitionSeq = Seq [Transition]
+
 type Trajectory = Seq [IdentifierSet]
 
 type Instance = Trajectory
@@ -164,5 +166,22 @@ case class TileMessageBuilder_ () extends TileMessageBuilder
 object TileMessageBuilder {
   def mk : TileMessageBuilder =
     TileMessageBuilder_ ()
+}
+
+trait InstanceBuilder
+{
+
+
+
+  def build (configuration : Configuration) : TileMessage [Boolean] =
+    TileMessageBuilder .mk .build (configuration .rules) (configuration .trajectory) (true)
+
+}
+
+case class InstanceBuilder_ () extends InstanceBuilder
+
+object InstanceBuilder {
+  def mk : InstanceBuilder =
+    InstanceBuilder_ ()
 }
 

@@ -1,0 +1,12 @@
+
+class Serializer
+
+  abstract
+
+  serialize (seq : Seq [Boolean] ) : String =
+    (seq
+      .map (lambda x --> x .toString + " ")
+      .mkString ) + "\n"
+
+end
+

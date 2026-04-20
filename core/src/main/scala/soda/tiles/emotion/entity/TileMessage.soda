@@ -41,3 +41,13 @@ class TileMessageBuilder
 
 end
 
+
+class InstanceBuilder
+
+  abstract
+
+  build (configuration : Configuration) : TileMessage [Boolean] =
+    TileMessageBuilder .mk .build (configuration .rules) (configuration .trajectory) (true)
+
+end
+
