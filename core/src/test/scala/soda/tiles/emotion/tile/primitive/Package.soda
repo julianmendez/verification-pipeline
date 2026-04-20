@@ -1,30 +1,34 @@
-package soda.tiles.emotion.block
+package soda.tiles.emotion.tile.primitive
 
 /*
- * This package contains classes to model the blocks.
+ * This package contains tests for the primitive tiles.
  */
 
 import
-  soda.lib.Fold
+  org.scalatest.funsuite.AnyFunSuite
   soda.tiles.emotion.entity.Action
   soda.tiles.emotion.entity.ActionSet
-  soda.tiles.emotion.entity.ActionSetType
   soda.tiles.emotion.entity.AllowsRule
   soda.tiles.emotion.entity.CausesIfRule
+  soda.tiles.emotion.entity.Context
   soda.tiles.emotion.entity.ContravenesRule
   soda.tiles.emotion.entity.DefaultRule
   soda.tiles.emotion.entity.FacilitatesRule
-  soda.tiles.emotion.entity.Fluent
-  soda.tiles.emotion.entity.FluentOrActionSet
   soda.tiles.emotion.entity.FluentSet
-  soda.tiles.emotion.entity.FluentSetType
+  soda.tiles.emotion.entity.FluentValue
   soda.tiles.emotion.entity.ForbidsToCauseRule
+  soda.tiles.emotion.entity.Identifier
+  soda.tiles.emotion.entity.IdentifierSet
   soda.tiles.emotion.entity.IfRule
   soda.tiles.emotion.entity.InfluencesIfRule
   soda.tiles.emotion.entity.InfluencesRule
   soda.tiles.emotion.entity.InhibitsRule
-  soda.tiles.emotion.entity.Instant
+  soda.tiles.emotion.entity.Instance
   soda.tiles.emotion.entity.NoConcurrencyRule
+  soda.tiles.emotion.entity.Rule
+  soda.tiles.emotion.entity.RuleSeq
+  soda.tiles.emotion.entity.TileMessage
+  soda.tiles.emotion.entity.TileMessageBuilder
+  soda.tiles.emotion.entity.TilePair
+  soda.tiles.emotion.entity.Trajectory
   soda.tiles.emotion.entity.TriggersRule
-
-

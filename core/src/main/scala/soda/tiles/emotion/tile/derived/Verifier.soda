@@ -1,0 +1,63 @@
+
+class Verifier
+
+  abstract
+
+  verify (transition : Transition) (inhibited : ActionSet) : Boolean =
+    match transition
+      case CausesIfRule (input_set , action , output_set) ==> verifyCausesIfRule (transition) (inhibited) (input_set) (action) (output_set)
+      case IfRule (input_set , output_set) ==> verifyIfRule (transition) (input_set) (output_set)
+      case TriggersRule (input_set , action) ==> verifyTriggersRule (transition) (inhibited) (input_set) (action)
+      case AllowsRule (input_set , action) ==> verifyAllowsRule (transition) (inhibited) (input_set) (action)
+      case InhibitsRule (input_set , action) ==> verifyInhibitsRule (transition) (input_set) (action)
+      case NoConcurrencyRule (action_set) ==> verifyNoConcurrencyRule (transition) (action_set)
+      case DefaultRule (input_fluent) ==> verifyDefaultRule (transition) (input_fluent)
+      case InfluencesIfRule (input_set , action , output_set) ==> verifyCausesIfRule (transition) (inhibited) (input_set) (action) (output_set)
+      case InfluencesRule (input_set , output_set) ==> verifyIfRule (transition) (input_set) (output_set)
+      case FacilitatesRule (input_set , action) ==> verifyAllowsRule (transition) (inhibited) (input_set) (action)
+      case ContravenesRule (input_set , action) ==> verifyInhibitsRule (transition) (input_set) (action)
+      case ForbidsToCauseRule (input_set , output_set) ==> verifyForbidsToCauseRule (transition) (input_set) (output_set)
+
+  verifyCausesIfRule (transition : Transition) (inhibited : ActionSet) (input : FluentSet) (action : Action) (output : FluentSet) : Boolean =
+    if (input .forall (fluent --> transition .input .contains (fluent) )
+        and (transition .actions .contains (action) )
+        and (not (inhibited .contains (action) ) ) )
+    then (output .forall (fluent --> transition .output .contains (fluent) ) )
+    else true
+
+  verifyIfRule (transition : Transition) (input : FluentSet) (output : FluentSet) : Boolean =
+    if (input .forall (fluent --> transition .input .contains (fluent) ) )
+    then (output .forall (fluent --> transition .input .contains (fluent) ) )
+    else true
+
+  verifyTriggersRule (transition : Transition) (inhibited : ActionSet) (input : FluentSet) (action : Action) : Boolean =
+    if (input .forall (fluent --> transition .input .contains (fluent) )
+      and (not (inhibited .contains (action) ) ) )
+    then (transition .actions .contains (action) )
+    else true
+
+  verifyAllowsRule (transition : Transition) (inhibited : ActionSet) (input : FluentSet) (action : Action) : Boolean =
+    if (input .forall (fluent --> transition .input .contains (fluent) )
+      and (transition .actions .contains (action) )
+      and (not (inhibited .contains (action) ) ) )
+    then true
+    else true
+
+  verifyInhibitsRule (transition : Transition) (input : FluentSet) (action : Action) : Boolean =
+    if (input .forall (fluent --> transition .input .contains (fluent) ) )
+    then not (transition .actions .contains (action) )
+    else true
+
+  verifyNoConcurrencyRule (transition : Transition) (actions : ActionSet) : Boolean =
+    (actions .intersect (transition .actions) .toList .length) <= 1
+
+  verifyDefaultRule (transition : Transition) (fluent : FluentValue) : Boolean =
+    transition .input .contains (fluent)
+
+  verifyForbidsToCauseRule (transition : Transition) (input : FluentSet) (output : FluentSet) : Boolean =
+    if (input .forall (fluent --> transition .input .contains (fluent) ) )
+    then (output .forall (fluent --> not transition .output .contains (fluent) ) )
+    else true
+
+end
+

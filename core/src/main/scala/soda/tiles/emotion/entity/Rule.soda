@@ -6,11 +6,17 @@ datatype Rule
   TriggersRule : (input : FluentSet) -> (action : Action) -> Rule
   AllowsRule : (input : FluentSet) -> (action : Action) -> Rule
   InhibitsRule : (input : FluentSet) -> (action : Action) -> Rule
-  NoConcurrencyRule : (action : ActionSet) -> Rule
-  DefaultRule : (input : Fluent) -> Rule
+  NoConcurrencyRule : (actions : ActionSet) -> Rule
+  DefaultRule : (fluent : FluentValue) -> Rule
   InfluencesIfRule : (input : FluentSet) -> (action : Action) -> (output : FluentSet) -> Rule
   InfluencesRule : (input : FluentSet) -> (output : FluentSet) -> Rule
   FacilitatesRule : (input : FluentSet) -> (action : Action) -> Rule
   ContravenesRule : (input : FluentSet) -> (action : Action) -> Rule
   ForbidsToCauseRule : (input : FluentSet) -> (output : FluentSet) -> Rule
+
+
+class RuleSeq = Seq [Rule]
+
+
+class Context = RuleSeq
 

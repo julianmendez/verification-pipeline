@@ -1,0 +1,29 @@
+
+class Preprocessor
+
+  abstract
+
+  empty_set : ActionSet = Set [Action] ()
+
+  find (transition : Transition) : ActionSet =
+    match transition
+      case CausesIfRule (input_set , action , output_set) ==> empty_set
+      case IfRule (input_set , output_set) ==> empty_set
+      case TriggersRule (input_set , action) ==> empty_set
+      case AllowsRule (input_set , action) ==> empty_set
+      case InhibitsRule (input_set , action) ==> _get_actions (transition) (input_set) (action)
+      case NoConcurrencyRule (action_set) ==> empty_set
+      case DefaultRule (input_fluent) ==> empty_set
+      case InfluencesIfRule (input_set , action , output_set) ==> empty_set
+      case InfluencesRule (input_set , output_set) ==> empty_set
+      case FacilitatesRule (input_set , action) ==> empty_set
+      case ContravenesRule (input_set , action) ==> _get_actions (transition) (input_set) (action)
+      case ForbidsToCauseRule (input_set , output_set) ==> empty_set
+
+  _get_actions (transition : Transition) (input : FluentSet) (action : Action) : ActionSet =
+    if (input .forall (fluent --> transition .input .contains (fluent) ) )
+    then empty_set .+ (action)
+    else empty_set
+
+end
+

@@ -1,0 +1,146 @@
+---
+- fluents:
+  - fluent: need
+    values:
+    - need_high
+    - need_undecided
+    - need_low
+  - fluent: goal
+    values:
+    - goal_high
+    - goal_undecided
+    - goal_low
+  - fluent: control
+    values:
+    - control_high
+    - control_undecided
+    - control_low
+  - fluent: accountability
+    values:
+    - account_self
+    - account_other
+    - account_environment
+    - account_undecided
+- actions:
+  - perceive_threat
+  - receive_support
+  - achieve_goal
+  - make_error
+  - no_action
+- rules:
+  - rule: CausesIfRule
+    input:
+    - goal_undecided
+    action: perceive_threat
+    output:
+    - goal_high
+    - need_high
+    - account_environment
+    - control_low
+  - rule: CausesIfRule
+    input:
+    - need_high
+    action: receive_support
+    output:
+    - need_low
+    - account_other
+    - control_high
+  - rule: CausesIfRule
+    input:
+    - goal_high
+    action: achieve_goal
+    output:
+    - need_low
+    - account_self
+    - control_high
+  - rule: CausesIfRule
+    input:
+    - goal_high
+    action: make_error
+    output:
+    - need_high
+    - goal_low
+    - account_self
+    - control_low
+  - rule: FacilitatesRule
+    input:
+    - control_high
+    action: achieve_goal
+  - rule: InhibitsRule
+    input:
+    - control_low
+    action: achieve_goal
+  - rule: ContravenesRule
+    input:
+    - account_environment
+    action: achieve_goal
+  - rule: CausesIfRule
+    input: []
+    action: no_action
+    output: []
+  - rule: IfRule
+    input: []
+    output: []
+  - rule: TriggersRule
+    input: []
+    action: no_action
+  - rule: AllowsRule
+    input: []
+    action: no_action
+  - rule: InhibitsRule
+    input: []
+    action: no_action
+  - rule: NoConcurrencyRule
+    actions: []
+  - rule: DefaultRule
+    input_fluent: goal_undecided
+  - rule: InfluencesIfRule
+    input: []
+    action: no_action
+    output: []
+  - rule: InfluencesRule
+    input: []
+    output: []
+  - rule: FacilitatesRule
+    input: []
+    action: no_action
+  - rule: ContravenesRule
+    input: []
+    action: no_action
+  - rule: ForbidsToCauseRule
+    input: []
+    output: []
+- trajectory:
+  - state:
+    - need_undecided
+    - goal_undecided
+    - account_undecided
+    - control_undecided
+  - actions:
+    - perceive_threat
+  - state:
+    - need_high
+    - goal_high
+    - account_environment
+    - control_low
+  - actions:
+    - receive_support
+  - state:
+    - need_low
+    - goal_high
+    - account_other
+    - control_high
+  - actions:
+    - achieve_goal
+  - state:
+    - need_low
+    - goal_high
+    - account_self
+    - control_high
+  - actions:
+    - make_error
+  - state:
+    - need_high
+    - goal_low
+    - account_self
+    - control_low

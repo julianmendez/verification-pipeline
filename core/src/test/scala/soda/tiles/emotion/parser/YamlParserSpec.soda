@@ -1,0 +1,51 @@
+
+class YamlParserSpec ()
+  extends
+    AnyFunSuite
+
+  check [A : Type] (obtained : A) (expected : A) : org.scalatest.compatible.Assertion =
+    assert (obtained == expected)
+
+  read_file (file_name : String) : String =
+    @new String (
+      Files .readAllBytes (
+        Paths .get (getClass .getResource (file_name) .toURI)
+      )
+    )
+
+  parser = YamlParser .mk
+
+  example1_name = "/example/example-1.yaml"
+
+  example1_contents = read_file (example1_name)
+
+  example1_parsed_instance = parser .parse ( @new StringReader (example1_contents) )
+
+  example1_instance = Some (Example1Instance .mk .instance)
+
+  example2_name = "/example/example-2.yaml"
+
+  example2_contents = read_file (example2_name)
+
+  example2_parsed_instance = parser .parse ( @new StringReader (example2_contents) )
+
+  example2_instance = Some (Example2Instance .mk .instance)
+
+  test ("parse example 1") (
+    check (
+      obtained := example1_parsed_instance
+    ) (
+      expected := example1_instance
+    )
+  )
+
+  test ("parse example 2") (
+    check (
+      obtained := example2_parsed_instance
+    ) (
+      expected := example2_instance
+    )
+  )
+
+end
+

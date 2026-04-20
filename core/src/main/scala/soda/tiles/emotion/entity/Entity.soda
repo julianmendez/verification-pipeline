@@ -2,36 +2,28 @@
 class Identifier = String
 
 
-class Action = Identifier
+class IdentifierSet = Set [Identifier]
 
 
 class FluentName = Identifier
 
 
-class FluentValue = Boolean
+class FluentValue = Identifier
 
 
-class Fluent
-
-  abstract
-    name : FluentName
-    value : FluentValue
-
-end
+class FluentSet = IdentifierSet
 
 
-class FluentSet = Set [Fluent]
+class FluentMap = Map [FluentValue] [FluentName]
 
 
-class ActionSet = Set [Action]
+class Action = Identifier
 
 
-datatype FluentOrActionSet
-  FluentSetType : (fluent_set : FluentSet) -> FluentOrActionSet
-  ActionSetType : (action_set : ActionSet) -> FluentOrActionSet
+class ActionSet = IdentifierSet
 
 
-class Instant
+class Transition
 
   abstract
     input : FluentSet
@@ -40,4 +32,9 @@ class Instant
 
 end
 
+
+class Trajectory = Seq [IdentifierSet]
+
+
+class Instance = Trajectory
 

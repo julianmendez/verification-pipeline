@@ -1,0 +1,55 @@
+
+class ScenarioExample
+
+  abstract
+
+  fluent_value_0 = "fluent0"
+
+  fluent_value_1 = "fluent1"
+
+  fluent_value_2 = "fluent2"
+
+  fluent_value_3 = "fluent3"
+
+  fluent_0 = fluent_value_0
+
+  fluent_1 = fluent_value_1
+
+  fluent_2 = fluent_value_2
+
+  fluent_3 = fluent_value_3
+
+  action_0 = "action0"
+
+  action_1 = "action1"
+
+  action_2 = "action2"
+
+  action_3 = "action3"
+
+  action_set_0_1 = (Seq [Action] (action_0 , action_1) ) .toSet
+
+  action_set_1_2 = (Seq [Action] (action_1 , action_2) ) .toSet
+
+  fluent_set_0 = (Seq [FluentValue] (fluent_0) ) .toSet
+
+  fluent_set_1 = (Seq [FluentValue] (fluent_1) ) .toSet
+
+  fluent_set_2 = (Seq [FluentValue] (fluent_2) ) .toSet
+
+  fluent_set_0_1 = (Seq [FluentValue] (fluent_0 , fluent_1) ) .toSet
+
+  if_rule_0 = IfRule (fluent_set_0 , fluent_set_0_1)
+
+  inh_rule_0 = InhibitsRule (fluent_set_2 , action_2)
+
+  nc_rule_0 = NoConcurrencyRule (action_set_0_1)
+
+  nc_rule_1 = NoConcurrencyRule (action_set_1_2)
+
+  context_0 = Seq [Rule] (if_rule_0 , inh_rule_0 , nc_rule_0 , nc_rule_1)
+
+  instance_0 = Seq [IdentifierSet] (fluent_set_0_1 , action_set_0_1 , fluent_set_0_1 , action_set_1_2 , fluent_set_0_1)
+
+end
+

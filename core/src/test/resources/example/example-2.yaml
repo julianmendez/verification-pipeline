@@ -1,0 +1,151 @@
+---
+- fluents:
+  - fluent: need
+    values:
+    - need_high
+    - need_undecided
+    - need_low
+  - fluent: goal
+    values:
+    - goal_high
+    - goal_undecided
+    - goal_low
+  - fluent: control
+    values:
+    - control_high
+    - control_undecided
+    - control_low
+  - fluent: accountability
+    values:
+    - account_self
+    - account_other
+    - account_environment
+    - account_undecided
+- actions:
+  - endorsement
+  - attribution
+  - affirmation
+  - commitment
+  - justification
+  - challenge
+- rules:
+  - rule: InfluencesIfRule
+    input:
+    - goal_low
+    action: commitment
+    output:
+    - goal_high
+  - rule: InfluencesIfRule
+    input:
+    - account_other
+    action: commitment
+    output:
+    - account_self
+  - rule: InfluencesIfRule
+    input:
+    - need_high
+    action: endorsement
+    output:
+    - need_undecided
+  - rule: InfluencesIfRule
+    input:
+    - control_high
+    action: endorsement
+    output:
+    - control_undecided
+  - rule: InfluencesIfRule
+    input:
+    - account_self
+    action: justification
+    output:
+    - account_environment
+  - rule: InfluencesIfRule
+    input:
+    - control_undecided
+    action: justification
+    output:
+    - control_low
+  - rule: InfluencesIfRule
+    input:
+    - account_environment
+    action: attribution
+    output:
+    - account_self
+  - rule: InfluencesIfRule
+    input:
+    - control_low
+    action: attribution
+    output:
+    - control_undecided
+  - rule: InfluencesIfRule
+    input:
+    - account_self
+    action: challenge
+    output:
+    - account_environment
+  - rule: InfluencesIfRule
+    input:
+    - control_undecided
+    action: challenge
+    output:
+    - control_low
+  - rule: InfluencesIfRule
+    input:
+    - need_undecided
+    action: affirmation
+    output:
+    - need_high
+  - rule: InfluencesIfRule
+    input:
+    - control_low
+    action: affirmation
+    output:
+    - control_undecided
+- trajectory:
+  - state:
+    - need_high
+    - goal_low
+    - account_other
+    - control_high
+  - actions:
+    - commitment
+  - state:
+    - need_high
+    - goal_high
+    - account_self
+    - control_high
+  - actions:
+    - endorsement
+  - state:
+    - need_undecided
+    - goal_high
+    - account_self
+    - control_undecided
+  - actions:
+    - justification
+  - state:
+    - need_undecided
+    - goal_high
+    - account_environment
+    - control_low
+  - actions:
+    - attribution
+  - state:
+    - need_undecided
+    - goal_high
+    - account_self
+    - control_undecided
+  - actions:
+    - challenge
+  - state:
+    - need_undecided
+    - goal_high
+    - account_environment
+    - control_low
+  - actions:
+    - affirmation
+  - state:
+    - need_high
+    - goal_high
+    - account_environment
+    - control_undecided

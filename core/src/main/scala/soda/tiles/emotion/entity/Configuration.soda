@@ -1,0 +1,11 @@
+
+class Configuration
+
+  abstract
+    fluents : FluentMap
+    actions : ActionSet
+    rules : RuleSeq
+    trajectory : Trajectory
+
+end
+

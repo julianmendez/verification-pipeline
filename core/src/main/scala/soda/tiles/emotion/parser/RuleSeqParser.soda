@@ -1,0 +1,40 @@
+
+class RuleSeqParser
+
+  abstract
+
+  identifier = "rules"
+
+  rule_parser : RuleParser = RuleParser .mk
+
+  convert_to_map (s : Seq [Option [Rule] ] ) : Option [RuleSeq] =
+    if (s .contains (None) )
+    then None
+    else Some (s .flatten)
+
+  parse_sequence (part : Any) : Option [RuleSeq] =
+    match part
+      case s : Seq [Any] ==>
+        convert_to_map (s .map (lambda elem --> rule_parser .parse (elem) ) )
+      case otherwise ==> None
+
+  parse_rules_with (part : Any)  : Option [RuleSeq] =
+    match part
+      case (a , s) ==>
+        if (a == identifier)
+        then parse_sequence (s)
+        else None
+      case otherwise ==> None
+
+  parse_rules (part : Any)  : Option [RuleSeq] =
+    match part
+      case s : Seq [Any] ==>
+        if s .isEmpty
+        then None
+        else parse_rules_with (s (0) )
+      case otherwise ==> None
+
+  parse (part : Any) : Option [RuleSeq] =
+    parse_rules (part)
+
+end

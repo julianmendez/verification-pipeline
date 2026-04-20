@@ -1,0 +1,23 @@
+
+directive lean
+import Soda.tiles.emotion.entity.TileMessage
+
+
+/**
+ * This tile returns a sorted sequence of resources, where each resource occurs exactly once.
+ */
+
+class AllRuleTile
+
+  abstract
+
+  all_rules (message : TileMessage [Boolean] ) : Context =
+    message .context
+
+  apply (message : TileMessage [Boolean] ) : TileMessage [Context] =
+    TileMessageBuilder .mk .build (message .context) (message .instance) (
+      all_rules (message)
+    )
+
+end
+

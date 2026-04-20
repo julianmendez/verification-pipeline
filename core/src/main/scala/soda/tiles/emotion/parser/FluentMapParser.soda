@@ -1,0 +1,75 @@
+
+class FluentMapParser
+
+  abstract
+
+  identifier = "fluents"
+
+  keyword_fluent = "fluent"
+
+  keyword_values = "values"
+
+  parse_one_fluent_with_values (name : FluentName) (part : Any) : Option [Seq [Tuple2 [FluentValue] [FluentName] ] ] =
+    match part
+      case s : Seq [FluentValue] ==>
+        Some (s .map (lambda elem --> (elem , name) ) )
+      case otherwise ==> None
+
+  parse_one_fluent_with (name : FluentName) (part : Any) : Option [Seq [Tuple2 [FluentValue] [FluentName] ] ] =
+    match part
+      case (key , value) ==>
+        if (key == keyword_values)
+        then parse_one_fluent_with_values (name) (value)
+        else None
+      case otherwise ==> None
+
+  parse_one_fluent (first : Any) (second : Any) : Option [Seq [Tuple2 [FluentValue] [FluentName] ] ] =
+    match first
+      case (key , value) ==>
+        if (key == keyword_fluent)
+        then parse_one_fluent_with (value .toString) (second)
+        else None
+      case otherwise ==> None
+
+  parse_sequence_with_elem (s : Seq [Any] ) : Option [Seq [Tuple2 [FluentValue] [FluentName] ] ] =
+    if (s .length == 2)
+    then parse_one_fluent (s (0) )  (s (1) )
+    else None
+
+  parse_sequence_with (part : Any) : Option [Seq [Tuple2 [FluentValue] [FluentName] ] ] =
+    match part
+      case s : Seq [Any] ==> parse_sequence_with_elem (s)
+      case otherwise ==> None
+
+  convert_to_map (s : Seq [Option [Seq [Tuple2 [FluentValue] [FluentName] ] ] ] ) : Option [FluentMap] =
+    if (s .contains (None) )
+    then None
+    else Some(s .flatten .flatten .toMap)
+
+  parse_sequence (part : Any) : Option [FluentMap] =
+    match part
+      case s : Seq [Any] ==>
+        convert_to_map (s .map (lambda pair -->  parse_sequence_with (pair) ) )
+      case otherwise ==> None
+
+  parse_fluents_with (part : Any) : Option [FluentMap] =
+    match part
+      case (a , s) ==>
+        if (a == identifier)
+        then parse_sequence (s)
+        else None
+      case otherwise ==> None
+
+  parse_fluents (part : Any) : Option [FluentMap] =
+    match part
+      case s : Seq [Any] ==>
+        if s .isEmpty
+        then None
+        else parse_fluents_with (s (0) )
+      case otherwise ==> None
+
+  parse (a : Any) : Option [FluentMap] =
+    parse_fluents (a)
+
+end
+

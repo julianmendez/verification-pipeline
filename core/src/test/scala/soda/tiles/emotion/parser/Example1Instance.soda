@@ -1,0 +1,197 @@
+
+class Example1Instance
+
+  abstract
+
+  fluents : Map [FluentValue] [FluentName] =
+    Map [FluentValue] [FluentName] (
+       ("need_high" , "need") ,
+       ("need_undecided" , "need") ,
+       ("need_low" , "need") ,
+       ("goal_high" , "goal") ,
+       ("goal_undecided" , "goal") ,
+       ("goal_low" , "goal") ,
+       ("control_high" , "control") ,
+       ("control_undecided" , "control") ,
+       ("control_low" , "control") ,
+       ("account_self" , "accountability") ,
+       ("account_other" , "accountability") ,
+       ("account_environment" , "accountability") ,
+       ("account_undecided" , "accountability")
+     )
+
+  actions : ActionSet =
+    Set [Action] (
+      "perceive_threat",
+      "receive_support",
+      "achieve_goal",
+      "make_error",
+      "no_action"
+    )
+
+  rules : RuleSeq = Seq [Rule] (
+    CausesIfRule (
+      Set [FluentValue] (
+        "goal_undecided"
+      ) ,
+      "perceive_threat" ,
+      Set [FluentValue] (
+        "goal_high" ,
+        "need_high" ,
+        "account_environment" ,
+        "control_low"
+      )
+    ) ,
+    CausesIfRule (
+      Set [FluentValue] (
+        "need_high"
+      ) ,
+      "receive_support" ,
+      Set [FluentValue] (
+        "need_low" ,
+        "account_other" ,
+        "control_high"
+      )
+    ) ,
+    CausesIfRule (
+      Set [FluentValue] (
+        "goal_high"
+      ) ,
+      "achieve_goal" ,
+      Set [FluentValue] (
+        "need_low" ,
+        "account_self" ,
+        "control_high"
+      )
+    ) ,
+    CausesIfRule (
+      Set [FluentValue] (
+        "goal_high"
+      ) ,
+      "make_error" ,
+      Set [FluentValue] (
+        "need_high" ,
+        "goal_low" ,
+        "account_self" ,
+        "control_low"
+      )
+    ) ,
+    FacilitatesRule (
+      Set [FluentValue] (
+        "control_high"
+      ) ,
+      "achieve_goal"
+    ) ,
+    InhibitsRule (
+      Set [FluentValue] (
+        "control_low"
+      ) ,
+      "achieve_goal"
+    ) ,
+    ContravenesRule (
+      Set [FluentValue] (
+        "account_environment"
+      ) ,
+      "achieve_goal"
+    ) ,
+    CausesIfRule (
+      Set [FluentValue] () ,
+      "no_action" ,
+      Set [FluentValue] ()
+    ) ,
+    IfRule (
+      Set [FluentValue] () ,
+      Set [FluentValue] ()
+    ) ,
+    TriggersRule (
+      Set [FluentValue] () ,
+      "no_action"
+    ) ,
+    AllowsRule (
+      Set [FluentValue] () ,
+      "no_action"
+    ) ,
+    InhibitsRule (
+      Set [FluentValue] () ,
+      "no_action"
+    ) ,
+    NoConcurrencyRule (
+      Set [Action] ()
+    ) ,
+    DefaultRule (
+      "goal_undecided"
+    ) ,
+    InfluencesIfRule (
+      Set [FluentValue] () ,
+      "no_action" ,
+      Set [FluentValue] ()
+    ) ,
+    InfluencesRule (
+      Set [FluentValue] () ,
+      Set [FluentValue] ()
+    ) ,
+    FacilitatesRule (
+      Set [FluentValue] () ,
+      "no_action"
+    ) ,
+    ContravenesRule (
+      Set [FluentValue] () ,
+      "no_action"
+    ) ,
+    ForbidsToCauseRule (
+      Set [FluentValue] () ,
+      Set [FluentValue] ()
+    )
+  )
+
+  trajectory : Seq [IdentifierSet] =
+    Seq [IdentifierSet] (
+      Set [FluentValue] (
+        "need_undecided" ,
+        "goal_undecided" ,
+        "account_undecided" ,
+        "control_undecided"
+      ) ,
+      Set [Action] (
+        "perceive_threat"
+      ) ,
+      Set [FluentValue] (
+        "need_high" ,
+        "goal_high" ,
+        "account_environment" ,
+        "control_low"
+      ) ,
+      Set [Action] (
+        "receive_support"
+      ) ,
+      Set [FluentValue] (
+        "need_low" ,
+        "goal_high" ,
+        "account_other" ,
+        "control_high"
+      ) ,
+      Set [Action] (
+        "achieve_goal"
+      ) ,
+      Set [FluentValue] (
+        "need_low" ,
+        "goal_high" ,
+        "account_self" ,
+        "control_high"
+      ) ,
+      Set [Action] (
+        "make_error"
+      ) ,
+      Set [FluentValue] (
+        "need_high" ,
+        "goal_low" ,
+        "account_self" ,
+        "control_low"
+      )
+    )
+
+  instance : Configuration =
+    Configuration .mk (fluents) (actions) (rules) (trajectory)
+
+end
+
