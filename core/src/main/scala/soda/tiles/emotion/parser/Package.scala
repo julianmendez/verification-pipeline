@@ -595,14 +595,60 @@ trait TrajectoryParser
 
   lazy val identifier = "trajectory"
 
-  def parse_trajectory (part : Any) : List [Any] =
+  def parse_set_of_strings (part : Any) : Option [IdentifierSet] =
     part match  {
-      case p : Seq [Any] => p .toList
-      case otherwise => List ()
+      case s : Seq [String] => Some (s .toSet)
+      case otherwise => None
+    }
+
+  def parse_state_of_action_with (part : Any) : Option [IdentifierSet] =
+    part match  {
+      case ("state" , set) => parse_set_of_strings (set)
+      case ("actions" , set) => parse_set_of_strings (set)
+      case otherwise => None
+    }
+
+  def parse_state_or_action (part : Any) : Option [IdentifierSet] =
+    part match  {
+      case s : Seq [Any] =>
+        if ( (s .length == 1)
+        ) parse_state_of_action_with (s (0) )
+        else None
+      case otherwise => None
+    }
+
+  def convert_to_seq (s : Seq [Option [IdentifierSet] ] ) : Option [Trajectory] =
+    if ( (s .contains (None) )
+    ) None
+    else Some (s .flatten)
+
+  def parse_sequence (part : Any) : Option [Trajectory] =
+    part match  {
+      case s : Seq [Any] =>
+        convert_to_seq (s .map ( elem => parse_state_or_action (elem) ) )
+      case otherwise => None
+    }
+
+  def parse_trajectory_with (part : Any)  : Option [Trajectory] =
+    part match  {
+      case (a , s) =>
+        if ( (a == identifier)
+        ) parse_sequence (s)
+        else None
+      case otherwise => None
+    }
+
+  def parse_trajectory (part : Any)  : Option [Trajectory] =
+    part match  {
+      case s : Seq [Any] =>
+        if ( s .isEmpty
+        ) None
+        else parse_trajectory_with (s (0) )
+      case otherwise => None
     }
 
   def parse (a : Any) : Option [Trajectory] =
-    None
+    parse_trajectory (a)
 
 }
 

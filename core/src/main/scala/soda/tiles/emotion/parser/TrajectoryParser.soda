@@ -5,12 +5,53 @@ class TrajectoryParser
 
   identifier = "trajectory"
 
-  parse_trajectory (part : Any) : List [Any] =
+  parse_set_of_strings (part : Any) : Option [IdentifierSet] =
     match part
-      case p : Seq [Any] ==> p .toList
-      case otherwise ==> List ()
+      case s : Seq [String] ==> Some (s .toSet)
+      case otherwise ==> None
+
+  parse_state_of_action_with (part : Any) : Option [IdentifierSet] =
+    match part
+      case ("state" , set) ==> parse_set_of_strings (set)
+      case ("actions" , set) ==> parse_set_of_strings (set)
+      case otherwise ==> None
+
+  parse_state_or_action (part : Any) : Option [IdentifierSet] =
+    match part
+      case s : Seq [Any] ==>
+        if (s .length == 1)
+        then parse_state_of_action_with (s (0) )
+        else None
+      case otherwise ==> None
+
+  convert_to_seq (s : Seq [Option [IdentifierSet] ] ) : Option [Trajectory] =
+    if (s .contains (None) )
+    then None
+    else Some (s .flatten)
+
+  parse_sequence (part : Any) : Option [Trajectory] =
+    match part
+      case s : Seq [Any] ==>
+        convert_to_seq (s .map (lambda elem --> parse_state_or_action (elem) ) )
+      case otherwise ==> None
+
+  parse_trajectory_with (part : Any)  : Option [Trajectory] =
+    match part
+      case (a , s) ==>
+        if (a == identifier)
+        then parse_sequence (s)
+        else None
+      case otherwise ==> None
+
+  parse_trajectory (part : Any)  : Option [Trajectory] =
+    match part
+      case s : Seq [Any] ==>
+        if s .isEmpty
+        then None
+        else parse_trajectory_with (s (0) )
+      case otherwise ==> None
 
   parse (a : Any) : Option [Trajectory] =
-    None
+    parse_trajectory (a)
 
 end
