@@ -58,11 +58,14 @@ class ConfigurationParser
       )
     )
 
-  parse (part : Any) : Option [Configuration] =
+  parse_configuration (part : Any) : Option [Configuration] =
     match part
       case s : Seq [Any] ==>
         build_partial_configuration (s)
           .flatMap (lambda partial_conf --> build_configuration (partial_conf) )
       case otherwise ==> None
+
+  parse (part : Any) : Option [Configuration] =
+    parse_configuration (part)
 
 end
