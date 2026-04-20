@@ -141,69 +141,69 @@ class Example2Instance
     )
   )
 
-trajectory : Seq [IdentifierSet] =
-  Seq [IdentifierSet] (
-    Seq [FluentValue] (
-      "need_high" ,
-      "goal_low" ,
-      "account_other" ,
-      "control_high"
-    ) .toSet ,
-    Seq [Action] (
-      "commitment"
-    ) .toSet ,
-    Seq [FluentValue] (
-      "need_high" ,
-      "goal_high" ,
-      "account_self" ,
-      "control_high"
-    ) .toSet ,
-    Seq [Action] (
-      "endorsement"
-    ) .toSet ,
-    Seq [FluentValue] (
-      "need_undecided" ,
-      "goal_high" ,
-      "account_self" ,
-      "control_undecided"
-    ) .toSet ,
-    Seq [Action] (
-      "justification"
-    ) .toSet ,
-    Seq [FluentValue] (
-      "need_undecided" ,
-      "goal_high" ,
-      "account_environment" ,
-      "control_low"
-    ) .toSet ,
-    Seq [Action] (
-      "attribution"
-    ) .toSet ,
-    Seq [FluentValue] (
-      "need_undecided" ,
-      "goal_high" ,
-      "account_self" ,
-      "control_undecided"
-    ) .toSet ,
-    Seq [Action] (
-      "challenge"
-    ) .toSet ,
-    Seq [FluentValue] (
-      "need_undecided" ,
-      "goal_high" ,
-      "account_environment" ,
-      "control_low"
-    ) .toSet ,
-    Seq [Action] (
-      "affirmation"
-    ) .toSet ,
-    Seq [FluentValue] (
-      "need_high" ,
-      "goal_high" ,
-      "account_environment" ,
-      "control_undecided"
-    ) .toSet
-  )
+  trajectory : Seq [IdentifierSet] =
+    Seq [IdentifierSet] (
+      Seq [FluentValue] (
+        "need_high" ,
+        "goal_low" ,
+        "account_other" ,
+        "control_high"
+      ) .toSet ,
+      Seq [Action] (
+        "commitment"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "need_high" ,
+        "goal_high" ,
+        "account_self" ,
+        "control_high"
+      ) .toSet ,
+      Seq [Action] (
+        "endorsement"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "need_undecided" ,
+        "goal_high" ,
+        "account_self" ,
+        "control_undecided"
+      ) .toSet ,
+      Seq [Action] (
+        "justification"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "need_undecided" ,
+        "goal_high" ,
+        "account_environment" ,
+        "control_low"
+      ) .toSet ,
+      Seq [Action] (
+        "attribution"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "need_undecided" ,
+        "goal_high" ,
+        "account_self" ,
+        "control_undecided"
+      ) .toSet ,
+      Seq [Action] (
+        "challenge"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "need_undecided" ,
+        "goal_high" ,
+        "account_environment" ,
+        "control_low"
+      ) .toSet ,
+      Seq [Action] (
+        "affirmation"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "need_high" ,
+        "goal_high" ,
+        "account_environment" ,
+        "control_undecided"
+      ) .toSet
+    )
 
   instance : Configuration =
     Configuration .mk (fluents) (actions) (rules) (trajectory)
