@@ -6,31 +6,19 @@ package soda.tiles.emotion.tile.primitive
 
 import   org.scalatest.funsuite.AnyFunSuite
 import   soda.tiles.emotion.entity.Action
-import   soda.tiles.emotion.entity.ActionSet
-import   soda.tiles.emotion.entity.AllowsRule
-import   soda.tiles.emotion.entity.CausesIfRule
-import   soda.tiles.emotion.entity.Context
-import   soda.tiles.emotion.entity.ContravenesRule
-import   soda.tiles.emotion.entity.DefaultRule
-import   soda.tiles.emotion.entity.FacilitatesRule
-import   soda.tiles.emotion.entity.FluentSet
 import   soda.tiles.emotion.entity.FluentValue
-import   soda.tiles.emotion.entity.ForbidsToCauseRule
-import   soda.tiles.emotion.entity.Identifier
 import   soda.tiles.emotion.entity.IdentifierSet
 import   soda.tiles.emotion.entity.IfRule
-import   soda.tiles.emotion.entity.InfluencesIfRule
-import   soda.tiles.emotion.entity.InfluencesRule
 import   soda.tiles.emotion.entity.InhibitsRule
-import   soda.tiles.emotion.entity.Instance
 import   soda.tiles.emotion.entity.NoConcurrencyRule
 import   soda.tiles.emotion.entity.Rule
-import   soda.tiles.emotion.entity.RuleSeq
 import   soda.tiles.emotion.entity.TileMessage
 import   soda.tiles.emotion.entity.TileMessageBuilder
 import   soda.tiles.emotion.entity.TilePair
-import   soda.tiles.emotion.entity.Trajectory
-import   soda.tiles.emotion.entity.TriggersRule
+
+
+
+
 
 trait SquareApplyTile
   extends
