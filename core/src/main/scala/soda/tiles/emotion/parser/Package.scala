@@ -15,6 +15,24 @@ import   soda.tiles.emotion.entity.Trajectory
 import   soda.tiles.emotion.entity.Transition
 import   soda.tiles.emotion.entity.Rule
 import   soda.tiles.emotion.entity.RuleSeq
+import   soda.tiles.emotion.entity.AllowsRule
+import   soda.tiles.emotion.entity.CausesIfRule
+import   soda.tiles.emotion.entity.ContravenesRule
+import   soda.tiles.emotion.entity.DefaultRule
+import   soda.tiles.emotion.entity.FacilitatesRule
+import   soda.tiles.emotion.entity.FluentSet
+import   soda.tiles.emotion.entity.FluentValue
+import   soda.tiles.emotion.entity.ForbidsToCauseRule
+import   soda.tiles.emotion.entity.IdentifierSet
+import   soda.tiles.emotion.entity.IfRule
+import   soda.tiles.emotion.entity.InfluencesIfRule
+import   soda.tiles.emotion.entity.InfluencesRule
+import   soda.tiles.emotion.entity.InhibitsRule
+import   soda.tiles.emotion.entity.Transition
+import   soda.tiles.emotion.entity.NoConcurrencyRule
+import   soda.tiles.emotion.entity.TriggersRule
+
+
 
 
 
@@ -314,43 +332,251 @@ object PartialConfiguration {
 }
 
 
+trait RuleParser
+{
+
+
+
+  lazy val identifier = "rule"
+
+  lazy val keyword_rule = "rule"
+
+  lazy val keyword_input_fluent = "input_fluent"
+
+  lazy val keyword_input = "input"
+
+  lazy val keyword_output = "output"
+
+  lazy val keyword_action = "action"
+
+  lazy val keyword_actions = "actions"
+
+  def parse_set_of_strings (part : Any) : Option [Set [String] ] =
+    part match  {
+      case s : Seq [String] => Some (s .toSet)
+      case otherwise => None
+    }
+
+  def parse_fluents (part : Any) : Option [FluentSet] =
+    parse_set_of_strings (part)
+
+  def parse_actions_with (part : Any) : Option [FluentSet] =
+    parse_set_of_strings (part)
+
+  def parse_fluent (part : Any) : Option [FluentValue] =
+    part match  {
+      case ("input_fluent" , value) => Some (value .toString)
+      case otherwise => None
+    }
+
+  def parse_input (part : Any) : Option [FluentSet] =
+    part match  {
+      case ("input" , value) => parse_fluents (value)
+      case otherwise => None
+    }
+
+  def parse_output (part : Any) : Option [FluentSet] =
+    part match  {
+      case ("output" , value) => parse_fluents (value)
+      case otherwise => None
+    }
+
+  def parse_action (part : Any) : Option [Action] =
+    part match  {
+      case ("action" , value) => Some (value .toString)
+      case otherwise => None
+    }
+
+  def parse_actions (part : Any) : Option [ActionSet] =
+    part match  {
+      case ("actions" , value) => parse_actions_with (value)
+      case otherwise => None
+    }
+
+  def parse_CausesIfRule (maybe_input : Option [FluentSet] ) (maybe_action : Option [Action] ) (maybe_output : Option [FluentSet] ) : Option [CausesIfRule] =
+    if ( (maybe_input .isDefined && maybe_action .isDefined && maybe_output .isDefined)
+    ) Some (CausesIfRule (maybe_input .get , maybe_action .get , maybe_output .get) )
+    else None
+
+  def parse_IfRule (maybe_input : Option [FluentSet] ) (maybe_output : Option [FluentSet] ) : Option [IfRule] =
+    if ( (maybe_input .isDefined && maybe_output .isDefined)
+    ) Some (IfRule (maybe_input .get , maybe_output .get) )
+    else None
+
+  def parse_TriggersRule (maybe_input : Option [FluentSet] ) (maybe_action : Option [Action] ) : Option [TriggersRule] =
+    if ( (maybe_input .isDefined && maybe_action .isDefined)
+    ) Some (TriggersRule (maybe_input .get , maybe_action .get) )
+    else None
+
+  def parse_AllowsRule (maybe_input : Option [FluentSet] ) (maybe_action : Option [Action] ) : Option [AllowsRule] =
+    if ( (maybe_input .isDefined && maybe_action .isDefined)
+    ) Some (AllowsRule (maybe_input .get , maybe_action .get) )
+    else None
+
+  def parse_InhibitsRule (maybe_input : Option [FluentSet] ) (maybe_action : Option [Action] ) : Option [InhibitsRule] =
+    if ( (maybe_input .isDefined && maybe_action .isDefined)
+    ) Some (InhibitsRule (maybe_input .get , maybe_action .get) )
+    else None
+
+  def parse_NoConcurrencyRule (maybe_actions : Option [ActionSet] ) : Option [NoConcurrencyRule] =
+    if ( (maybe_actions .isDefined)
+    ) Some (NoConcurrencyRule (maybe_actions .get) )
+    else None
+
+  def parse_DefaultRule (maybe_fluent : Option [FluentValue] ) : Option [DefaultRule] =
+    if ( (maybe_fluent .isDefined)
+    ) Some (DefaultRule (maybe_fluent .get) )
+    else None
+
+  def parse_InfluencesIfRule (maybe_input : Option [FluentSet] ) (maybe_action : Option [Action] ) (maybe_output : Option [FluentSet] ) : Option [InfluencesIfRule] =
+    if ( (maybe_input .isDefined && maybe_action .isDefined && maybe_output .isDefined)
+    ) Some (InfluencesIfRule (maybe_input .get , maybe_action .get , maybe_output .get) )
+    else None
+
+  def parse_InfluencesRule (maybe_input : Option [FluentSet] ) (maybe_output : Option [FluentSet] ) : Option [InfluencesRule] =
+    if ( (maybe_input .isDefined && maybe_output .isDefined)
+    ) Some (InfluencesRule (maybe_input .get , maybe_output .get) )
+    else None
+
+  def parse_FacilitatesRule (maybe_input : Option [FluentSet] ) (maybe_action : Option [Action] ) : Option [FacilitatesRule] =
+    if ( (maybe_input .isDefined && maybe_action .isDefined)
+    ) Some (FacilitatesRule (maybe_input .get , maybe_action .get) )
+    else None
+
+  def parse_ContravenesRule (maybe_input : Option [FluentSet] ) (maybe_action : Option [Action] ) : Option [ContravenesRule] =
+    if ( (maybe_input .isDefined && maybe_action .isDefined)
+    ) Some (ContravenesRule (maybe_input .get , maybe_action .get) )
+    else None
+
+  def parse_ForbidsToCauseRule (maybe_input : Option [FluentSet] ) (maybe_output : Option [FluentSet] ) : Option [ForbidsToCauseRule] =
+    if ( (maybe_input .isDefined && maybe_output .isDefined)
+    ) Some (ForbidsToCauseRule (maybe_input .get , maybe_output .get) )
+    else None
+
+  def parse_rule_for_name (rule_name : Identifier) (s : Seq [Any] ) : Option [Rule] =
+    rule_name match  {
+      case "CausesIfRule" =>
+         if ( (s .length == 4)
+         ) parse_CausesIfRule (parse_input (s (1) ) ) (parse_action (s (2) ) ) (parse_output (s (3) ) )
+         else None
+      case "IfRule" =>
+         if ( (s .length == 3)
+         ) parse_IfRule (parse_input (s (1) ) ) (parse_output (s (2) ) )
+         else None
+      case "TriggersRule" =>
+         if ( (s .length == 3)
+         ) parse_TriggersRule (parse_input (s (1) ) ) (parse_action (s (2) ) )
+         else None
+      case "AllowsRule" =>
+         if ( (s .length == 3)
+         ) parse_AllowsRule (parse_input (s (1) ) ) (parse_action (s (2) ) )
+         else None
+      case "InhibitsRule" =>
+         if ( (s .length == 3)
+         ) parse_InhibitsRule (parse_input (s (1) ) ) (parse_action (s (2) ) )
+         else None
+      case "NoConcurrencyRule" =>
+         if ( (s .length == 2)
+         ) parse_NoConcurrencyRule (parse_actions (s (1) ) )
+         else None
+      case "DefaultRule" =>
+         if ( (s .length == 2)
+         ) parse_DefaultRule (parse_fluent (s (1) ) )
+         else None
+      case "InfluencesIfRule" =>
+         if ( (s .length == 4)
+         ) parse_InfluencesIfRule (parse_input (s (1) ) ) (parse_action (s (2) ) ) (parse_output (s (3) ) )
+         else None
+      case "InfluencesRule" =>
+         if ( (s .length == 3)
+         ) parse_InfluencesRule (parse_input (s (1) ) ) (parse_output (s (2) ) )
+         else None
+      case "FacilitatesRule" =>
+         if ( (s .length == 3)
+         ) parse_FacilitatesRule (parse_input (s (1) ) ) (parse_action (s (2) ) )
+         else None
+      case "ContravenesRule" =>
+         if ( (s .length == 3)
+         ) parse_ContravenesRule (parse_input (s (1) ) ) (parse_action (s (2) ) )
+         else None
+      case "ForbidsToCauseRule" =>
+         if ( (s .length == 3)
+         ) parse_ForbidsToCauseRule (parse_input (s (1) ) ) (parse_output (s (2) ) )
+         else None
+    }
+
+  def parse_rule_with (first : Any) (s : Seq [Any] ) : Option [Rule] =
+    first match  {
+      case (name , rule_name) =>
+        if ( (name == keyword_rule)
+        ) parse_rule_for_name (rule_name .toString) (s)
+        else None
+      case otherwise => None
+    }
+
+  def parse_rule (part : Any) : Option [Rule] =
+    part match  {
+      case s : Seq [Any] =>
+        if ( (s .isEmpty)
+        ) None
+        else parse_rule_with (s (0) ) (s)
+      case otherwise => None
+    }
+
+  def parse (part : Any) : Option [Rule] =
+    parse_rule (part)
+
+}
+
+case class RuleParser_ () extends RuleParser
+
+object RuleParser {
+  def mk : RuleParser =
+    RuleParser_ ()
+}
+
+
 trait RuleSeqParser
 {
 
 
 
-  import   scala.jdk.CollectionConverters.CollectionHasAsScala
-  import   scala.jdk.CollectionConverters.IteratorHasAsScala
-  import   scala.jdk.CollectionConverters.MapHasAsScala
-
   lazy val identifier = "rules"
 
-  def parse_tuple_type (rule_type : String) (part : Any) : Option [Tuple2 [String, java.util.Map [Any, Any] ] ] =
+  lazy val rule_parser : RuleParser = RuleParser .mk
+
+  def convert_to_map (s : Seq [Option [Rule] ] ) : Option [RuleSeq] =
+    if ( (s .contains (None) )
+    ) None
+    else Some (s .flatten)
+
+  def parse_sequence (part : Any) : Option [RuleSeq] =
     part match  {
-      case m : java.util.Map [Any, Any] => Some (Tuple2 (rule_type , m))
+      case s : Seq [Any] =>
+        convert_to_map (s .map ( elem => rule_parser .parse (elem) ) )
       case otherwise => None
     }
 
-  def parse_rule_pair (p : Tuple2 [Any, Any] ) : Option [Tuple2 [String, java.util.Map [Any, Any] ] ] =
-    p ._1 match  {
-      case rule_type : String => parse_tuple_type (rule_type) (p ._2)
+  def parse_rules_with (part : Any)  : Option [RuleSeq] =
+    part match  {
+      case (a , s) =>
+        if ( (a == identifier)
+        ) parse_sequence (s)
+        else None
       case otherwise => None
     }
 
-  def parse_rule (part : Any) : Option [Tuple2 [String, java.util.Map [Any, Any] ] ] =
+  def parse_rules (part : Any)  : Option [RuleSeq] =
     part match  {
-      case p : Tuple2 [Any, Any] => parse_rule_pair (p)
+      case s : Seq [Any] =>
+        if ( s .isEmpty
+        ) None
+        else parse_rules_with (s (0) )
       case otherwise => None
     }
 
-  def parse_rules (part : Any) : List [Tuple2 [String, java.util.Map [Any, Any] ] ] =
-    part match  {
-      case p : Seq[Any] => p .flatMap ( r => parse_rule (r) ) .toList
-      case otherwise => List ()
-    }
-
-  def parse (a : Any) : Option [RuleSeq] =
-    None
+  def parse (part : Any) : Option [RuleSeq] =
+    parse_rules (part)
 
 }
 

@@ -17,4 +17,22 @@ import
   soda.tiles.emotion.entity.Transition
   soda.tiles.emotion.entity.Rule
   soda.tiles.emotion.entity.RuleSeq
+  soda.tiles.emotion.entity.AllowsRule
+  soda.tiles.emotion.entity.CausesIfRule
+  soda.tiles.emotion.entity.ContravenesRule
+  soda.tiles.emotion.entity.DefaultRule
+  soda.tiles.emotion.entity.FacilitatesRule
+  soda.tiles.emotion.entity.FluentSet
+  soda.tiles.emotion.entity.FluentValue
+  soda.tiles.emotion.entity.ForbidsToCauseRule
+  soda.tiles.emotion.entity.IdentifierSet
+  soda.tiles.emotion.entity.IfRule
+  soda.tiles.emotion.entity.InfluencesIfRule
+  soda.tiles.emotion.entity.InfluencesRule
+  soda.tiles.emotion.entity.InhibitsRule
+  soda.tiles.emotion.entity.Transition
+  soda.tiles.emotion.entity.NoConcurrencyRule
+  soda.tiles.emotion.entity.TriggersRule
+
+
 
