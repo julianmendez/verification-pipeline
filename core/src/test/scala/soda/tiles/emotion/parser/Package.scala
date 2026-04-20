@@ -83,18 +83,6 @@ trait Example1Instance
     ) ,
     CausesIfRule (
       Set [FluentValue] (
-        "goal_undecided"
-      ) ,
-      "perceive_threat" ,
-      Set [FluentValue] (
-        "goal_high" ,
-        "need_high" ,
-        "account_environment" ,
-        "control_low"
-      )
-    ) ,
-    CausesIfRule (
-      Set [FluentValue] (
         "need_high"
       ) ,
       "receive_support" ,
@@ -497,7 +485,7 @@ case class YamlParserSpec ()
 
   lazy val example1_parsed_instance = parser .parse ( new StringReader (example1_contents) )
 
-  lazy val example1_instance = Example1Instance .mk .instance
+  lazy val example1_instance = Some (Example1Instance .mk .instance)
 
   lazy val example2_name = "/example/example-2.yaml"
 
@@ -505,19 +493,19 @@ case class YamlParserSpec ()
 
   lazy val example2_parsed_instance = parser .parse ( new StringReader (example2_contents) )
 
-  lazy val example2_instance = Example2Instance .mk .instance
+  lazy val example2_instance = Some (Example2Instance .mk .instance)
 
-  test ("TO DO - read example 1") (
+  test ("parse example 1") (
     check (
-      obtained = example1_instance
+      obtained = example1_parsed_instance
     ) (
       expected = example1_instance
     )
   )
 
-  test ("TO DO - read example 2") (
+  test ("parse example 2") (
     check (
-      obtained = example2_instance
+      obtained = example2_parsed_instance
     ) (
       expected = example2_instance
     )

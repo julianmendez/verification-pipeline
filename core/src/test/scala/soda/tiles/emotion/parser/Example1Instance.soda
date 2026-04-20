@@ -44,18 +44,6 @@ class Example1Instance
     ) ,
     CausesIfRule (
       Set [FluentValue] (
-        "goal_undecided"
-      ) ,
-      "perceive_threat" ,
-      Set [FluentValue] (
-        "goal_high" ,
-        "need_high" ,
-        "account_environment" ,
-        "control_low"
-      )
-    ) ,
-    CausesIfRule (
-      Set [FluentValue] (
         "need_high"
       ) ,
       "receive_support" ,
