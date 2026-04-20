@@ -1,0 +1,19 @@
+
+class TrajectoryTransitionsTile
+
+  abstract
+
+  trajectory_tile = TrajectoryTile .mk
+
+  transitions_tile = TransitionsTile .mk
+
+  apply (message : TileMessage [Boolean] ) : TileMessage [TransitionSeq] =
+    transitions_tile (
+      trajectory_tile (
+        message
+      )
+    )
+
+end
+
+

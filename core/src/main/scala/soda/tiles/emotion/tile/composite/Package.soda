@@ -1,0 +1,17 @@
+package soda.tiles.emotion.tile.composite
+
+/*
+ * This package contains classes to model composite tiles.
+ */
+
+import
+  soda.tiles.emotion.entity.Rule
+  soda.tiles.emotion.entity.RuleSeq
+  soda.tiles.emotion.entity.TileMessage
+  soda.tiles.emotion.entity.Transition
+  soda.tiles.emotion.entity.TransitionSeq
+  soda.tiles.emotion.tile.constant.TrajectoryTile
+  soda.tiles.emotion.tile.derived.PreprocessorTile
+  soda.tiles.emotion.tile.derived.TransitionsTile
+  soda.tiles.emotion.tile.derived.VerifierTile
+  soda.tiles.emotion.tile.primitive.CrossTile
