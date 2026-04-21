@@ -43,8 +43,8 @@ trait PreprocessorTile
     ) empty_set .+ (action)
     else empty_set
 
-  def find (transition : Transition) : ActionSet =
-    transition match  {
+  def find (transition : Transition) (rule : Rule) : ActionSet =
+    rule match  {
       case CausesIfRule (input_set , action , output_set) => empty_set
       case IfRule (input_set , output_set) => empty_set
       case TriggersRule (input_set , action) => empty_set
@@ -60,7 +60,7 @@ trait PreprocessorTile
     }
 
   def process_elem (elem : TilePair [Transition, Rule] ) : TileTriple [Transition, Rule, ActionSet]  =
-    TileTriple .mk (elem .fst) (elem .snd) (find (elem .fst) )
+    TileTriple .mk (elem .fst) (elem .snd) (find (elem .fst) (elem .snd) )
 
   def apply (message : TileMessage [Seq [TilePair [Transition, Rule] ] ] )
       : TileMessage [Seq [TileTriple [Transition, Rule, ActionSet] ] ] =
@@ -202,8 +202,8 @@ trait VerifierTile
     ) (output .forall (fluent => ! transition .output .contains (fluent) ) )
     else true
 
-  def verify (transition : Transition) (inhibited : ActionSet) : Boolean =
-    transition match  {
+  def verify (transition : Transition) (rule : Rule) (inhibited : ActionSet) : Boolean =
+    rule match  {
       case CausesIfRule (input_set , action , output_set) => verifyCausesIfRule (transition) (inhibited) (input_set) (action) (output_set)
       case IfRule (input_set , output_set) => verifyIfRule (transition) (input_set) (output_set)
       case TriggersRule (input_set , action) => verifyTriggersRule (transition) (inhibited) (input_set) (action)
@@ -219,7 +219,7 @@ trait VerifierTile
     }
 
   def verify_elem (elem : TileTriple [Transition, Rule, ActionSet] ) : Boolean =
-    verify (elem .fst) (elem .trd)
+    verify (elem .fst) (elem .snd) (elem .trd)
 
   def apply (message : TileMessage [Seq [TileTriple [Transition, Rule, ActionSet] ] ] ) : TileMessage [Seq [Boolean] ] =
     TileMessageBuilder .mk .build (message .context) (message .instance) (

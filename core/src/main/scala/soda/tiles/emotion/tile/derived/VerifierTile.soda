@@ -44,8 +44,8 @@ class VerifierTile
     then (output .forall (fluent --> not transition .output .contains (fluent) ) )
     else true
 
-  verify (transition : Transition) (inhibited : ActionSet) : Boolean =
-    match transition
+  verify (transition : Transition) (rule : Rule) (inhibited : ActionSet) : Boolean =
+    match rule
       case CausesIfRule (input_set , action , output_set) ==> verifyCausesIfRule (transition) (inhibited) (input_set) (action) (output_set)
       case IfRule (input_set , output_set) ==> verifyIfRule (transition) (input_set) (output_set)
       case TriggersRule (input_set , action) ==> verifyTriggersRule (transition) (inhibited) (input_set) (action)
@@ -60,7 +60,7 @@ class VerifierTile
       case ForbidsToCauseRule (input_set , output_set) ==> verifyForbidsToCauseRule (transition) (input_set) (output_set)
 
   verify_elem (elem : TileTriple [Transition] [Rule] [ActionSet] ) : Boolean =
-    verify (elem .fst) (elem .trd)
+    verify (elem .fst) (elem .snd) (elem .trd)
 
   apply (message : TileMessage [Seq [TileTriple [Transition] [Rule] [ActionSet] ] ] ) : TileMessage [Seq [Boolean] ] =
     TileMessageBuilder .mk .build (message .context) (message .instance) (
