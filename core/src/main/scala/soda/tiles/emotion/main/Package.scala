@@ -8,14 +8,14 @@ package soda.tiles.emotion.main
 import   java.nio.file.Files
 import   java.nio.file.Paths
 import   java.io.StringReader
+import   soda.tiles.emotion.entity.ActionSet
 import   soda.tiles.emotion.entity.Configuration
 import   soda.tiles.emotion.entity.InstanceBuilder
+import   soda.tiles.emotion.entity.Rule
+import   soda.tiles.emotion.entity.TileQuad
+import   soda.tiles.emotion.entity.Transition
 import   soda.tiles.emotion.parser.YamlParser
 import   soda.tiles.emotion.pipeline.EmotionalReasoningPipeline
-
-
-
-
 
 /**
  * This is the main entry point.
@@ -51,23 +51,27 @@ trait Main
 
   lazy val emotional_reasoning_pipeline = EmotionalReasoningPipeline .mk
 
-  def process_configuration (configuration : Configuration) : Seq [Boolean] =
+  def process_configuration (configuration : Configuration)
+      : Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] =
     emotional_reasoning_pipeline .run (
       instance_builder
         .build (configuration)
     ) .contents
 
-  def process_maybe_configuration (maybe_conf : Option [Configuration] ) : Option [Seq [Boolean] ] =
+  def process_maybe_configuration (maybe_conf : Option [Configuration] )
+      : Option [Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] ] =
     if ( (maybe_conf .isDefined)
     ) Some (process_configuration (maybe_conf .get) )
     else None
 
-  def process_file (file_name : String) : Option [Seq [Boolean] ] =
+  def process_file (file_name : String)
+      : Option [Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] ] =
     process_maybe_configuration (
       yaml_parser .parse ( new StringReader (read_file (file_name) ) )
     )
 
-  def serialize_output (maybe_output : Option [Seq [Boolean] ] ) : String =
+  def serialize_output (maybe_output : Option [Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] ] )
+      : String =
     maybe_output match  {
       case Some (instance) => serializer .serialize (instance)
       case None => "Undefined result"
@@ -101,10 +105,18 @@ trait Serializer
 
 
 
-  def serialize (seq : Seq [Boolean] ) : String =
+  def show_entry (entry : TileQuad [Transition, Rule, ActionSet, Boolean] ) : String =
+    "- transition : " + entry .fst + "\n" +
+    "  rule : " + entry .snd + "\n" +
+    "  inhibiting_actions : " + entry .trd + "\n" +
+    "  valid : " + entry .fth + "\n"
+
+  def serialize (seq : Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] ) : String =
+    "---" + "\n" +
     (seq
-      .map ( x => x .toString + " ")
-      .mkString ) + "\n"
+      .map ( x => show_entry (x) )
+      .mkString
+    ) + "\n"
 
 }
 

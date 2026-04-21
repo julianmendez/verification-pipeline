@@ -29,6 +29,7 @@ import
   soda.tiles.emotion.entity.TileMessageBuilder
   soda.tiles.emotion.entity.TilePair
   soda.tiles.emotion.entity.TileTriple
+  soda.tiles.emotion.entity.TileQuad
   soda.tiles.emotion.entity.Trajectory
   soda.tiles.emotion.entity.TriggersRule
 

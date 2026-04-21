@@ -4,7 +4,11 @@ package soda.tiles.emotion.pipeline
  * This package contains classes to model pipelines.
  */
 
+import   soda.tiles.emotion.entity.ActionSet
+import   soda.tiles.emotion.entity.Rule
 import   soda.tiles.emotion.entity.TileMessage
+import   soda.tiles.emotion.entity.TileQuad
+import   soda.tiles.emotion.entity.Transition
 import   soda.tiles.emotion.tile.composite.CrossPreprocessorVerifierTile
 import   soda.tiles.emotion.tile.composite.TrajectoryTransitionsTile
 import   soda.tiles.emotion.tile.constant.RulesTile
@@ -25,7 +29,8 @@ trait EmotionalReasoningPipeline
 
   lazy val cross_preprocessor_verifier_tile = CrossPreprocessorVerifierTile .mk
 
-  def apply (message : TileMessage [Boolean] ) : TileMessage [Seq [Boolean] ] =
+  def apply (message : TileMessage [Boolean] )
+      : TileMessage [Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] ] =
     cross_preprocessor_verifier_tile .apply (
       trajectory_transitions_tile .apply (
         message
@@ -36,7 +41,8 @@ trait EmotionalReasoningPipeline
       )
     )
 
-  def run (message : TileMessage [Boolean] ) : TileMessage [Seq [Boolean] ] =
+  def run (message : TileMessage [Boolean] )
+    : TileMessage [Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] ] =
     apply (message)
 
 }

@@ -62,9 +62,12 @@ class VerifierTile
   verify_elem (elem : TileTriple [Transition] [Rule] [ActionSet] ) : Boolean =
     verify (elem .fst) (elem .snd) (elem .trd)
 
-  apply (message : TileMessage [Seq [TileTriple [Transition] [Rule] [ActionSet] ] ] ) : TileMessage [Seq [Boolean] ] =
+  apply (message : TileMessage [Seq [TileTriple [Transition] [Rule] [ActionSet] ] ] )
+      : TileMessage [Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] ] =
     TileMessageBuilder .mk .build (message .context) (message .instance) (
-      message .contents .map (lambda elem --> verify_elem (elem) )
+      message .contents .map (lambda elem -->
+        TileQuad .mk (elem .fst) (elem .snd) (elem .trd) (verify_elem (elem) )
+      )
     )
 
 end

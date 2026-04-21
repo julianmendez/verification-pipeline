@@ -5,9 +5,11 @@ package soda.tiles.emotion.tile.composite
  */
 
 import
+  soda.tiles.emotion.entity.ActionSet
   soda.tiles.emotion.entity.Rule
   soda.tiles.emotion.entity.RuleSeq
   soda.tiles.emotion.entity.TileMessage
+  soda.tiles.emotion.entity.TileQuad
   soda.tiles.emotion.entity.Transition
   soda.tiles.emotion.entity.TransitionSeq
   soda.tiles.emotion.tile.constant.TrajectoryTile

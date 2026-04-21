@@ -32,23 +32,27 @@ class Main
 
   emotional_reasoning_pipeline = EmotionalReasoningPipeline .mk
 
-  process_configuration (configuration : Configuration) : Seq [Boolean] =
+  process_configuration (configuration : Configuration)
+      : Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] =
     emotional_reasoning_pipeline .run (
       instance_builder
         .build (configuration)
     ) .contents
 
-  process_maybe_configuration (maybe_conf : Option [Configuration] ) : Option [Seq [Boolean] ] =
+  process_maybe_configuration (maybe_conf : Option [Configuration] )
+      : Option [Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] ] =
     if (maybe_conf .isDefined)
     then Some (process_configuration (maybe_conf .get) )
     else None
 
-  process_file (file_name : String) : Option [Seq [Boolean] ] =
+  process_file (file_name : String)
+      : Option [Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] ] =
     process_maybe_configuration (
       yaml_parser .parse ( @new StringReader (read_file (file_name) ) )
     )
 
-  serialize_output (maybe_output : Option [Seq [Boolean] ] ) : String =
+  serialize_output (maybe_output : Option [Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] ] )
+      : String =
     match maybe_output
       case Some (instance) ==> serializer .serialize (instance)
       case None ==> "Undefined result"

@@ -28,6 +28,7 @@ import   soda.tiles.emotion.entity.TileMessage
 import   soda.tiles.emotion.entity.TileMessageBuilder
 import   soda.tiles.emotion.entity.TilePair
 import   soda.tiles.emotion.entity.TileTriple
+import   soda.tiles.emotion.entity.TileQuad
 import   soda.tiles.emotion.entity.Trajectory
 import   soda.tiles.emotion.entity.TriggersRule
 
@@ -221,9 +222,12 @@ trait VerifierTile
   def verify_elem (elem : TileTriple [Transition, Rule, ActionSet] ) : Boolean =
     verify (elem .fst) (elem .snd) (elem .trd)
 
-  def apply (message : TileMessage [Seq [TileTriple [Transition, Rule, ActionSet] ] ] ) : TileMessage [Seq [Boolean] ] =
+  def apply (message : TileMessage [Seq [TileTriple [Transition, Rule, ActionSet] ] ] )
+      : TileMessage [Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] ] =
     TileMessageBuilder .mk .build (message .context) (message .instance) (
-      message .contents .map ( elem => verify_elem (elem) )
+      message .contents .map ( elem =>
+        TileQuad .mk (elem .fst) (elem .snd) (elem .trd) (verify_elem (elem) )
+      )
     )
 
 }

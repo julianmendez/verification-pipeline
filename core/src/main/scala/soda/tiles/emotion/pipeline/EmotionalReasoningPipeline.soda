@@ -14,7 +14,8 @@ class EmotionalReasoningPipeline
 
   cross_preprocessor_verifier_tile = CrossPreprocessorVerifierTile .mk
 
-  apply (message : TileMessage [Boolean] ) : TileMessage [Seq [Boolean] ] =
+  apply (message : TileMessage [Boolean] )
+      : TileMessage [Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] ] =
     cross_preprocessor_verifier_tile .apply (
       trajectory_transitions_tile .apply (
         message
@@ -25,7 +26,8 @@ class EmotionalReasoningPipeline
       )
     )
 
-  run (message : TileMessage [Boolean] ) : TileMessage [Seq [Boolean] ] =
+  run (message : TileMessage [Boolean] )
+    : TileMessage [Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] ] =
     apply (message)
 
 end

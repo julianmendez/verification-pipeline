@@ -4,9 +4,11 @@ package soda.tiles.emotion.tile.composite
  * This package contains classes to model composite tiles.
  */
 
+import   soda.tiles.emotion.entity.ActionSet
 import   soda.tiles.emotion.entity.Rule
 import   soda.tiles.emotion.entity.RuleSeq
 import   soda.tiles.emotion.entity.TileMessage
+import   soda.tiles.emotion.entity.TileQuad
 import   soda.tiles.emotion.entity.Transition
 import   soda.tiles.emotion.entity.TransitionSeq
 import   soda.tiles.emotion.tile.constant.TrajectoryTile
@@ -27,7 +29,7 @@ trait CrossPreprocessorVerifierTile
   lazy val verifier_tile = VerifierTile .mk
 
   def apply (message0 : TileMessage [TransitionSeq] ) (message1 : TileMessage [RuleSeq] )
-      : TileMessage [Seq [Boolean] ] =
+      : TileMessage [Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] ] =
     verifier_tile .apply (
       preprocessor_tile .apply (
         cross_tile .apply (
