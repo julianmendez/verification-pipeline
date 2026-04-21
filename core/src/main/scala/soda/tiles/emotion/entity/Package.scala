@@ -135,6 +135,23 @@ object TileTriple {
     TileTriple_ [A, B, C] (fst, snd, trd)
 }
 
+trait TileQuad [A , B , C , D ]
+{
+
+  def   fst : A
+  def   snd : B
+  def   trd : C
+  def   fth : D
+
+}
+
+case class TileQuad_ [A, B, C, D] (fst : A, snd : B, trd : C, fth : D) extends TileQuad [A, B, C, D]
+
+object TileQuad {
+  def mk [A, B, C, D] (fst : A) (snd : B) (trd : C) (fth : D) : TileQuad [A, B, C, D] =
+    TileQuad_ [A, B, C, D] (fst, snd, trd, fth)
+}
+
 trait TileMessage [A ]
 {
 
