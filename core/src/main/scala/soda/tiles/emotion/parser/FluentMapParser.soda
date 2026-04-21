@@ -11,8 +11,8 @@ class FluentMapParser
 
   parse_one_fluent_with_values (name : FluentName) (part : Any) : Option [Seq [Tuple2 [FluentValue] [FluentName] ] ] =
     match part
-      case s : Seq [FluentValue] ==>
-        Some (s .map (lambda elem --> (elem , name) ) )
+      case s : Seq [Any] ==>
+        Some (s .map (lambda elem --> (elem .toString , name) ) )
       case otherwise ==> None
 
   parse_one_fluent_with (name : FluentName) (part : Any) : Option [Seq [Tuple2 [FluentValue] [FluentName] ] ] =

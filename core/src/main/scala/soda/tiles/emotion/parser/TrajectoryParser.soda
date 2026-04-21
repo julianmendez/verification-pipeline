@@ -7,7 +7,11 @@ class TrajectoryParser
 
   parse_set_of_strings (part : Any) : Option [IdentifierSet] =
     match part
-      case s : Seq [String] ==> Some (s .toSet)
+      case s : Seq [Any] ==>
+        Some (
+          s .map (lambda elem --> elem .toString)
+            .toSet
+        )
       case otherwise ==> None
 
   parse_state_of_action_with (part : Any) : Option [IdentifierSet] =
