@@ -6,7 +6,6 @@ class SlidingWindow
     defined : Boolean
     s0 : Option [FluentSet]
     a : Option [ActionSet]
-    s1 : Option [FluentSet]
     accum : Seq [Transition]
 
 end
@@ -18,19 +17,20 @@ class TransitionsTile
 
   fold = Fold .mk
 
-  _process_output_state (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
-    if (sw .s1 .isEmpty)
-    then SlidingWindow .mk (sw .defined) (sw .s0) (sw .a) (Some (elem) ) (sw .accum)
-    else SlidingWindow .mk (false) (sw .s0) (sw .a) (sw .s1) (sw .accum)
-
   _process_action (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
     if (sw .a .isEmpty)
-    then SlidingWindow .mk (sw .defined) (sw .s0) (Some (elem) ) (sw .s1) (sw .accum)
-    else _process_output_state (sw) (elem)
+    then
+      SlidingWindow .mk (sw .defined) (sw .s0) (Some (elem) ) (
+        sw .accum
+      )
+    else
+      SlidingWindow .mk (sw .defined) (Some (elem) ) (None) (
+        (sw .accum) .:+ (Transition .mk (sw .s0 .get) (sw .a .get) (elem) )
+      )
 
   _process_input_state (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
     if (sw .s0 .isEmpty)
-    then SlidingWindow .mk (sw .defined) (Some (elem) ) (sw .a) (sw .s1) (sw .accum)
+    then SlidingWindow .mk (sw .defined) (Some (elem) ) (sw .a) (sw .accum)
     else _process_action (sw) (elem)
 
   _process_window (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
@@ -39,11 +39,11 @@ class TransitionsTile
     else _process_input_state (sw) (elem)
 
   _empty_sliding_window : SlidingWindow =
-    SlidingWindow .mk (true) (None) (None) (None) (Seq [Transition] () )
+    SlidingWindow .mk (true) (None) (None) (Seq [Transition] () )
 
   _postprocess (sw : SlidingWindow) : Option [Seq [Transition] ] =
-    if (sw .defined) and (sw .s0 .isEmpty) and (sw .a .isEmpty) and (sw .s1 .isEmpty)
-    then Some (sw .accum)
+    if (sw .defined) and (sw .a .isEmpty)
+    then Some (sw .accum .reverse)
     else None
 
   make_instants (seq : Seq [IdentifierSet] ) : Option [TransitionSeq] =
