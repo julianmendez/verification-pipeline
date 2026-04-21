@@ -173,8 +173,8 @@ trait FluentMapParser
 
   def parse_one_fluent_with_values (name : FluentName) (part : Any) : Option [Seq [Tuple2 [FluentValue, FluentName] ] ] =
     part match  {
-      case s : Seq [FluentValue] =>
-        Some (s .map ( elem => (elem , name) ) )
+      case s : Seq [Any] =>
+        Some (s .map ( elem => (elem .toString , name) ) )
       case otherwise => None
     }
 
@@ -385,7 +385,11 @@ trait RuleParser
 
   def parse_set_of_strings (part : Any) : Option [Set [String] ] =
     part match  {
-      case s : Seq [String] => Some (s .toSet)
+      case s : Seq [Any] =>
+        Some (
+          s .map ( elem => elem .toString)
+            .toSet
+        )
       case otherwise => None
     }
 
@@ -629,7 +633,11 @@ trait TrajectoryParser
 
   def parse_set_of_strings (part : Any) : Option [IdentifierSet] =
     part match  {
-      case s : Seq [String] => Some (s .toSet)
+      case s : Seq [Any] =>
+        Some (
+          s .map ( elem => elem .toString)
+            .toSet
+        )
       case otherwise => None
     }
 

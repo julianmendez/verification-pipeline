@@ -28,6 +28,7 @@ import   soda.tiles.emotion.entity.TileMessage
 import   soda.tiles.emotion.entity.TileMessageBuilder
 import   soda.tiles.emotion.entity.TilePair
 import   soda.tiles.emotion.entity.TileTriple
+import   soda.tiles.emotion.entity.TileQuad
 import   soda.tiles.emotion.entity.Trajectory
 import   soda.tiles.emotion.entity.TriggersRule
 
@@ -43,8 +44,8 @@ trait PreprocessorTile
     ) empty_set .+ (action)
     else empty_set
 
-  def find (transition : Transition) : ActionSet =
-    transition match  {
+  def find (transition : Transition) (rule : Rule) : ActionSet =
+    rule match  {
       case CausesIfRule (input_set , action , output_set) => empty_set
       case IfRule (input_set , output_set) => empty_set
       case TriggersRule (input_set , action) => empty_set
@@ -60,7 +61,7 @@ trait PreprocessorTile
     }
 
   def process_elem (elem : TilePair [Transition, Rule] ) : TileTriple [Transition, Rule, ActionSet]  =
-    TileTriple .mk (elem .fst) (elem .snd) (find (elem .fst) )
+    TileTriple .mk (elem .fst) (elem .snd) (find (elem .fst) (elem .snd) )
 
   def apply (message : TileMessage [Seq [TilePair [Transition, Rule] ] ] )
       : TileMessage [Seq [TileTriple [Transition, Rule, ActionSet] ] ] =
@@ -86,16 +87,15 @@ trait SlidingWindow
   def   defined : Boolean
   def   s0 : Option [FluentSet]
   def   a : Option [ActionSet]
-  def   s1 : Option [FluentSet]
   def   accum : Seq [Transition]
 
 }
 
-case class SlidingWindow_ (defined : Boolean, s0 : Option [FluentSet], a : Option [ActionSet], s1 : Option [FluentSet], accum : Seq [Transition]) extends SlidingWindow
+case class SlidingWindow_ (defined : Boolean, s0 : Option [FluentSet], a : Option [ActionSet], accum : Seq [Transition]) extends SlidingWindow
 
 object SlidingWindow {
-  def mk (defined : Boolean) (s0 : Option [FluentSet]) (a : Option [ActionSet]) (s1 : Option [FluentSet]) (accum : Seq [Transition]) : SlidingWindow =
-    SlidingWindow_ (defined, s0, a, s1, accum)
+  def mk (defined : Boolean) (s0 : Option [FluentSet]) (a : Option [ActionSet]) (accum : Seq [Transition]) : SlidingWindow =
+    SlidingWindow_ (defined, s0, a, accum)
 }
 
 trait TransitionsTile
@@ -105,19 +105,20 @@ trait TransitionsTile
 
   lazy val fold = Fold .mk
 
-  private def _process_output_state (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
-    if ( (sw .s1 .isEmpty)
-    ) SlidingWindow .mk (sw .defined) (sw .s0) (sw .a) (Some (elem) ) (sw .accum)
-    else SlidingWindow .mk (false) (sw .s0) (sw .a) (sw .s1) (sw .accum)
-
   private def _process_action (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
     if ( (sw .a .isEmpty)
-    ) SlidingWindow .mk (sw .defined) (sw .s0) (Some (elem) ) (sw .s1) (sw .accum)
-    else _process_output_state (sw) (elem)
+    )
+      SlidingWindow .mk (sw .defined) (sw .s0) (Some (elem) ) (
+        sw .accum
+      )
+    else
+      SlidingWindow .mk (sw .defined) (Some (elem) ) (None) (
+        (sw .accum) .:+ (Transition .mk (sw .s0 .get) (sw .a .get) (elem) )
+      )
 
   private def _process_input_state (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
     if ( (sw .s0 .isEmpty)
-    ) SlidingWindow .mk (sw .defined) (Some (elem) ) (sw .a) (sw .s1) (sw .accum)
+    ) SlidingWindow .mk (sw .defined) (Some (elem) ) (sw .a) (sw .accum)
     else _process_action (sw) (elem)
 
   private def _process_window (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
@@ -126,11 +127,11 @@ trait TransitionsTile
     else _process_input_state (sw) (elem)
 
   private lazy val _empty_sliding_window : SlidingWindow =
-    SlidingWindow .mk (true) (None) (None) (None) (Seq [Transition] () )
+    SlidingWindow .mk (true) (None) (None) (Seq [Transition] () )
 
   private def _postprocess (sw : SlidingWindow) : Option [Seq [Transition] ] =
-    if ( (sw .defined) && (sw .s0 .isEmpty) && (sw .a .isEmpty) && (sw .s1 .isEmpty)
-    ) Some (sw .accum)
+    if ( (sw .defined) && (sw .a .isEmpty)
+    ) Some (sw .accum .reverse)
     else None
 
   def make_instants (seq : Seq [IdentifierSet] ) : Option [TransitionSeq] =
@@ -202,8 +203,8 @@ trait VerifierTile
     ) (output .forall (fluent => ! transition .output .contains (fluent) ) )
     else true
 
-  def verify (transition : Transition) (inhibited : ActionSet) : Boolean =
-    transition match  {
+  def verify (transition : Transition) (rule : Rule) (inhibited : ActionSet) : Boolean =
+    rule match  {
       case CausesIfRule (input_set , action , output_set) => verifyCausesIfRule (transition) (inhibited) (input_set) (action) (output_set)
       case IfRule (input_set , output_set) => verifyIfRule (transition) (input_set) (output_set)
       case TriggersRule (input_set , action) => verifyTriggersRule (transition) (inhibited) (input_set) (action)
@@ -219,11 +220,14 @@ trait VerifierTile
     }
 
   def verify_elem (elem : TileTriple [Transition, Rule, ActionSet] ) : Boolean =
-    verify (elem .fst) (elem .trd)
+    verify (elem .fst) (elem .snd) (elem .trd)
 
-  def apply (message : TileMessage [Seq [TileTriple [Transition, Rule, ActionSet] ] ] ) : TileMessage [Seq [Boolean] ] =
+  def apply (message : TileMessage [Seq [TileTriple [Transition, Rule, ActionSet] ] ] )
+      : TileMessage [Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] ] =
     TileMessageBuilder .mk .build (message .context) (message .instance) (
-      message .contents .map ( elem => verify_elem (elem) )
+      message .contents .map ( elem =>
+        TileQuad .mk (elem .fst) (elem .snd) (elem .trd) (verify_elem (elem) )
+      )
     )
 
 }

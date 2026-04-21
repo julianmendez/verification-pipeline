@@ -22,6 +22,17 @@ class TileTriple [A : Type] [B : Type] [C : Type]
 end
 
 
+class TileQuad [A : Type] [B : Type] [C : Type] [D : Type]
+
+  abstract
+    fst : A
+    snd : B
+    trd : C
+    fth : D
+
+end
+
+
 class TileMessage [A : Type]
 
   abstract

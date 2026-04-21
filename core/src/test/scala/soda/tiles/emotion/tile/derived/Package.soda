@@ -1,0 +1,15 @@
+package soda.tiles.emotion.tile.derived
+
+/*
+ * This package contains test classes to model the blocks.
+ */
+
+import
+  org.scalatest.funsuite.AnyFunSuite
+  soda.tiles.emotion.entity.Identifier
+  soda.tiles.emotion.entity.IdentifierSet
+  soda.tiles.emotion.entity.Transition
+  soda.tiles.emotion.entity.TileMessage
+  soda.tiles.emotion.entity.TileMessageBuilder
+  soda.tiles.emotion.tile.primitive.ScenarioExample
+

@@ -10,8 +10,8 @@ class PreprocessorTile
     then empty_set .+ (action)
     else empty_set
 
-  find (transition : Transition) : ActionSet =
-    match transition
+  find (transition : Transition) (rule : Rule) : ActionSet =
+    match rule
       case CausesIfRule (input_set , action , output_set) ==> empty_set
       case IfRule (input_set , output_set) ==> empty_set
       case TriggersRule (input_set , action) ==> empty_set
@@ -26,7 +26,7 @@ class PreprocessorTile
       case ForbidsToCauseRule (input_set , output_set) ==> empty_set
 
   process_elem (elem : TilePair [Transition] [Rule] ) : TileTriple [Transition] [Rule] [ActionSet]  =
-    TileTriple .mk (elem .fst) (elem .snd) (find (elem .fst) )
+    TileTriple .mk (elem .fst) (elem .snd) (find (elem .fst) (elem .snd) )
 
   apply (message : TileMessage [Seq [TilePair [Transition] [Rule] ] ] )
       : TileMessage [Seq [TileTriple [Transition] [Rule] [ActionSet] ] ] =

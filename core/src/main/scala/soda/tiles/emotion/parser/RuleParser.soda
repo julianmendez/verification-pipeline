@@ -19,7 +19,11 @@ class RuleParser
 
   parse_set_of_strings (part : Any) : Option [Set [String] ] =
     match part
-      case s : Seq [String] ==> Some (s .toSet)
+      case s : Seq [Any] ==>
+        Some (
+          s .map (lambda elem --> elem .toString)
+            .toSet
+        )
       case otherwise ==> None
 
   parse_fluents (part : Any) : Option [FluentSet] =

@@ -10,7 +10,7 @@ class CrossPreprocessorVerifierTile
   verifier_tile = VerifierTile .mk
 
   apply (message0 : TileMessage [TransitionSeq] ) (message1 : TileMessage [RuleSeq] )
-      : TileMessage [Seq [Boolean] ] =
+      : TileMessage [Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] ] =
     verifier_tile .apply (
       preprocessor_tile .apply (
         cross_tile .apply (

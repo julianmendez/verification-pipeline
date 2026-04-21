@@ -3,10 +3,18 @@ class Serializer
 
   abstract
 
-  serialize (seq : Seq [Boolean] ) : String =
+  show_entry (entry : TileQuad [Transition] [Rule] [ActionSet] [Boolean] ) : String =
+    "- transition : " + entry .fst + "\n" +
+    "  rule : " + entry .snd + "\n" +
+    "  inhibiting_actions : " + entry .trd + "\n" +
+    "  valid : " + entry .fth + "\n"
+
+  serialize (seq : Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] ) : String =
+    "---" + "\n" +
     (seq
-      .map (lambda x --> x .toString + " ")
-      .mkString ) + "\n"
+      .map (lambda x --> show_entry (x) )
+      .mkString
+    ) + "\n"
 
 end
 
