@@ -1,0 +1,102 @@
+class TransitionsTileSpec ()
+  extends
+    AnyFunSuite
+
+  check [A : Type] (obtained: A) (expected: A): org.scalatest.compatible.Assertion =
+    assert(obtained == expected)
+
+  scenario = ScenarioExample .mk
+
+  s0_elem = Set [Identifier] ("s0_elem")
+
+  a_elem = Set [Identifier] ("a_elem")
+
+  s1_elem = Set [Identifier] ("s1_elem")
+
+  elem0 = Set [Identifier] ("elem0")
+
+  extra = Set [Identifier] ("extra")
+
+  mk_tile_message [A : Type] (seq: Seq[A]) : TileMessage[Seq[A]] =
+    TileMessageBuilder
+      .mk
+      .build (scenario.context_0) (scenario.instance_0) (seq)
+
+  transitions_tile = TransitionsTile .mk
+
+  test ("empty trajectory produces empty transition sequence") (
+    check (
+      obtained := transitions_tile
+        .apply (mk_tile_message (Seq [IdentifierSet] () ) )
+        .contents
+    ) (
+      expected := Seq [Transition] ()
+    )
+  )
+
+  test ("single-element trajectory produces empty transition sequence") (
+    check (
+      obtained := transitions_tile
+        .apply (mk_tile_message (Seq [IdentifierSet] (elem0) ) )
+        .contents
+    ) (
+      expected := Seq [Transition] ()
+    )
+  )
+
+  seq_test_3 =
+    Seq [IdentifierSet] (s0_elem, a_elem, s1_elem)
+
+  obtained_test_3 =
+    transitions_tile
+      .apply (mk_tile_message(seq_test_3) )
+      .contents
+
+  expected_test_3 =
+    Seq(Transition.mk(s0_elem) (a_elem) (s1_elem))
+
+
+  test ("three-element trajectory produces one transition") (
+    check (obtained_test_3) (expected_test_3)
+  )
+
+  seq_test_4 =
+    Seq [IdentifierSet] (s0_elem, a_elem, s1_elem, extra)
+
+  test ("four-element trajectory produces empty transition sequence") (
+    check (
+      obtained := transitions_tile
+        .apply (mk_tile_message (seq_test_4) )
+        .contents
+    ) (
+      expected := Seq [Transition] ()
+    )
+  )
+
+  seq_test_5 =
+    Seq [IdentifierSet] (s0_elem, a_elem)
+
+  test ("two-element trajectory produces empty transition sequence") (
+    check (
+      obtained := transitions_tile
+        .apply (mk_tile_message (seq_test_5) )
+        .contents
+    ) (
+      expected := Seq [Transition] ()
+    )
+  )
+
+/*
+  test ("context and instance are preserved by TransitionsTile") (
+    val msg =
+      mk_tile_message (Seq [IdentifierSet] () )
+
+    val result =
+      transitions_tile.apply(msg)
+
+    assert(result.context == msg.context)
+    assert(result.instance == msg.instance)
+  )
+*/
+
+end
