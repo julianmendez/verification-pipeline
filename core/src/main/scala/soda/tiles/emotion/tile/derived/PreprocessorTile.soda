@@ -28,11 +28,14 @@ class PreprocessorTile
   process_elem (elem : TilePair [Transition] [Rule] ) : TileTriple [Transition] [Rule] [ActionSet]  =
     TileTriple .mk (elem .fst) (elem .snd) (find (elem .fst) (elem .snd) )
 
+  map_tile = MapTile .mk [TilePair [Transition] [Rule] ] [TileTriple [Transition] [Rule] [ActionSet] ] (process_elem)
+
   apply (message : TileMessage [Seq [TilePair [Transition] [Rule] ] ] )
       : TileMessage [Seq [TileTriple [Transition] [Rule] [ActionSet] ] ] =
-    TileMessageBuilder .mk .build (message .context) (message .instance) (
-      message .contents .map (lambda elem --> process_elem (elem) )
+    map_tile .apply (
+      message
     )
 
 end
+
 

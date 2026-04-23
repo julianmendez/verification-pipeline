@@ -64,7 +64,7 @@ case class TransitionsTileSpec ()
   )
 
   lazy val seq_test_3 =
-    Seq [IdentifierSet] (s0_elem, a_elem, s1_elem)
+    Seq [IdentifierSet] (s0_elem , a_elem , s1_elem)
 
   lazy val obtained_test_3 =
     transitions_tile
@@ -79,7 +79,7 @@ case class TransitionsTileSpec ()
   )
 
   lazy val seq_test_4 =
-    Seq [IdentifierSet] (s0_elem, a_elem, s1_elem, extra)
+    Seq [IdentifierSet] (s0_elem , a_elem , s1_elem , extra)
 
   test ("four-element trajectory produces empty transition sequence") (
     check (
@@ -92,7 +92,7 @@ case class TransitionsTileSpec ()
   )
 
   lazy val seq_test_5 =
-    Seq [IdentifierSet] (s0_elem, a_elem)
+    Seq [IdentifierSet] (s0_elem , a_elem)
 
   test ("two-element trajectory produces empty transition sequence") (
     check (
@@ -104,18 +104,25 @@ case class TransitionsTileSpec ()
     )
   )
 
-/*
-  test ("context and instance are preserved by TransitionsTile") (
-    val msg =
-      mk_tile_message (Seq [IdentifierSet] () )
+  lazy val seq_test_7 =
+    Seq [IdentifierSet] (s0_elem , a_elem , s1_elem , elem0 , extra , a_elem , s0_elem)
 
-    private lazy val __soda__val result =
-      transitions_tile.apply(msg)
+  lazy val expected_test_7 =
+    Seq [Transition] (
+      Transition .mk (s0_elem) (a_elem) (s1_elem) ,
+      Transition .mk (s1_elem) (elem0) (extra) ,
+      Transition .mk (extra) (a_elem) (s0_elem)
+    )
 
-    assert(result.context == msg.context)
-    assert(result.instance == msg.instance)
+  test ("seven-element trajectory produces correctly ordered transitions") (
+    check (
+      obtained = transitions_tile
+        .apply (mk_tile_message (seq_test_7) )
+        .contents
+    ) (
+      expected = expected_test_7
+    )
   )
-*/
 
 }
 
