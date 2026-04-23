@@ -32,5 +32,7 @@ import
   soda.tiles.emotion.entity.TileQuad
   soda.tiles.emotion.entity.Trajectory
   soda.tiles.emotion.entity.TriggersRule
+  soda.tiles.emotion.tile.primitive.FoldTile
+  soda.tiles.emotion.tile.primitive.MapTile
 
 

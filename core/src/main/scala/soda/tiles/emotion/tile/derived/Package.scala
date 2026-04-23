@@ -31,6 +31,8 @@ import   soda.tiles.emotion.entity.TileTriple
 import   soda.tiles.emotion.entity.TileQuad
 import   soda.tiles.emotion.entity.Trajectory
 import   soda.tiles.emotion.entity.TriggersRule
+import   soda.tiles.emotion.tile.primitive.FoldTile
+import   soda.tiles.emotion.tile.primitive.MapTile
 
 trait PreprocessorTile
 {
@@ -63,10 +65,12 @@ trait PreprocessorTile
   def process_elem (elem : TilePair [Transition, Rule] ) : TileTriple [Transition, Rule, ActionSet]  =
     TileTriple .mk (elem .fst) (elem .snd) (find (elem .fst) (elem .snd) )
 
+  lazy val map_tile = MapTile .mk [TilePair [Transition, Rule] , TileTriple [Transition, Rule, ActionSet] ] (process_elem)
+
   def apply (message : TileMessage [Seq [TilePair [Transition, Rule] ] ] )
       : TileMessage [Seq [TileTriple [Transition, Rule, ActionSet] ] ] =
-    TileMessageBuilder .mk .build (message .context) (message .instance) (
-      message .contents .map ( elem => process_elem (elem) )
+    map_tile .apply (
+      message
     )
 
 }
@@ -77,6 +81,8 @@ object PreprocessorTile {
   def mk : PreprocessorTile =
     PreprocessorTile_ ()
 }
+
+
 
 
 
