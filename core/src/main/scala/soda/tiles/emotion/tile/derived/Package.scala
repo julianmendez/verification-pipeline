@@ -131,7 +131,7 @@ trait TransitionsTile
 
   private def _postprocess (sw : SlidingWindow) : Option [Seq [Transition] ] =
     if ( (sw .defined) && (sw .a .isEmpty)
-    ) Some (sw .accum .reverse)
+    ) Some (sw .accum)
     else None
 
   def make_instants (seq : Seq [IdentifierSet] ) : Option [TransitionSeq] =

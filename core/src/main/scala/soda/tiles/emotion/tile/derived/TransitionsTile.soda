@@ -43,7 +43,7 @@ class TransitionsTile
 
   _postprocess (sw : SlidingWindow) : Option [Seq [Transition] ] =
     if (sw .defined) and (sw .a .isEmpty)
-    then Some (sw .accum .reverse)
+    then Some (sw .accum)
     else None
 
   make_instants (seq : Seq [IdentifierSet] ) : Option [TransitionSeq] =
