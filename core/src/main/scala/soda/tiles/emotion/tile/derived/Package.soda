@@ -5,7 +5,6 @@ package soda.tiles.emotion.tile.derived
  */
 
 import
-  soda.lib.Fold
   soda.tiles.emotion.entity.Action
   soda.tiles.emotion.entity.ActionSet
   soda.tiles.emotion.entity.AllowsRule
@@ -32,6 +31,7 @@ import
   soda.tiles.emotion.entity.TileQuad
   soda.tiles.emotion.entity.Trajectory
   soda.tiles.emotion.entity.TriggersRule
+  soda.tiles.emotion.tile.primitive.ApplyTile
   soda.tiles.emotion.tile.primitive.FoldTile
   soda.tiles.emotion.tile.primitive.MapTile
 

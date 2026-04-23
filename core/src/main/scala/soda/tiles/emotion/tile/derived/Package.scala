@@ -4,7 +4,6 @@ package soda.tiles.emotion.tile.derived
  * This package contains classes to model the blocks.
  */
 
-import   soda.lib.Fold
 import   soda.tiles.emotion.entity.Action
 import   soda.tiles.emotion.entity.ActionSet
 import   soda.tiles.emotion.entity.AllowsRule
@@ -31,6 +30,7 @@ import   soda.tiles.emotion.entity.TileTriple
 import   soda.tiles.emotion.entity.TileQuad
 import   soda.tiles.emotion.entity.Trajectory
 import   soda.tiles.emotion.entity.TriggersRule
+import   soda.tiles.emotion.tile.primitive.ApplyTile
 import   soda.tiles.emotion.tile.primitive.FoldTile
 import   soda.tiles.emotion.tile.primitive.MapTile
 
@@ -109,9 +109,7 @@ trait TransitionsTile
 
 
 
-  lazy val fold = Fold .mk
-
-  private def _process_action (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
+  def process_action (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
     if ( (sw .a .isEmpty)
     )
       SlidingWindow .mk (sw .defined) (sw .s0) (Some (elem) ) (
@@ -122,35 +120,33 @@ trait TransitionsTile
         (sw .accum) .:+ (Transition .mk (sw .s0 .get) (sw .a .get) (elem) )
       )
 
-  private def _process_input_state (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
+  def process_input_state (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
     if ( (sw .s0 .isEmpty)
     ) SlidingWindow .mk (sw .defined) (Some (elem) ) (sw .a) (sw .accum)
-    else _process_action (sw) (elem)
+    else process_action (sw) (elem)
 
-  private def _process_window (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
+  def process_window (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
     if ( (! (sw .defined) )
     ) sw
-    else _process_input_state (sw) (elem)
+    else process_input_state (sw) (elem)
 
-  private lazy val _empty_sliding_window : SlidingWindow =
+  lazy val empty_sliding_window : SlidingWindow =
     SlidingWindow .mk (true) (None) (None) (Seq [Transition] () )
 
-  private def _postprocess (sw : SlidingWindow) : Option [Seq [Transition] ] =
+  def postprocess (sw : SlidingWindow) : Seq [Transition] =
     if ( (sw .defined) && (sw .a .isEmpty)
-    ) Some (sw .accum)
-    else None
+    ) sw .accum
+    else Seq [Transition] ()
 
-  def make_instants (seq : Seq [IdentifierSet] ) : Option [TransitionSeq] =
-    _postprocess (
-      fold (seq) (_empty_sliding_window) (_process_window)
-    )
+  lazy val apply_tile = ApplyTile .mk [SlidingWindow, Seq [Transition] ] (postprocess)
 
-  def make_transitions (seq : Trajectory) : TransitionSeq =
-    make_instants (seq) .getOrElse (Seq [Transition] () )
+  lazy val fold_tile = FoldTile .mk (empty_sliding_window) (process_window)
 
   def apply (message : TileMessage [Trajectory] ) : TileMessage [TransitionSeq] =
-    TileMessageBuilder .mk .build (message .context) (message .instance) (
-      make_transitions (message .contents)
+    apply_tile .apply (
+      fold_tile .apply (
+        message
+      )
     )
 
 }

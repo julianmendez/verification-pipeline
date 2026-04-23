@@ -15,9 +15,7 @@ class TransitionsTile
 
   abstract
 
-  fold = Fold .mk
-
-  _process_action (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
+  process_action (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
     if (sw .a .isEmpty)
     then
       SlidingWindow .mk (sw .defined) (sw .s0) (Some (elem) ) (
@@ -28,35 +26,33 @@ class TransitionsTile
         (sw .accum) .:+ (Transition .mk (sw .s0 .get) (sw .a .get) (elem) )
       )
 
-  _process_input_state (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
+  process_input_state (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
     if (sw .s0 .isEmpty)
     then SlidingWindow .mk (sw .defined) (Some (elem) ) (sw .a) (sw .accum)
-    else _process_action (sw) (elem)
+    else process_action (sw) (elem)
 
-  _process_window (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
+  process_window (sw : SlidingWindow) (elem : IdentifierSet) : SlidingWindow =
     if (not (sw .defined) )
     then sw
-    else _process_input_state (sw) (elem)
+    else process_input_state (sw) (elem)
 
-  _empty_sliding_window : SlidingWindow =
+  empty_sliding_window : SlidingWindow =
     SlidingWindow .mk (true) (None) (None) (Seq [Transition] () )
 
-  _postprocess (sw : SlidingWindow) : Option [Seq [Transition] ] =
+  postprocess (sw : SlidingWindow) : Seq [Transition] =
     if (sw .defined) and (sw .a .isEmpty)
-    then Some (sw .accum)
-    else None
+    then sw .accum
+    else Seq [Transition] ()
 
-  make_instants (seq : Seq [IdentifierSet] ) : Option [TransitionSeq] =
-    _postprocess (
-      fold (seq) (_empty_sliding_window) (_process_window)
-    )
+  apply_tile = ApplyTile .mk [SlidingWindow] [Seq [Transition] ] (postprocess)
 
-  make_transitions (seq : Trajectory) : TransitionSeq =
-    make_instants (seq) .getOrElse (Seq [Transition] () )
+  fold_tile = FoldTile .mk (empty_sliding_window) (process_window)
 
   apply (message : TileMessage [Trajectory] ) : TileMessage [TransitionSeq] =
-    TileMessageBuilder .mk .build (message .context) (message .instance) (
-      make_transitions (message .contents)
+    apply_tile .apply (
+      fold_tile .apply (
+        message
+      )
     )
 
 end
