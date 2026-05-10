@@ -35,20 +35,25 @@
     input_fluent: honest
 - trajectory:
   - state:
+    - honest
     - uninformed
   - actions:
     - read_lie
   - state:
+    - honest
     - uninformed
   - actions:
     - send_lie
   - state:
+    - honest
     - uninformed
   - actions:
     - read_truth
   - state:
+    - honest
     - informed
   - actions:
     - share_lie
   - state:
+    - honest
     - informed
