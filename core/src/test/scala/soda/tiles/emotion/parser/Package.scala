@@ -454,6 +454,122 @@ object Example2Instance {
 }
 
 
+trait Example3Instance
+{
+
+
+
+  lazy val fluents : Map [FluentValue, FluentName] =
+    Map [FluentValue, FluentName] (
+      ("honest" , "honesty") ,
+      ("dishonest" , "honesty") ,
+      ("informed" , "information") ,
+      ("uninformed" , "information")
+    )
+
+  lazy val actions : ActionSet =
+    Seq [Action] (
+      "read_truth" ,
+      "read_lie" ,
+      "share_truth" ,
+      "share_lie"
+    ) .toSet
+
+  lazy val rules : RuleSeq = Seq [Rule] (
+
+    ForbidsToCauseRule (
+      Seq [FluentValue] (
+        "informed"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "dishonest"
+      ) .toSet
+    ) ,
+
+    TriggersRule (
+      Seq [FluentValue] (
+        "dishonest"
+      ) .toSet ,
+      "share_lie"
+    ) ,
+
+    NoConcurrencyRule (
+      Seq [Action] (
+        "read_truth" ,
+        "read_lie"
+      ) .toSet
+    ) ,
+
+    NoConcurrencyRule (
+      Seq [Action] (
+        "share_truth" ,
+        "share_lie"
+      ) .toSet
+    ) ,
+
+    DefaultRule (
+      "honest"
+    )
+  )
+
+  lazy val trajectory : Seq [IdentifierSet] =
+    Seq [IdentifierSet] (
+
+      Seq [FluentValue] (
+        "honest" ,
+        "uninformed"
+      ) .toSet ,
+
+      Seq [Action] (
+        "read_lie"
+      ) .toSet ,
+
+      Seq [FluentValue] (
+        "honest" ,
+        "uninformed"
+      ) .toSet ,
+
+      Seq [Action] (
+        "send_lie"
+      ) .toSet ,
+
+      Seq [FluentValue] (
+        "honest" ,
+        "uninformed"
+      ) .toSet ,
+
+      Seq [Action] (
+        "read_truth"
+      ) .toSet ,
+
+      Seq [FluentValue] (
+        "honest" ,
+        "informed"
+      ) .toSet ,
+
+      Seq [Action] (
+        "share_lie"
+      ) .toSet ,
+
+      Seq [FluentValue] (
+        "honest" ,
+        "informed"
+      ) .toSet
+    )
+
+  lazy val instance : Configuration =
+    Configuration .mk (fluents) (actions) (rules) (trajectory)
+
+}
+
+case class Example3Instance_ () extends Example3Instance
+
+object Example3Instance {
+  def mk : Example3Instance =
+    Example3Instance_ ()
+}
+
+
 case class YamlParserSpec ()
   extends
     AnyFunSuite
@@ -487,6 +603,14 @@ case class YamlParserSpec ()
 
   lazy val example2_instance = Some (Example2Instance .mk .instance)
 
+  lazy val example3_name = "/example/example-3.yaml"
+
+  lazy val example3_contents = read_file (example3_name)
+
+  lazy val example3_parsed_instance = parser .parse ( new StringReader (example3_contents) )
+
+  lazy val example3_instance = Some (Example3Instance .mk .instance)
+
   test ("parse example 1") (
     check (
       obtained = example1_parsed_instance
@@ -500,6 +624,14 @@ case class YamlParserSpec ()
       obtained = example2_parsed_instance
     ) (
       expected = example2_instance
+    )
+  )
+
+  test ("parse example 3") (
+    check (
+      obtained = example3_parsed_instance
+    ) (
+      expected = example3_instance
     )
   )
 
