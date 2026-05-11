@@ -1,0 +1,106 @@
+class Example3Instance
+
+  abstract
+
+  fluents : Map [FluentValue] [FluentName] =
+    Map [FluentValue] [FluentName] (
+      ("honest" , "honesty") ,
+      ("dishonest" , "honesty") ,
+      ("informed" , "information") ,
+      ("uninformed" , "information")
+    )
+
+  actions : ActionSet =
+    Seq [Action] (
+      "read_truth" ,
+      "read_lie" ,
+      "share_truth" ,
+      "share_lie"
+    ) .toSet
+
+  rules : RuleSeq = Seq [Rule] (
+
+    ForbidsToCauseRule (
+      Seq [FluentValue] (
+        "informed"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "dishonest"
+      ) .toSet
+    ) ,
+
+    TriggersRule (
+      Seq [FluentValue] (
+        "dishonest"
+      ) .toSet ,
+      "share_lie"
+    ) ,
+
+    NoConcurrencyRule (
+      Seq [Action] (
+        "read_truth" ,
+        "read_lie"
+      ) .toSet
+    ) ,
+
+    NoConcurrencyRule (
+      Seq [Action] (
+        "share_truth" ,
+        "share_lie"
+      ) .toSet
+    ) ,
+
+    DefaultRule (
+      "honest"
+    )
+  )
+
+  trajectory : Seq [IdentifierSet] =
+    Seq [IdentifierSet] (
+
+      Seq [FluentValue] (
+        "honest" ,
+        "uninformed"
+      ) .toSet ,
+
+      Seq [Action] (
+        "read_lie"
+      ) .toSet ,
+
+      Seq [FluentValue] (
+        "honest" ,
+        "uninformed"
+      ) .toSet ,
+
+      Seq [Action] (
+        "send_lie"
+      ) .toSet ,
+
+      Seq [FluentValue] (
+        "honest" ,
+        "uninformed"
+      ) .toSet ,
+
+      Seq [Action] (
+        "read_truth"
+      ) .toSet ,
+
+      Seq [FluentValue] (
+        "honest" ,
+        "informed"
+      ) .toSet ,
+
+      Seq [Action] (
+        "share_lie"
+      ) .toSet ,
+
+      Seq [FluentValue] (
+        "honest" ,
+        "informed"
+      ) .toSet
+    )
+
+  instance : Configuration =
+    Configuration .mk (fluents) (actions) (rules) (trajectory)
+
+end
