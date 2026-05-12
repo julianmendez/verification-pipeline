@@ -1,0 +1,10 @@
+
+class ActionValidator
+
+  abstract
+
+  is_valid (actions : ActionSet) (all_actions : ActionSet) : Boolean =
+    actions .forall (lambda x --> all_actions .contains (x) )
+
+end
+

@@ -1,0 +1,15 @@
+
+class FluentValidator
+
+  abstract
+
+  get_fluents (fluent_set : FluentSet) (fluent_map : FluentMap) : Set [FluentName] =
+    fluent_set
+      .filter (lambda x --> fluent_map .contains (x) )
+      .map (lambda x --> fluent_map .get (x) .get)
+
+  is_valid (fluent_set : FluentSet) (fluent_map : FluentMap) : Boolean =
+    (get_fluents (fluent_set) (fluent_map) .size) == (fluent_set .size)
+
+end
+

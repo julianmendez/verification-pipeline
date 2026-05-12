@@ -1,0 +1,50 @@
+
+class ValidationWindow
+
+  abstract
+    valid : Boolean
+    even : Boolean
+    fluents : FluentMap
+    actions : ActionSet
+
+end
+
+
+class TrajectoryValidator
+
+  abstract
+
+  fv = FluentValidator .mk
+
+  av = ActionValidator .mk
+
+  _tailrec_foldl [A : Type] [B : Type] (sequence : Seq [A] ) (current : B)
+      (next : B -> A -> B) : B =
+    match sequence
+      case Nil ==> current
+      case (head) +: (tail) ==>
+        _tailrec_foldl [A] [B] (tail) (next (current) (head) ) (next)
+
+  foldl [A : Type] [B : Type] (sequence : Seq [A] ) (initial : B) (next : B -> A -> B) : B =
+    _tailrec_foldl [A] [B] (sequence) (initial) (next)
+
+  initial_window (fluents : FluentMap) (actions : ActionSet) : ValidationWindow =
+    ValidationWindow .mk (true) (true) (fluents) (actions)
+
+  process_window (vw : ValidationWindow) (elem : IdentifierSet) : ValidationWindow =
+    if (not (vw .valid) )
+    then ValidationWindow .mk (false) (not vw .even) (vw .fluents) (vw .actions)
+    else
+      if (vw .even)
+      then ValidationWindow .mk (fv .is_valid (elem) (vw .fluents) ) (not vw .even) (vw .fluents) (vw .actions)
+      else ValidationWindow .mk (av .is_valid (elem) (vw .actions) ) (not vw .even) (vw .fluents) (vw .actions)
+
+  has_valid_length (trajectory : Trajectory) : Boolean =
+    (trajectory .size >= 3) and (not (trajectory .size % 2 == 0) )
+
+  is_valid (trajectory : Trajectory) (fluents : FluentMap) (actions : ActionSet) : Boolean =
+    has_valid_length (trajectory) and
+    foldl [IdentifierSet] [ValidationWindow] (trajectory) (initial_window (fluents) (actions) ) (process_window) .valid
+
+end
+
