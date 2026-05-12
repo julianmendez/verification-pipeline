@@ -1,0 +1,209 @@
+package soda.tiles.emotion.validator
+
+/*
+ * This package contains classes to validate entities.
+ */
+
+import   soda.tiles.emotion.entity.ActionSet
+import   soda.tiles.emotion.entity.AllowsRule
+import   soda.tiles.emotion.entity.CausesIfRule
+import   soda.tiles.emotion.entity.Configuration
+import   soda.tiles.emotion.entity.ContravenesRule
+import   soda.tiles.emotion.entity.DefaultRule
+import   soda.tiles.emotion.entity.FacilitatesRule
+import   soda.tiles.emotion.entity.FluentMap
+import   soda.tiles.emotion.entity.FluentName
+import   soda.tiles.emotion.entity.FluentSet
+import   soda.tiles.emotion.entity.ForbidsToCauseRule
+import   soda.tiles.emotion.entity.IdentifierSet
+import   soda.tiles.emotion.entity.IfRule
+import   soda.tiles.emotion.entity.InfluencesIfRule
+import   soda.tiles.emotion.entity.InfluencesRule
+import   soda.tiles.emotion.entity.InhibitsRule
+import   soda.tiles.emotion.entity.NoConcurrencyRule
+import   soda.tiles.emotion.entity.Rule
+import   soda.tiles.emotion.entity.Trajectory
+import   soda.tiles.emotion.entity.TriggersRule
+
+
+
+
+
+trait ActionValidator
+{
+
+
+
+  def is_valid (actions : ActionSet) (all_actions : ActionSet) : Boolean =
+    actions .forall ( x => all_actions .contains (x) )
+
+}
+
+case class ActionValidator_ () extends ActionValidator
+
+object ActionValidator {
+  def mk : ActionValidator =
+    ActionValidator_ ()
+}
+
+
+trait ConfigurationValidator
+{
+
+
+
+  lazy val rv = RuleValidator .mk
+
+  lazy val tv = TrajectoryValidator .mk
+
+  def is_valid (conf : Configuration) : Boolean =
+    conf .rules .forall ( x =>
+      rv .is_valid (x) (conf .fluents) (conf .actions)
+    ) && tv .is_valid (conf .trajectory) (conf .fluents) (conf .actions)
+
+}
+
+case class ConfigurationValidator_ () extends ConfigurationValidator
+
+object ConfigurationValidator {
+  def mk : ConfigurationValidator =
+    ConfigurationValidator_ ()
+}
+
+
+trait FluentValidator
+{
+
+
+
+  def get_fluents (fluent_set : FluentSet) (fluent_map : FluentMap) : Set [FluentName] =
+    fluent_set
+      .filter ( x => fluent_map .contains (x) )
+      .map ( x => fluent_map .get (x) .get)
+
+  def is_valid (fluent_set : FluentSet) (fluent_map : FluentMap) : Boolean =
+    (get_fluents (fluent_set) (fluent_map) .size) == (fluent_set .size)
+
+}
+
+case class FluentValidator_ () extends FluentValidator
+
+object FluentValidator {
+  def mk : FluentValidator =
+    FluentValidator_ ()
+}
+
+
+trait RuleValidator
+{
+
+
+
+  lazy val fv = FluentValidator .mk
+
+  lazy val av = ActionValidator .mk
+
+  def is_valid (rule : Rule) (fluent_map : FluentMap) (action_set : ActionSet) : Boolean =
+    rule match  {
+      case CausesIfRule (input , action , output) =>
+        fv .is_valid (input) (fluent_map) && fv .is_valid (output) (fluent_map) &&
+        action_set .contains (action)
+      case IfRule (input , output) =>
+        fv .is_valid (input) (fluent_map) && fv .is_valid (output) (fluent_map)
+      case TriggersRule (input , action) =>
+        fv .is_valid (input) (fluent_map) && action_set .contains (action)
+      case AllowsRule (input , action) =>
+        fv .is_valid (input) (fluent_map) && action_set .contains (action)
+      case InhibitsRule (input , action) =>
+        fv .is_valid (input) (fluent_map) && action_set .contains (action)
+      case NoConcurrencyRule (actions) =>
+        av .is_valid (actions) (action_set)
+      case DefaultRule (fluent) =>
+        fluent_map .contains (fluent)
+      case InfluencesIfRule (input , action , output) =>
+        fv .is_valid (input) (fluent_map) && fv .is_valid (output) (fluent_map) &&
+        action_set .contains (action)
+      case InfluencesRule (input , output) =>
+        fv .is_valid (input) (fluent_map) && fv .is_valid (output) (fluent_map)
+      case FacilitatesRule (input , action) =>
+        fv .is_valid (input) (fluent_map) && action_set .contains (action)
+      case ContravenesRule (input , action) =>
+        fv .is_valid (input) (fluent_map) && action_set .contains (action)
+      case ForbidsToCauseRule (input , output) =>
+        fv .is_valid (input) (fluent_map) && fv .is_valid (output) (fluent_map)
+    }
+
+}
+
+case class RuleValidator_ () extends RuleValidator
+
+object RuleValidator {
+  def mk : RuleValidator =
+    RuleValidator_ ()
+}
+
+
+trait ValidationWindow
+{
+
+  def   valid : Boolean
+  def   even : Boolean
+  def   fluents : FluentMap
+  def   actions : ActionSet
+
+}
+
+case class ValidationWindow_ (valid : Boolean, even : Boolean, fluents : FluentMap, actions : ActionSet) extends ValidationWindow
+
+object ValidationWindow {
+  def mk (valid : Boolean) (even : Boolean) (fluents : FluentMap) (actions : ActionSet) : ValidationWindow =
+    ValidationWindow_ (valid, even, fluents, actions)
+}
+
+trait TrajectoryValidator
+{
+
+
+
+  lazy val fv = FluentValidator .mk
+
+  lazy val av = ActionValidator .mk
+
+  private def _tailrec_foldl [A , B ] (sequence : Seq [A] ) (current : B)
+      (next : B => A => B) : B =
+    sequence match  {
+      case Nil => current
+      case (head) +: (tail) =>
+        _tailrec_foldl [A, B] (tail) (next (current) (head) ) (next)
+    }
+
+  def foldl [A , B ] (sequence : Seq [A] ) (initial : B) (next : B => A => B) : B =
+    _tailrec_foldl [A, B] (sequence) (initial) (next)
+
+  def initial_window (fluents : FluentMap) (actions : ActionSet) : ValidationWindow =
+    ValidationWindow .mk (true) (true) (fluents) (actions)
+
+  def process_window (vw : ValidationWindow) (elem : IdentifierSet) : ValidationWindow =
+    if ( (! (vw .valid) )
+    ) ValidationWindow .mk (false) (! vw .even) (vw .fluents) (vw .actions)
+    else
+      if ( (vw .even)
+      ) ValidationWindow .mk (fv .is_valid (elem) (vw .fluents) ) (! vw .even) (vw .fluents) (vw .actions)
+      else ValidationWindow .mk (av .is_valid (elem) (vw .actions) ) (! vw .even) (vw .fluents) (vw .actions)
+
+  def has_valid_length (trajectory : Trajectory) : Boolean =
+    (trajectory .size >= 3) && (! (trajectory .size % 2 == 0) )
+
+  def is_valid (trajectory : Trajectory) (fluents : FluentMap) (actions : ActionSet) : Boolean =
+    has_valid_length (trajectory) &&
+    foldl [IdentifierSet, ValidationWindow] (trajectory) (initial_window (fluents) (actions) ) (process_window) .valid
+
+}
+
+case class TrajectoryValidator_ () extends TrajectoryValidator
+
+object TrajectoryValidator {
+  def mk : TrajectoryValidator =
+    TrajectoryValidator_ ()
+}
+
