@@ -16,6 +16,7 @@ import   soda.tiles.emotion.entity.TileQuad
 import   soda.tiles.emotion.entity.Transition
 import   soda.tiles.emotion.parser.YamlParser
 import   soda.tiles.emotion.pipeline.EmotionalReasoningPipeline
+import   soda.tiles.emotion.validator.ConfigurationValidator
 
 /**
  * This is the main entry point.
@@ -49,6 +50,8 @@ trait Main
 
   lazy val instance_builder = InstanceBuilder .mk
 
+  lazy val conf_validator = ConfigurationValidator .mk
+
   lazy val emotional_reasoning_pipeline = EmotionalReasoningPipeline .mk
 
   def process_configuration (configuration : Configuration)
@@ -61,7 +64,10 @@ trait Main
   def process_maybe_configuration (maybe_conf : Option [Configuration] )
       : Option [Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] ] =
     if ( (maybe_conf .isDefined)
-    ) Some (process_configuration (maybe_conf .get) )
+    )
+      if ( conf_validator .is_valid (maybe_conf .get)
+      ) Some (process_configuration (maybe_conf .get) )
+      else None
     else None
 
   def process_file (file_name : String)

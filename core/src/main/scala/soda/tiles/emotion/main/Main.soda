@@ -30,6 +30,8 @@ class Main
 
   instance_builder = InstanceBuilder .mk
 
+  conf_validator = ConfigurationValidator .mk
+
   emotional_reasoning_pipeline = EmotionalReasoningPipeline .mk
 
   process_configuration (configuration : Configuration)
@@ -42,7 +44,10 @@ class Main
   process_maybe_configuration (maybe_conf : Option [Configuration] )
       : Option [Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] ] =
     if (maybe_conf .isDefined)
-    then Some (process_configuration (maybe_conf .get) )
+    then
+      if conf_validator .is_valid (maybe_conf .get)
+      then Some (process_configuration (maybe_conf .get) )
+      else None
     else None
 
   process_file (file_name : String)
