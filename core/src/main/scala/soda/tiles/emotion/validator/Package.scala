@@ -4,6 +4,7 @@ package soda.tiles.emotion.validator
  * This package contains classes to validate entities.
  */
 
+import   soda.tiles.emotion.entity.Action
 import   soda.tiles.emotion.entity.ActionSet
 import   soda.tiles.emotion.entity.AllowsRule
 import   soda.tiles.emotion.entity.CausesIfRule
@@ -15,6 +16,7 @@ import   soda.tiles.emotion.entity.FluentMap
 import   soda.tiles.emotion.entity.FluentName
 import   soda.tiles.emotion.entity.FluentSet
 import   soda.tiles.emotion.entity.ForbidsToCauseRule
+import   soda.tiles.emotion.entity.Identifier
 import   soda.tiles.emotion.entity.IdentifierSet
 import   soda.tiles.emotion.entity.IfRule
 import   soda.tiles.emotion.entity.InfluencesIfRule
@@ -34,8 +36,21 @@ trait ActionValidator
 
 
 
+  lazy val error_unknown_action = "Unknown action: "
+
   def is_valid (actions : ActionSet) (all_actions : ActionSet) : Boolean =
-    actions .forall ( x => all_actions .contains (x) )
+    actions
+      .forall ( x => all_actions .contains (x) )
+
+  def validate_action (action : Action) (action_set : ActionSet) : Option [String] =
+    if ( action_set .contains(action)
+    ) None
+    else Some (error_unknown_action + action.toString)
+
+  def validate (actions : ActionSet) (all_actions : ActionSet) : Option[String] =
+    actions
+      .find ( x => ! all_actions .contains(x) )
+      .map ( x => error_unknown_action + x .toString)
 
 }
 
@@ -76,6 +91,10 @@ trait FluentValidator
 
 
 
+  lazy val error_unknown_fluent = "Unknown fluent: "
+
+  lazy val error_duplicate_fluent_mapping = "Duplicate fluent mapping: "
+
   def get_fluents (fluent_set : FluentSet) (fluent_map : FluentMap) : Set [FluentName] =
     fluent_set
       .filter ( x => fluent_map .contains (x) )
@@ -83,6 +102,39 @@ trait FluentValidator
 
   def is_valid (fluent_set : FluentSet) (fluent_map : FluentMap) : Boolean =
     (get_fluents (fluent_set) (fluent_map) .size) == (fluent_set .size)
+
+  def validate_fluent (fluent : FluentName) (fluent_map : FluentMap) : Option [String] =
+    if ( fluent_map .contains (fluent)
+    ) None
+    else Some (error_unknown_fluent + fluent.toString)
+
+  def validate_keys (fluent_set : FluentSet) (fluent_map : FluentMap) : Option [String] =
+    fluent_set
+      .find ( x => ! fluent_map .contains (x) )
+      .map ( x => error_unknown_fluent + x .toString)
+
+  def mapped (fluent_set : FluentSet) (fluent_map : FluentMap) : Seq [Identifier] =
+    fluent_set
+      .toSeq
+      .filter ( x => fluent_map .contains (x) )
+      .map ( x => fluent_map .get (x) .get)
+
+  private def _validate_injective_with_set (fluent_set : FluentSet) (fluent_map : FluentMap) (
+      seq : Seq [Identifier] ) (uniq : Set [Identifier] ) : Option [String] =
+    seq .filter ( x => ! uniq .contains (x) )
+      .headOption
+      .map ( x => error_duplicate_fluent_mapping + x .toString)
+
+  private def _validate_injective_with (fluent_set : FluentSet) (fluent_map : FluentMap) (seq : Seq [Identifier] )
+      : Option [String] =
+    _validate_injective_with_set (fluent_set) (fluent_map) (seq) (seq .toSet)
+
+  def validate_injective (fluent_set : FluentSet) (fluent_map : FluentMap) : Option [String] =
+    _validate_injective_with (fluent_set) (fluent_map) (mapped (fluent_set) (fluent_map) )
+
+  def validate (fluent_set : FluentSet) (fluent_map : FluentMap) : Option [String] =
+    validate_keys (fluent_set) (fluent_map)
+      .orElse (validate_injective (fluent_set) (fluent_map) )
 
 }
 
@@ -131,6 +183,46 @@ trait RuleValidator
         fv .is_valid (input) (fluent_map) && action_set .contains (action)
       case ForbidsToCauseRule (input , output) =>
         fv .is_valid (input) (fluent_map) && fv .is_valid (output) (fluent_map)
+    }
+
+  def validate (rule : Rule) (fluent_map : FluentMap) (action_set : ActionSet) : Option [String] =
+    rule match  {
+      case CausesIfRule (input , action , output) =>
+        fv .validate (input) (fluent_map)
+          .orElse (fv .validate (output) (fluent_map) )
+          .orElse (av .validate_action (action) (action_set) )
+      case IfRule (input , output) =>
+         fv .validate (input) (fluent_map)
+          .orElse (fv .validate (output) (fluent_map) )
+      case TriggersRule (input , action) =>
+        fv .validate (input) (fluent_map)
+          .orElse (av .validate_action (action) (action_set) )
+      case AllowsRule (input , action) =>
+        fv .validate (input) (fluent_map)
+          .orElse (av .validate_action (action) (action_set) )
+      case InhibitsRule (input , action) =>
+        fv .validate (input) (fluent_map)
+          .orElse (av .validate_action (action) (action_set) )
+      case NoConcurrencyRule (actions) =>
+        av .validate(actions)(action_set)
+      case DefaultRule (fluent) =>
+        fv .validate_fluent (fluent) (fluent_map)
+      case InfluencesIfRule (input , action , output) =>
+        fv .validate (input) (fluent_map)
+          .orElse (fv .validate (output) (fluent_map) )
+          .orElse (av .validate_action (action) (action_set) )
+      case InfluencesRule (input , output) =>
+        fv .validate (input) (fluent_map)
+          .orElse (fv .validate (output) (fluent_map) )
+      case FacilitatesRule (input , action) =>
+        fv .validate (input) (fluent_map)
+          .orElse (av .validate_action (action) (action_set) )
+      case ContravenesRule (input , action) =>
+        fv .validate (input) (fluent_map)
+          .orElse (av .validate_action (action) (action_set) )
+      case ForbidsToCauseRule (input , output) =>
+        fv .validate (input) (fluent_map)
+          .orElse (fv .validate (output) (fluent_map) )
     }
 
 }

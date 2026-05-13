@@ -5,6 +5,7 @@ package soda.tiles.emotion.validator
  */
 
 import
+  soda.tiles.emotion.entity.Action
   soda.tiles.emotion.entity.ActionSet
   soda.tiles.emotion.entity.AllowsRule
   soda.tiles.emotion.entity.CausesIfRule
@@ -16,6 +17,7 @@ import
   soda.tiles.emotion.entity.FluentName
   soda.tiles.emotion.entity.FluentSet
   soda.tiles.emotion.entity.ForbidsToCauseRule
+  soda.tiles.emotion.entity.Identifier
   soda.tiles.emotion.entity.IdentifierSet
   soda.tiles.emotion.entity.IfRule
   soda.tiles.emotion.entity.InfluencesIfRule

@@ -3,8 +3,21 @@ class ActionValidator
 
   abstract
 
+  error_unknown_action = "Unknown action: "
+
   is_valid (actions : ActionSet) (all_actions : ActionSet) : Boolean =
-    actions .forall (lambda x --> all_actions .contains (x) )
+    actions
+      .forall (lambda x --> all_actions .contains (x) )
+
+  validate_action (action : Action) (action_set : ActionSet) : Option [String] =
+    if action_set .contains(action)
+    then None
+    else Some (error_unknown_action + action.toString)
+
+  validate (actions : ActionSet) (all_actions : ActionSet) : Option[String] =
+    actions
+      .find (lambda x --> not all_actions .contains(x) )
+      .map (lambda x --> error_unknown_action + x .toString)
 
 end
 

@@ -3,6 +3,10 @@ class FluentValidator
 
   abstract
 
+  error_unknown_fluent = "Unknown fluent: "
+
+  error_duplicate_fluent_mapping = "Duplicate fluent mapping: "
+
   get_fluents (fluent_set : FluentSet) (fluent_map : FluentMap) : Set [FluentName] =
     fluent_set
       .filter (lambda x --> fluent_map .contains (x) )
@@ -10,6 +14,39 @@ class FluentValidator
 
   is_valid (fluent_set : FluentSet) (fluent_map : FluentMap) : Boolean =
     (get_fluents (fluent_set) (fluent_map) .size) == (fluent_set .size)
+
+  validate_fluent (fluent : FluentName) (fluent_map : FluentMap) : Option [String] =
+    if fluent_map .contains (fluent)
+    then None
+    else Some (error_unknown_fluent + fluent.toString)
+
+  validate_keys (fluent_set : FluentSet) (fluent_map : FluentMap) : Option [String] =
+    fluent_set
+      .find (lambda x --> not fluent_map .contains (x) )
+      .map (lambda x --> error_unknown_fluent + x .toString)
+
+  mapped (fluent_set : FluentSet) (fluent_map : FluentMap) : Seq [Identifier] =
+    fluent_set
+      .toSeq
+      .filter (lambda x --> fluent_map .contains (x) )
+      .map (lambda x --> fluent_map .get (x) .get)
+
+  _validate_injective_with_set (fluent_set : FluentSet) (fluent_map : FluentMap) (
+      seq : Seq [Identifier] ) (uniq : Set [Identifier] ) : Option [String] =
+    seq .filter (lambda x --> not uniq .contains (x) )
+      .headOption
+      .map (lambda x --> error_duplicate_fluent_mapping + x .toString)
+
+  _validate_injective_with (fluent_set : FluentSet) (fluent_map : FluentMap) (seq : Seq [Identifier] )
+      : Option [String] =
+    _validate_injective_with_set (fluent_set) (fluent_map) (seq) (seq .toSet)
+
+  validate_injective (fluent_set : FluentSet) (fluent_map : FluentMap) : Option [String] =
+    _validate_injective_with (fluent_set) (fluent_map) (mapped (fluent_set) (fluent_map) )
+
+  validate (fluent_set : FluentSet) (fluent_map : FluentMap) : Option [String] =
+    validate_keys (fluent_set) (fluent_map)
+      .orElse (validate_injective (fluent_set) (fluent_map) )
 
 end
 
