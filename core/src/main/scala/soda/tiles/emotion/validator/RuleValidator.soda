@@ -7,8 +7,6 @@ class RuleValidator
 
   av = ActionValidator .mk
 
-  vu = ValidationUtil .mk
-
   is_valid (rule : Rule) (fluent_map : FluentMap) (action_set : ActionSet) : Boolean =
     match rule
       case CausesIfRule (input , action , output) ==>
@@ -38,54 +36,44 @@ class RuleValidator
       case ForbidsToCauseRule (input , output) ==>
         fv .is_valid (input) (fluent_map) and fv .is_valid (output) (fluent_map)
 
-  validate (rule : Rule) (fluent_map : FluentMap) (action_set : ActionSet) : Option [String] =
+  validate (rule : Rule) (fluent_map : FluentMap) (action_set : ActionSet) : Seq [String] =
     match rule
       case CausesIfRule (input , action , output) ==>
-        vu .concatenate_triplet (
-          fv .validate (input) (fluent_map) ) (
-          fv .validate (output) (fluent_map) ) (
-          av .validate_action (action) (action_set) )
+        fv .validate (input) (fluent_map) .++ ( (
+        fv .validate (output) (fluent_map) ) .++ (
+        av .validate_action (action) (action_set) ) )
       case IfRule (input , output) ==>
-        vu .concatenate_pair (
-         fv .validate (input) (fluent_map) ) (
-         fv .validate (output) (fluent_map) )
+        fv .validate (input) (fluent_map) .++ (
+        fv .validate (output) (fluent_map) )
       case TriggersRule (input , action) ==>
-        vu .concatenate_pair (
-          fv .validate (input) (fluent_map) ) (
-          av .validate_action (action) (action_set) )
+        fv .validate (input) (fluent_map) .++ (
+        av .validate_action (action) (action_set) )
       case AllowsRule (input , action) ==>
-        vu .concatenate_pair (
-          fv .validate (input) (fluent_map) ) (
-          av .validate_action (action) (action_set) )
+        fv .validate (input) (fluent_map) .++ (
+        av .validate_action (action) (action_set) )
       case InhibitsRule (input , action) ==>
-        vu .concatenate_pair (
-          fv .validate (input) (fluent_map) ) (
-          av .validate_action (action) (action_set) )
+        fv .validate (input) (fluent_map) .++ (
+        av .validate_action (action) (action_set) )
       case NoConcurrencyRule (actions) ==>
         av .validate(actions)(action_set)
       case DefaultRule (fluent) ==>
         fv .validate_fluent (fluent) (fluent_map)
       case InfluencesIfRule (input , action , output) ==>
-        vu .concatenate_triplet (
-          fv .validate (input) (fluent_map) ) (
-          fv .validate (output) (fluent_map) ) (
-          av .validate_action (action) (action_set) )
+        fv .validate (input) (fluent_map) .++ ( (
+        fv .validate (output) (fluent_map) ) .++ (
+        av .validate_action (action) (action_set) ) )
       case InfluencesRule (input , output) ==>
-        vu .concatenate_pair (
-          fv .validate (input) (fluent_map) ) (
-          fv .validate (output) (fluent_map) )
+        fv .validate (input) (fluent_map) .++ (
+        fv .validate (output) (fluent_map) )
       case FacilitatesRule (input , action) ==>
-        vu .concatenate_pair (
-          fv .validate (input) (fluent_map) ) (
-          av .validate_action (action) (action_set) )
+        fv .validate (input) (fluent_map) .++ (
+        av .validate_action (action) (action_set) )
       case ContravenesRule (input , action) ==>
-        vu .concatenate_pair (
-          fv .validate (input) (fluent_map) ) (
-          av .validate_action (action) (action_set) )
+        fv .validate (input) (fluent_map) .++ (
+        av .validate_action (action) (action_set) )
       case ForbidsToCauseRule (input , output) ==>
-        vu .concatenate_pair (
-          fv .validate (input) (fluent_map) ) (
-          fv .validate (output) (fluent_map) )
+        fv .validate (input) (fluent_map) .++ (
+        fv .validate (output) (fluent_map) )
 
 end
 

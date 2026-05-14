@@ -16,12 +16,11 @@ class Serializer
       .mkString
     ) + "\n"
 
-  serialize_errors (error : String) : String =
+  serialize_errors (errors : Seq [String] ) : String =
     "---" + "\n" +
     "- errors:" + "\n" +
-      error
-        .split ("\n")
-        .map (lambda x --> "  - " + x + "\n")
+      errors
+        .map (lambda x --> "  - " + x)
         .mkString ("\n")
 
 end

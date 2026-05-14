@@ -65,11 +65,10 @@ trait Main
         .build (configuration)
     ) .contents
 
-  def process_instance_with (conf : Configuration) (errors : Option [String] ) : String =
-    errors match  {
-      case Some (error) => serializer .serialize_errors (error)
-      case None => serializer .serialize_response (process_configuration (conf) )
-    }
+  def process_instance_with (conf : Configuration) (errors : Seq [String] ) : String =
+    if ( errors .isEmpty
+    ) serializer .serialize_response (process_configuration (conf) )
+    else serializer .serialize_errors (errors)
 
   def process_instance (maybe_conf : Option [Configuration] ) : String =
     maybe_conf match  {
@@ -126,12 +125,11 @@ trait Serializer
       .mkString
     ) + "\n"
 
-  def serialize_errors (error : String) : String =
+  def serialize_errors (errors : Seq [String] ) : String =
     "---" + "\n" +
     "- errors:" + "\n" +
-      error
-        .split ("\n")
-        .map ( x => "  - " + x + "\n")
+      errors
+        .map ( x => "  - " + x)
         .mkString ("\n")
 
 }

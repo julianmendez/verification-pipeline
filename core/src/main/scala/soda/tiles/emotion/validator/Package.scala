@@ -36,26 +36,20 @@ trait ActionValidator
 
 
 
-  lazy val vu = ValidationUtil .mk
-
   lazy val error_unknown_action = "unknown action"
 
   def is_valid (actions : ActionSet) (all_actions : ActionSet) : Boolean =
     actions
       .forall ( x => all_actions .contains (x) )
 
-  def validate_action (action : Action) (action_set : ActionSet) : Option [String] =
-    if ( action_set .contains(action)
-    ) None
-    else Some (error_unknown_action + action.toString)
+  def validate (actions : ActionSet) (all_actions : ActionSet) : Seq [String] =
+    actions
+      .toSeq
+      .filter ( x => ! all_actions .contains(x) )
+      .map ( x => error_unknown_action + " " + x .toString)
 
-  def validate (actions : ActionSet) (all_actions : ActionSet) : Option[String] =
-    vu .concatenate (
-      actions
-        .toSeq
-        .filter ( x => ! all_actions .contains(x) )
-        .map ( x => Some (error_unknown_action + " " + x .toString) )
-    )
+  def validate_action (action : Action) (action_set : ActionSet) : Seq [String] =
+    validate (Seq [Action] (action) .toSet) (action_set)
 
 }
 
@@ -76,23 +70,20 @@ trait ConfigurationValidator
 
   lazy val tv = TrajectoryValidator .mk
 
-  lazy val vu = ValidationUtil .mk
-
   def is_valid (conf : Configuration) : Boolean =
-    conf .rules .forall ( x =>
-      rv .is_valid (x) (conf .fluents) (conf .actions)
-    ) && tv .is_valid (conf .trajectory) (conf .fluents) (conf .actions)
+    conf
+      .rules
+      .forall ( x =>
+        rv .is_valid (x) (conf .fluents) (conf .actions)
+      ) && tv .is_valid (conf .trajectory) (conf .fluents) (conf .actions)
 
-  def validate (conf : Configuration) : Option [String] =
-    vu .concatenate (
-      conf .rules .map ( x =>
+  def validate (conf : Configuration) : Seq [String] =
+    conf .rules
+      .flatMap ( x =>
         rv .validate (x) (conf .fluents) (conf .actions)
       ) .++ (
-        Seq [Option [String] ] (
-          tv .validate (conf .trajectory) (conf .fluents) (conf .actions)
-        )
+        tv .validate (conf .trajectory) (conf .fluents) (conf .actions)
       )
-    )
 
 }
 
@@ -109,8 +100,6 @@ trait FluentValidator
 
 
 
-  lazy val vu = ValidationUtil .mk
-
   lazy val error_unknown_fluent = "unknown fluent"
 
   lazy val error_duplicate_fluent_mapping = "duplicate fluent mapping"
@@ -123,15 +112,14 @@ trait FluentValidator
   def is_valid (fluent_set : FluentSet) (fluent_map : FluentMap) : Boolean =
     (get_fluents (fluent_set) (fluent_map) .size) == (fluent_set .size)
 
-  def validate_fluent (fluent : FluentName) (fluent_map : FluentMap) : Option [String] =
-    if ( fluent_map .contains (fluent)
-    ) None
-    else Some (error_unknown_fluent + fluent.toString)
-
-  def validate_keys (fluent_set : FluentSet) (fluent_map : FluentMap) : Option [String] =
+  def validate_keys (fluent_set : FluentSet) (fluent_map : FluentMap) : Seq [String] =
     fluent_set
-      .find ( x => ! fluent_map .contains (x) )
+      .toSeq
+      .filter ( x => ! fluent_map .contains (x) )
       .map ( x => error_unknown_fluent + " " + x .toString)
+
+  def validate_fluent (fluent : FluentName) (fluent_map : FluentMap) : Seq [String] =
+    validate_keys (Seq [FluentName] (fluent) .toSet) (fluent_map)
 
   def mapped (fluent_set : FluentSet) (fluent_map : FluentMap) : Seq [Identifier] =
     fluent_set
@@ -140,21 +128,20 @@ trait FluentValidator
       .map ( x => fluent_map .get (x) .get)
 
   private def _validate_injective_with_set (fluent_set : FluentSet) (fluent_map : FluentMap) (
-      seq : Seq [Identifier] ) (uniq : Set [Identifier] ) : Option [String] =
-    seq .filter ( x => ! uniq .contains (x) )
-      .headOption
+      seq : Seq [Identifier] ) (uniq : Set [Identifier] ) : Seq [String] =
+    seq
+      .filter ( x => ! uniq .contains (x) )
       .map ( x => error_duplicate_fluent_mapping + " " + x .toString)
 
   private def _validate_injective_with (fluent_set : FluentSet) (fluent_map : FluentMap) (seq : Seq [Identifier] )
-      : Option [String] =
+      : Seq [String] =
     _validate_injective_with_set (fluent_set) (fluent_map) (seq) (seq .toSet)
 
-  def validate_injective (fluent_set : FluentSet) (fluent_map : FluentMap) : Option [String] =
+  def validate_injective (fluent_set : FluentSet) (fluent_map : FluentMap) : Seq [String] =
     _validate_injective_with (fluent_set) (fluent_map) (mapped (fluent_set) (fluent_map) )
 
-  def validate (fluent_set : FluentSet) (fluent_map : FluentMap) : Option [String] =
-    vu .concatenate_pair (
-      validate_keys (fluent_set) (fluent_map) ) (
+  def validate (fluent_set : FluentSet) (fluent_map : FluentMap) : Seq [String] =
+    validate_keys (fluent_set) (fluent_map) .++ (
       validate_injective (fluent_set) (fluent_map) )
 
 }
@@ -175,8 +162,6 @@ trait RuleValidator
   lazy val fv = FluentValidator .mk
 
   lazy val av = ActionValidator .mk
-
-  lazy val vu = ValidationUtil .mk
 
   def is_valid (rule : Rule) (fluent_map : FluentMap) (action_set : ActionSet) : Boolean =
     rule match  {
@@ -208,54 +193,44 @@ trait RuleValidator
         fv .is_valid (input) (fluent_map) && fv .is_valid (output) (fluent_map)
     }
 
-  def validate (rule : Rule) (fluent_map : FluentMap) (action_set : ActionSet) : Option [String] =
+  def validate (rule : Rule) (fluent_map : FluentMap) (action_set : ActionSet) : Seq [String] =
     rule match  {
       case CausesIfRule (input , action , output) =>
-        vu .concatenate_triplet (
-          fv .validate (input) (fluent_map) ) (
-          fv .validate (output) (fluent_map) ) (
-          av .validate_action (action) (action_set) )
+        fv .validate (input) (fluent_map) .++ ( (
+        fv .validate (output) (fluent_map) ) .++ (
+        av .validate_action (action) (action_set) ) )
       case IfRule (input , output) =>
-        vu .concatenate_pair (
-         fv .validate (input) (fluent_map) ) (
-         fv .validate (output) (fluent_map) )
+        fv .validate (input) (fluent_map) .++ (
+        fv .validate (output) (fluent_map) )
       case TriggersRule (input , action) =>
-        vu .concatenate_pair (
-          fv .validate (input) (fluent_map) ) (
-          av .validate_action (action) (action_set) )
+        fv .validate (input) (fluent_map) .++ (
+        av .validate_action (action) (action_set) )
       case AllowsRule (input , action) =>
-        vu .concatenate_pair (
-          fv .validate (input) (fluent_map) ) (
-          av .validate_action (action) (action_set) )
+        fv .validate (input) (fluent_map) .++ (
+        av .validate_action (action) (action_set) )
       case InhibitsRule (input , action) =>
-        vu .concatenate_pair (
-          fv .validate (input) (fluent_map) ) (
-          av .validate_action (action) (action_set) )
+        fv .validate (input) (fluent_map) .++ (
+        av .validate_action (action) (action_set) )
       case NoConcurrencyRule (actions) =>
         av .validate(actions)(action_set)
       case DefaultRule (fluent) =>
         fv .validate_fluent (fluent) (fluent_map)
       case InfluencesIfRule (input , action , output) =>
-        vu .concatenate_triplet (
-          fv .validate (input) (fluent_map) ) (
-          fv .validate (output) (fluent_map) ) (
-          av .validate_action (action) (action_set) )
+        fv .validate (input) (fluent_map) .++ ( (
+        fv .validate (output) (fluent_map) ) .++ (
+        av .validate_action (action) (action_set) ) )
       case InfluencesRule (input , output) =>
-        vu .concatenate_pair (
-          fv .validate (input) (fluent_map) ) (
-          fv .validate (output) (fluent_map) )
+        fv .validate (input) (fluent_map) .++ (
+        fv .validate (output) (fluent_map) )
       case FacilitatesRule (input , action) =>
-        vu .concatenate_pair (
-          fv .validate (input) (fluent_map) ) (
-          av .validate_action (action) (action_set) )
+        fv .validate (input) (fluent_map) .++ (
+        av .validate_action (action) (action_set) )
       case ContravenesRule (input , action) =>
-        vu .concatenate_pair (
-          fv .validate (input) (fluent_map) ) (
-          av .validate_action (action) (action_set) )
+        fv .validate (input) (fluent_map) .++ (
+        av .validate_action (action) (action_set) )
       case ForbidsToCauseRule (input , output) =>
-        vu .concatenate_pair (
-          fv .validate (input) (fluent_map) ) (
-          fv .validate (output) (fluent_map) )
+        fv .validate (input) (fluent_map) .++ (
+        fv .validate (output) (fluent_map) )
     }
 
 }
@@ -275,15 +250,15 @@ trait ValidationWindow
   def   even : Boolean
   def   fluents : FluentMap
   def   actions : ActionSet
-  def   error : Option [String]
+  def   errors : Seq [String]
 
 }
 
-case class ValidationWindow_ (valid : Boolean, even : Boolean, fluents : FluentMap, actions : ActionSet, error : Option [String]) extends ValidationWindow
+case class ValidationWindow_ (valid : Boolean, even : Boolean, fluents : FluentMap, actions : ActionSet, errors : Seq [String]) extends ValidationWindow
 
 object ValidationWindow {
-  def mk (valid : Boolean) (even : Boolean) (fluents : FluentMap) (actions : ActionSet) (error : Option [String]) : ValidationWindow =
-    ValidationWindow_ (valid, even, fluents, actions, error)
+  def mk (valid : Boolean) (even : Boolean) (fluents : FluentMap) (actions : ActionSet) (errors : Seq [String]) : ValidationWindow =
+    ValidationWindow_ (valid, even, fluents, actions, errors)
 }
 
 trait TrajectoryValidator
@@ -294,8 +269,6 @@ trait TrajectoryValidator
   lazy val fv = FluentValidator .mk
 
   lazy val av = ActionValidator .mk
-
-  lazy val vu = ValidationUtil .mk
 
   lazy val error_trajectory_is_too_short = "the trajectory is too short"
 
@@ -313,11 +286,11 @@ trait TrajectoryValidator
     _tailrec_foldl [A, B] (sequence) (initial) (next)
 
   def initial_window (fluents : FluentMap) (actions : ActionSet) : ValidationWindow =
-    ValidationWindow .mk (true) (true) (fluents) (actions) (None)
+    ValidationWindow .mk (true) (true) (fluents) (actions) (Seq [String] () )
 
   def process_window (vw : ValidationWindow) (elem : IdentifierSet) : ValidationWindow =
     if ( (! (vw .valid) )
-    ) ValidationWindow .mk (false) (! vw .even) (vw .fluents) (vw .actions) (vw .error)
+    ) ValidationWindow .mk (false) (! vw .even) (vw .fluents) (vw .actions) (vw .errors)
     else
       if ( (vw .even)
       ) ValidationWindow .mk (fv .is_valid (elem) (vw .fluents) ) (! vw .even) (vw .fluents) (vw .actions) (fv .validate (elem) (vw .fluents) )
@@ -326,22 +299,21 @@ trait TrajectoryValidator
   def has_valid_length (trajectory : Trajectory) : Boolean =
     (trajectory .size >= 3) && (! (trajectory .size % 2 == 0) )
 
-  def validate_length (trajectory : Trajectory) : Option [String] =
+  def validate_length (trajectory : Trajectory) : Seq [String] =
     if ( (trajectory .size < 3)
-    ) Some (error_trajectory_is_too_short)
+    ) Seq [String] (error_trajectory_is_too_short)
     else
       if ( (trajectory .size % 2 == 0)
-      ) Some (error_trajectory_length_should_be_odd)
-      else None
+      ) Seq [String] (error_trajectory_length_should_be_odd)
+      else Seq [String] ()
 
   def is_valid (trajectory : Trajectory) (fluents : FluentMap) (actions : ActionSet) : Boolean =
     has_valid_length (trajectory) &&
     foldl [IdentifierSet, ValidationWindow] (trajectory) (initial_window (fluents) (actions) ) (process_window) .valid
 
-  def validate (trajectory : Trajectory) (fluents : FluentMap) (actions : ActionSet) : Option [String] =
-    vu .concatenate_pair (
-      validate_length (trajectory) ) (
-      foldl [IdentifierSet, ValidationWindow] (trajectory) (initial_window (fluents) (actions) ) (process_window) .error
+  def validate (trajectory : Trajectory) (fluents : FluentMap) (actions : ActionSet) : Seq [String] =
+    validate_length (trajectory) .++ (
+      foldl [IdentifierSet, ValidationWindow] (trajectory) (initial_window (fluents) (actions) ) (process_window) .errors
     )
 
 }
@@ -351,44 +323,5 @@ case class TrajectoryValidator_ () extends TrajectoryValidator
 object TrajectoryValidator {
   def mk : TrajectoryValidator =
     TrajectoryValidator_ ()
-}
-
-
-trait ValidationUtil
-{
-
-
-
-  lazy val separator = "\n"
-
-  lazy val empty = ""
-
-  def concatenate (seq : Seq [Option [String] ] ) : Option [String] =
-    if ( (seq .exists ( x => x .isDefined) )
-    ) Some (
-      seq
-        .filter ( x => x .isDefined)
-        .map ( x => x .getOrElse (empty) )
-        .mkString (separator)
-    )
-    else None
-
-  def concatenate_pair (fst : Option [String] ) (snd : Option [String] ) : Option [String] =
-    concatenate (
-      Seq [Option [String] ] (fst , snd)
-    )
-
-  def concatenate_triplet (fst : Option [String] ) (snd : Option [String] ) (trd : Option [String] ) : Option [String] =
-    concatenate (
-      Seq [Option [String] ] (fst , snd , trd)
-    )
-
-}
-
-case class ValidationUtil_ () extends ValidationUtil
-
-object ValidationUtil {
-  def mk : ValidationUtil =
-    ValidationUtil_ ()
 }
 

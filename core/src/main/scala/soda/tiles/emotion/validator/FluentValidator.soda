@@ -3,8 +3,6 @@ class FluentValidator
 
   abstract
 
-  vu = ValidationUtil .mk
-
   error_unknown_fluent = "unknown fluent"
 
   error_duplicate_fluent_mapping = "duplicate fluent mapping"
@@ -17,15 +15,14 @@ class FluentValidator
   is_valid (fluent_set : FluentSet) (fluent_map : FluentMap) : Boolean =
     (get_fluents (fluent_set) (fluent_map) .size) == (fluent_set .size)
 
-  validate_fluent (fluent : FluentName) (fluent_map : FluentMap) : Option [String] =
-    if fluent_map .contains (fluent)
-    then None
-    else Some (error_unknown_fluent + fluent.toString)
-
-  validate_keys (fluent_set : FluentSet) (fluent_map : FluentMap) : Option [String] =
+  validate_keys (fluent_set : FluentSet) (fluent_map : FluentMap) : Seq [String] =
     fluent_set
-      .find (lambda x --> not fluent_map .contains (x) )
+      .toSeq
+      .filter (lambda x --> not fluent_map .contains (x) )
       .map (lambda x --> error_unknown_fluent + " " + x .toString)
+
+  validate_fluent (fluent : FluentName) (fluent_map : FluentMap) : Seq [String] =
+    validate_keys (Seq [FluentName] (fluent) .toSet) (fluent_map)
 
   mapped (fluent_set : FluentSet) (fluent_map : FluentMap) : Seq [Identifier] =
     fluent_set
@@ -34,21 +31,20 @@ class FluentValidator
       .map (lambda x --> fluent_map .get (x) .get)
 
   _validate_injective_with_set (fluent_set : FluentSet) (fluent_map : FluentMap) (
-      seq : Seq [Identifier] ) (uniq : Set [Identifier] ) : Option [String] =
-    seq .filter (lambda x --> not uniq .contains (x) )
-      .headOption
+      seq : Seq [Identifier] ) (uniq : Set [Identifier] ) : Seq [String] =
+    seq
+      .filter (lambda x --> not uniq .contains (x) )
       .map (lambda x --> error_duplicate_fluent_mapping + " " + x .toString)
 
   _validate_injective_with (fluent_set : FluentSet) (fluent_map : FluentMap) (seq : Seq [Identifier] )
-      : Option [String] =
+      : Seq [String] =
     _validate_injective_with_set (fluent_set) (fluent_map) (seq) (seq .toSet)
 
-  validate_injective (fluent_set : FluentSet) (fluent_map : FluentMap) : Option [String] =
+  validate_injective (fluent_set : FluentSet) (fluent_map : FluentMap) : Seq [String] =
     _validate_injective_with (fluent_set) (fluent_map) (mapped (fluent_set) (fluent_map) )
 
-  validate (fluent_set : FluentSet) (fluent_map : FluentMap) : Option [String] =
-    vu .concatenate_pair (
-      validate_keys (fluent_set) (fluent_map) ) (
+  validate (fluent_set : FluentSet) (fluent_map : FluentMap) : Seq [String] =
+    validate_keys (fluent_set) (fluent_map) .++ (
       validate_injective (fluent_set) (fluent_map) )
 
 end
