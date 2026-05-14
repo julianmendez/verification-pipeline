@@ -7,34 +7,47 @@ class RuleValidator
 
   av = ActionValidator .mk
 
-  is_valid (rule : Rule) (fluent_map : FluentMap) (action_set : ActionSet) : Boolean =
+  validate (rule : Rule) (fluent_map : FluentMap) (action_set : ActionSet) : Seq [String] =
     match rule
       case CausesIfRule (input , action , output) ==>
-        fv .is_valid (input) (fluent_map) and fv .is_valid (output) (fluent_map) and
-        action_set .contains (action)
+        fv .validate (input) (fluent_map) .++ ( (
+        fv .validate (output) (fluent_map) ) .++ (
+        av .validate_action (action) (action_set) ) )
       case IfRule (input , output) ==>
-        fv .is_valid (input) (fluent_map) and fv .is_valid (output) (fluent_map)
+        fv .validate (input) (fluent_map) .++ (
+        fv .validate (output) (fluent_map) )
       case TriggersRule (input , action) ==>
-        fv .is_valid (input) (fluent_map) and action_set .contains (action)
+        fv .validate (input) (fluent_map) .++ (
+        av .validate_action (action) (action_set) )
       case AllowsRule (input , action) ==>
-        fv .is_valid (input) (fluent_map) and action_set .contains (action)
+        fv .validate (input) (fluent_map) .++ (
+        av .validate_action (action) (action_set) )
       case InhibitsRule (input , action) ==>
-        fv .is_valid (input) (fluent_map) and action_set .contains (action)
+        fv .validate (input) (fluent_map) .++ (
+        av .validate_action (action) (action_set) )
       case NoConcurrencyRule (actions) ==>
-        av .is_valid (actions) (action_set)
+        av .validate(actions)(action_set)
       case DefaultRule (fluent) ==>
-        fluent_map .contains (fluent)
+        fv .validate_fluent (fluent) (fluent_map)
       case InfluencesIfRule (input , action , output) ==>
-        fv .is_valid (input) (fluent_map) and fv .is_valid (output) (fluent_map) and
-        action_set .contains (action)
+        fv .validate (input) (fluent_map) .++ ( (
+        fv .validate (output) (fluent_map) ) .++ (
+        av .validate_action (action) (action_set) ) )
       case InfluencesRule (input , output) ==>
-        fv .is_valid (input) (fluent_map) and fv .is_valid (output) (fluent_map)
+        fv .validate (input) (fluent_map) .++ (
+        fv .validate (output) (fluent_map) )
       case FacilitatesRule (input , action) ==>
-        fv .is_valid (input) (fluent_map) and action_set .contains (action)
+        fv .validate (input) (fluent_map) .++ (
+        av .validate_action (action) (action_set) )
       case ContravenesRule (input , action) ==>
-        fv .is_valid (input) (fluent_map) and action_set .contains (action)
+        fv .validate (input) (fluent_map) .++ (
+        av .validate_action (action) (action_set) )
       case ForbidsToCauseRule (input , output) ==>
-        fv .is_valid (input) (fluent_map) and fv .is_valid (output) (fluent_map)
+        fv .validate (input) (fluent_map) .++ (
+        fv .validate (output) (fluent_map) )
+
+  is_valid (rule : Rule) (fluent_map : FluentMap) (action_set : ActionSet) : Boolean =
+    validate (rule) (fluent_map) (action_set) .isEmpty
 
 end
 

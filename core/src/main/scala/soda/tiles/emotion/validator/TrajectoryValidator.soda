@@ -6,6 +6,7 @@ class ValidationWindow
     even : Boolean
     fluents : FluentMap
     actions : ActionSet
+    errors : Seq [String]
 
 end
 
@@ -18,6 +19,10 @@ class TrajectoryValidator
 
   av = ActionValidator .mk
 
+  error_trajectory_is_too_short = "the trajectory is too short"
+
+  error_trajectory_length_should_be_odd = "the trajectory length should be an odd number"
+
   _tailrec_foldl [A : Type] [B : Type] (sequence : Seq [A] ) (current : B)
       (next : B -> A -> B) : B =
     match sequence
@@ -29,22 +34,31 @@ class TrajectoryValidator
     _tailrec_foldl [A] [B] (sequence) (initial) (next)
 
   initial_window (fluents : FluentMap) (actions : ActionSet) : ValidationWindow =
-    ValidationWindow .mk (true) (true) (fluents) (actions)
+    ValidationWindow .mk (true) (true) (fluents) (actions) (Seq [String] () )
 
   process_window (vw : ValidationWindow) (elem : IdentifierSet) : ValidationWindow =
     if (not (vw .valid) )
-    then ValidationWindow .mk (false) (not vw .even) (vw .fluents) (vw .actions)
+    then ValidationWindow .mk (false) (not vw .even) (vw .fluents) (vw .actions) (vw .errors)
     else
       if (vw .even)
-      then ValidationWindow .mk (fv .is_valid (elem) (vw .fluents) ) (not vw .even) (vw .fluents) (vw .actions)
-      else ValidationWindow .mk (av .is_valid (elem) (vw .actions) ) (not vw .even) (vw .fluents) (vw .actions)
+      then ValidationWindow .mk (fv .is_valid (elem) (vw .fluents) ) (not vw .even) (vw .fluents) (vw .actions) (fv .validate (elem) (vw .fluents) )
+      else ValidationWindow .mk (av .is_valid (elem) (vw .actions) ) (not vw .even) (vw .fluents) (vw .actions) (av .validate (elem) (vw .actions) )
 
-  has_valid_length (trajectory : Trajectory) : Boolean =
-    (trajectory .size >= 3) and (not (trajectory .size % 2 == 0) )
+  validate_length (trajectory : Trajectory) : Seq [String] =
+    if (trajectory .size < 3)
+    then Seq [String] (error_trajectory_is_too_short)
+    else
+      if (trajectory .size % 2 == 0)
+      then Seq [String] (error_trajectory_length_should_be_odd)
+      else Seq [String] ()
+
+  validate (trajectory : Trajectory) (fluents : FluentMap) (actions : ActionSet) : Seq [String] =
+    validate_length (trajectory) .++ (
+      foldl [IdentifierSet] [ValidationWindow] (trajectory) (initial_window (fluents) (actions) ) (process_window) .errors
+    )
 
   is_valid (trajectory : Trajectory) (fluents : FluentMap) (actions : ActionSet) : Boolean =
-    has_valid_length (trajectory) and
-    foldl [IdentifierSet] [ValidationWindow] (trajectory) (initial_window (fluents) (actions) ) (process_window) .valid
+    validate (trajectory) (fluents) (actions) .isEmpty
 
 end
 

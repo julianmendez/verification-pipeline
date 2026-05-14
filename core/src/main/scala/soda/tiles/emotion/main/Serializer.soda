@@ -3,18 +3,31 @@ class Serializer
 
   abstract
 
+  error_parsing_error = "parsing error possibly caused by a misspelled rule name"
+
   show_entry (entry : TileQuad [Transition] [Rule] [ActionSet] [Boolean] ) : String =
     "- transition : " + entry .fst + "\n" +
     "  rule : " + entry .snd + "\n" +
     "  inhibiting_actions : " + entry .trd + "\n" +
     "  valid : " + entry .fth + "\n"
 
-  serialize (seq : Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] ) : String =
+
+  serialize_errors (errors : Seq [String] ) : String =
     "---" + "\n" +
-    (seq
-      .map (lambda x --> show_entry (x) )
-      .mkString
-    ) + "\n"
+    "- errors:" + "\n" +
+      errors
+        .map (lambda x --> "  - " + x)
+        .mkString ("\n")
+
+  serialize_response (seq : Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] ) : String =
+    if (seq .isEmpty)
+    then serialize_errors (Seq [String] (error_parsing_error) )
+    else
+      "---" + "\n" +
+      (seq
+        .map (lambda x --> show_entry (x) )
+        .mkString
+      ) + "\n"
 
 end
 
