@@ -242,14 +242,15 @@ trait ValidationWindow
   def   even : Boolean
   def   fluents : FluentMap
   def   actions : ActionSet
+  def   error : Option [String]
 
 }
 
-case class ValidationWindow_ (valid : Boolean, even : Boolean, fluents : FluentMap, actions : ActionSet) extends ValidationWindow
+case class ValidationWindow_ (valid : Boolean, even : Boolean, fluents : FluentMap, actions : ActionSet, error : Option [String]) extends ValidationWindow
 
 object ValidationWindow {
-  def mk (valid : Boolean) (even : Boolean) (fluents : FluentMap) (actions : ActionSet) : ValidationWindow =
-    ValidationWindow_ (valid, even, fluents, actions)
+  def mk (valid : Boolean) (even : Boolean) (fluents : FluentMap) (actions : ActionSet) (error : Option [String]) : ValidationWindow =
+    ValidationWindow_ (valid, even, fluents, actions, error)
 }
 
 trait TrajectoryValidator
@@ -260,6 +261,10 @@ trait TrajectoryValidator
   lazy val fv = FluentValidator .mk
 
   lazy val av = ActionValidator .mk
+
+  lazy val error_trajectory_is_too_short = "The trajectory is too short."
+
+  lazy val error_trajectory_length_should_be_odd = "The trajectory length should be an odd number."
 
   private def _tailrec_foldl [A , B ] (sequence : Seq [A] ) (current : B)
       (next : B => A => B) : B =
@@ -273,22 +278,34 @@ trait TrajectoryValidator
     _tailrec_foldl [A, B] (sequence) (initial) (next)
 
   def initial_window (fluents : FluentMap) (actions : ActionSet) : ValidationWindow =
-    ValidationWindow .mk (true) (true) (fluents) (actions)
+    ValidationWindow .mk (true) (true) (fluents) (actions) (None)
 
   def process_window (vw : ValidationWindow) (elem : IdentifierSet) : ValidationWindow =
     if ( (! (vw .valid) )
-    ) ValidationWindow .mk (false) (! vw .even) (vw .fluents) (vw .actions)
+    ) ValidationWindow .mk (false) (! vw .even) (vw .fluents) (vw .actions) (vw .error)
     else
       if ( (vw .even)
-      ) ValidationWindow .mk (fv .is_valid (elem) (vw .fluents) ) (! vw .even) (vw .fluents) (vw .actions)
-      else ValidationWindow .mk (av .is_valid (elem) (vw .actions) ) (! vw .even) (vw .fluents) (vw .actions)
+      ) ValidationWindow .mk (fv .is_valid (elem) (vw .fluents) ) (! vw .even) (vw .fluents) (vw .actions) (fv .validate (elem) (vw .fluents) )
+      else ValidationWindow .mk (av .is_valid (elem) (vw .actions) ) (! vw .even) (vw .fluents) (vw .actions) (av .validate (elem) (vw .actions) )
 
   def has_valid_length (trajectory : Trajectory) : Boolean =
     (trajectory .size >= 3) && (! (trajectory .size % 2 == 0) )
 
+  def validate_length (trajectory : Trajectory) : Option [String] =
+    if ( (trajectory .size < 3)
+    ) Some (error_trajectory_is_too_short)
+    else
+      if ( (trajectory .size % 2 == 0)
+      ) Some (error_trajectory_length_should_be_odd)
+      else None
+
   def is_valid (trajectory : Trajectory) (fluents : FluentMap) (actions : ActionSet) : Boolean =
     has_valid_length (trajectory) &&
     foldl [IdentifierSet, ValidationWindow] (trajectory) (initial_window (fluents) (actions) ) (process_window) .valid
+
+  def validate (trajectory : Trajectory) (fluents : FluentMap) (actions : ActionSet) : Option [String] =
+    validate_length (trajectory) .orElse
+    (foldl [IdentifierSet, ValidationWindow] (trajectory) (initial_window (fluents) (actions) ) (process_window) .error)
 
 }
 
