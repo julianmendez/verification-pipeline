@@ -5,9 +5,9 @@ class FluentValidator
 
   vu = ValidationUtil .mk
 
-  error_unknown_fluent = "Unknown fluent: "
+  error_unknown_fluent = "unknown fluent"
 
-  error_duplicate_fluent_mapping = "Duplicate fluent mapping: "
+  error_duplicate_fluent_mapping = "duplicate fluent mapping"
 
   get_fluents (fluent_set : FluentSet) (fluent_map : FluentMap) : Set [FluentName] =
     fluent_set
@@ -25,7 +25,7 @@ class FluentValidator
   validate_keys (fluent_set : FluentSet) (fluent_map : FluentMap) : Option [String] =
     fluent_set
       .find (lambda x --> not fluent_map .contains (x) )
-      .map (lambda x --> error_unknown_fluent + x .toString)
+      .map (lambda x --> error_unknown_fluent + " " + x .toString)
 
   mapped (fluent_set : FluentSet) (fluent_map : FluentMap) : Seq [Identifier] =
     fluent_set
@@ -37,7 +37,7 @@ class FluentValidator
       seq : Seq [Identifier] ) (uniq : Set [Identifier] ) : Option [String] =
     seq .filter (lambda x --> not uniq .contains (x) )
       .headOption
-      .map (lambda x --> error_duplicate_fluent_mapping + x .toString)
+      .map (lambda x --> error_duplicate_fluent_mapping + " " + x .toString)
 
   _validate_injective_with (fluent_set : FluentSet) (fluent_map : FluentMap) (seq : Seq [Identifier] )
       : Option [String] =

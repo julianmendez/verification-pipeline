@@ -21,9 +21,9 @@ class TrajectoryValidator
 
   vu = ValidationUtil .mk
 
-  error_trajectory_is_too_short = "The trajectory is too short."
+  error_trajectory_is_too_short = "the trajectory is too short"
 
-  error_trajectory_length_should_be_odd = "The trajectory length should be an odd number."
+  error_trajectory_length_should_be_odd = "the trajectory length should be an odd number"
 
   _tailrec_foldl [A : Type] [B : Type] (sequence : Seq [A] ) (current : B)
       (next : B -> A -> B) : B =

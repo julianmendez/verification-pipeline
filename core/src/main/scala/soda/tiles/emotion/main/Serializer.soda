@@ -9,12 +9,20 @@ class Serializer
     "  inhibiting_actions : " + entry .trd + "\n" +
     "  valid : " + entry .fth + "\n"
 
-  serialize (seq : Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] ) : String =
+  serialize_response (seq : Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] ) : String =
     "---" + "\n" +
     (seq
       .map (lambda x --> show_entry (x) )
       .mkString
     ) + "\n"
+
+  serialize_errors (error : String) : String =
+    "---" + "\n" +
+    "- errors:" + "\n" +
+      error
+        .split ("\n")
+        .map (lambda x --> "  - " + x + "\n")
+        .mkString ("\n")
 
 end
 

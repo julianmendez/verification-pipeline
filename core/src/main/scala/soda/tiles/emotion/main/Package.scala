@@ -67,8 +67,8 @@ trait Main
 
   def process_instance_with (conf : Configuration) (errors : Option [String] ) : String =
     errors match  {
-      case Some (error) => error
-      case None => serializer .serialize (process_configuration (conf) )
+      case Some (error) => serializer .serialize_errors (error)
+      case None => serializer .serialize_response (process_configuration (conf) )
     }
 
   def process_instance (maybe_conf : Option [Configuration] ) : String =
@@ -119,12 +119,20 @@ trait Serializer
     "  inhibiting_actions : " + entry .trd + "\n" +
     "  valid : " + entry .fth + "\n"
 
-  def serialize (seq : Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] ) : String =
+  def serialize_response (seq : Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] ) : String =
     "---" + "\n" +
     (seq
       .map ( x => show_entry (x) )
       .mkString
     ) + "\n"
+
+  def serialize_errors (error : String) : String =
+    "---" + "\n" +
+    "- errors:" + "\n" +
+      error
+        .split ("\n")
+        .map ( x => "  - " + x + "\n")
+        .mkString ("\n")
 
 }
 

@@ -47,8 +47,8 @@ class Main
 
   process_instance_with (conf : Configuration) (errors : Option [String] ) : String =
     match errors
-      case Some (error) ==> error
-      case None ==> serializer .serialize (process_configuration (conf) )
+      case Some (error) ==> serializer .serialize_errors (error)
+      case None ==> serializer .serialize_response (process_configuration (conf) )
 
   process_instance (maybe_conf : Option [Configuration] ) : String =
     match maybe_conf

@@ -38,7 +38,7 @@ trait ActionValidator
 
   lazy val vu = ValidationUtil .mk
 
-  lazy val error_unknown_action = "Unknown action: "
+  lazy val error_unknown_action = "unknown action"
 
   def is_valid (actions : ActionSet) (all_actions : ActionSet) : Boolean =
     actions
@@ -54,7 +54,7 @@ trait ActionValidator
       actions
         .toSeq
         .filter ( x => ! all_actions .contains(x) )
-        .map ( x => Some (error_unknown_action + x .toString) )
+        .map ( x => Some (error_unknown_action + " " + x .toString) )
     )
 
 }
@@ -111,9 +111,9 @@ trait FluentValidator
 
   lazy val vu = ValidationUtil .mk
 
-  lazy val error_unknown_fluent = "Unknown fluent: "
+  lazy val error_unknown_fluent = "unknown fluent"
 
-  lazy val error_duplicate_fluent_mapping = "Duplicate fluent mapping: "
+  lazy val error_duplicate_fluent_mapping = "duplicate fluent mapping"
 
   def get_fluents (fluent_set : FluentSet) (fluent_map : FluentMap) : Set [FluentName] =
     fluent_set
@@ -131,7 +131,7 @@ trait FluentValidator
   def validate_keys (fluent_set : FluentSet) (fluent_map : FluentMap) : Option [String] =
     fluent_set
       .find ( x => ! fluent_map .contains (x) )
-      .map ( x => error_unknown_fluent + x .toString)
+      .map ( x => error_unknown_fluent + " " + x .toString)
 
   def mapped (fluent_set : FluentSet) (fluent_map : FluentMap) : Seq [Identifier] =
     fluent_set
@@ -143,7 +143,7 @@ trait FluentValidator
       seq : Seq [Identifier] ) (uniq : Set [Identifier] ) : Option [String] =
     seq .filter ( x => ! uniq .contains (x) )
       .headOption
-      .map ( x => error_duplicate_fluent_mapping + x .toString)
+      .map ( x => error_duplicate_fluent_mapping + " " + x .toString)
 
   private def _validate_injective_with (fluent_set : FluentSet) (fluent_map : FluentMap) (seq : Seq [Identifier] )
       : Option [String] =
@@ -297,9 +297,9 @@ trait TrajectoryValidator
 
   lazy val vu = ValidationUtil .mk
 
-  lazy val error_trajectory_is_too_short = "The trajectory is too short."
+  lazy val error_trajectory_is_too_short = "the trajectory is too short"
 
-  lazy val error_trajectory_length_should_be_odd = "The trajectory length should be an odd number."
+  lazy val error_trajectory_length_should_be_odd = "the trajectory length should be an odd number"
 
   private def _tailrec_foldl [A , B ] (sequence : Seq [A] ) (current : B)
       (next : B => A => B) : B =

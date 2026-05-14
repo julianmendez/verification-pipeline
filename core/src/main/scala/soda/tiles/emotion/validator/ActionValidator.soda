@@ -5,7 +5,7 @@ class ActionValidator
 
   vu = ValidationUtil .mk
 
-  error_unknown_action = "Unknown action: "
+  error_unknown_action = "unknown action"
 
   is_valid (actions : ActionSet) (all_actions : ActionSet) : Boolean =
     actions
@@ -21,7 +21,7 @@ class ActionValidator
       actions
         .toSeq
         .filter (lambda x --> not all_actions .contains(x) )
-        .map (lambda x --> Some (error_unknown_action + x .toString) )
+        .map (lambda x --> Some (error_unknown_action + " " + x .toString) )
     )
 
 end
