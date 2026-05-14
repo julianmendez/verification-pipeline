@@ -1,0 +1,21 @@
+
+class ValidationUtil
+
+  abstract
+
+  separator = "\n"
+
+  empty = ""
+
+  concatenate (seq : Seq [Option [String] ] ) : Option [String] =
+    if (seq .exists (lambda x --> x .isDefined) )
+    then Some (
+      seq
+        .filter (lambda x --> x .isDefined)
+        .map (lambda x --> x .getOrElse (empty) )
+        .mkString (separator)
+    )
+    else None
+
+end
+

@@ -7,10 +7,19 @@ class ConfigurationValidator
 
   tv = TrajectoryValidator .mk
 
+  vu = ValidationUtil .mk
+
   is_valid (conf : Configuration) : Boolean =
     conf .rules .forall (lambda x -->
       rv .is_valid (x) (conf .fluents) (conf .actions)
     ) and tv .is_valid (conf .trajectory) (conf .fluents) (conf .actions)
+
+  validate (conf : Configuration) : Option [String] =
+    vu .concatenate (
+      conf .rules .map (lambda x -->
+        rv .validate (x) (conf .fluents) (conf .actions)
+      )
+    ) .orElse (tv .validate (conf .trajectory) (conf .fluents) (conf .actions) )
 
 end
 

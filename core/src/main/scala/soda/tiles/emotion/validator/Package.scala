@@ -71,10 +71,19 @@ trait ConfigurationValidator
 
   lazy val tv = TrajectoryValidator .mk
 
+  lazy val vu = ValidationUtil .mk
+
   def is_valid (conf : Configuration) : Boolean =
     conf .rules .forall ( x =>
       rv .is_valid (x) (conf .fluents) (conf .actions)
     ) && tv .is_valid (conf .trajectory) (conf .fluents) (conf .actions)
+
+  def validate (conf : Configuration) : Option [String] =
+    vu .concatenate (
+      conf .rules .map ( x =>
+        rv .validate (x) (conf .fluents) (conf .actions)
+      )
+    ) .orElse (tv .validate (conf .trajectory) (conf .fluents) (conf .actions) )
 
 }
 
@@ -314,5 +323,34 @@ case class TrajectoryValidator_ () extends TrajectoryValidator
 object TrajectoryValidator {
   def mk : TrajectoryValidator =
     TrajectoryValidator_ ()
+}
+
+
+trait ValidationUtil
+{
+
+
+
+  lazy val separator = "\n"
+
+  lazy val empty = ""
+
+  def concatenate (seq : Seq [Option [String] ] ) : Option [String] =
+    if ( (seq .exists ( x => x .isDefined) )
+    ) Some (
+      seq
+        .filter ( x => x .isDefined)
+        .map ( x => x .getOrElse (empty) )
+        .mkString (separator)
+    )
+    else None
+
+}
+
+case class ValidationUtil_ () extends ValidationUtil
+
+object ValidationUtil {
+  def mk : ValidationUtil =
+    ValidationUtil_ ()
 }
 
