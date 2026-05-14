@@ -15,11 +15,11 @@ class FluentValidatorSpec ()
       ("c" , "C")
     ) .toMap
 
-  test ("get_fluents returns only mapped fluents") (
+  test ("mapped returns only mapped fluents") (
     check (
-      obtained := FluentValidator .mk .get_fluents (fluent_set_0) (fluent_map_0)
+      obtained := FluentValidator .mk .mapped (fluent_set_0) (fluent_map_0)
     ) (
-      expected := (Seq("A" , "C")) .toSet
+      expected := (Seq ("A" , "C") )
     )
   )
 
@@ -52,7 +52,7 @@ class FluentValidatorSpec ()
 
   test ("is_valid returns false when some fluents are missing") (
     check (
-      obtained := FluentValidator .mk .is_valid (fluent_set_2)(fluent_map_2)
+      obtained := FluentValidator .mk .is_valid (fluent_set_2) (fluent_map_2)
     ) (
       expected := false
     )
@@ -66,11 +66,11 @@ class FluentValidatorSpec ()
       ("x" , "X")
     ) .toMap
 
-  test ("get_fluents returns empty set when no fluents match") (
+  test ("mapped returns empty set when no fluents match") (
     check (
-      obtained := FluentValidator .mk.get_fluents (fluent_set_3) (fluent_map_3)
+      obtained := FluentValidator .mk .mapped (fluent_set_3) (fluent_map_3)
     ) (
-      expected := Set.empty
+      expected := Seq .empty
     )
   )
 
@@ -79,15 +79,15 @@ class FluentValidatorSpec ()
 
   fluent_map_4 : FluentMap =
     Seq (
-      ("a" , "X"),
+      ("a" , "X") ,
       ("b" , "X")
     ) .toMap
 
-  test ("get_fluents collapses duplicate mapped values into a set") (
+  test ("mapped does not collapse duplicate mapped values into a set") (
     check (
-      obtained := FluentValidator .mk .get_fluents(fluent_set_4)(fluent_map_4)
+      obtained := FluentValidator .mk .mapped (fluent_set_4) (fluent_map_4)
     ) (
-      expected := Seq("X") .toSet
+      expected := Seq ("X" , "X")
     )
   )
 

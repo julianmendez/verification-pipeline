@@ -44,9 +44,6 @@ class TrajectoryValidator
       then ValidationWindow .mk (fv .is_valid (elem) (vw .fluents) ) (not vw .even) (vw .fluents) (vw .actions) (fv .validate (elem) (vw .fluents) )
       else ValidationWindow .mk (av .is_valid (elem) (vw .actions) ) (not vw .even) (vw .fluents) (vw .actions) (av .validate (elem) (vw .actions) )
 
-  has_valid_length (trajectory : Trajectory) : Boolean =
-    (trajectory .size >= 3) and (not (trajectory .size % 2 == 0) )
-
   validate_length (trajectory : Trajectory) : Seq [String] =
     if (trajectory .size < 3)
     then Seq [String] (error_trajectory_is_too_short)
@@ -55,14 +52,13 @@ class TrajectoryValidator
       then Seq [String] (error_trajectory_length_should_be_odd)
       else Seq [String] ()
 
-  is_valid (trajectory : Trajectory) (fluents : FluentMap) (actions : ActionSet) : Boolean =
-    has_valid_length (trajectory) and
-    foldl [IdentifierSet] [ValidationWindow] (trajectory) (initial_window (fluents) (actions) ) (process_window) .valid
-
   validate (trajectory : Trajectory) (fluents : FluentMap) (actions : ActionSet) : Seq [String] =
     validate_length (trajectory) .++ (
       foldl [IdentifierSet] [ValidationWindow] (trajectory) (initial_window (fluents) (actions) ) (process_window) .errors
     )
+
+  is_valid (trajectory : Trajectory) (fluents : FluentMap) (actions : ActionSet) : Boolean =
+    validate (trajectory) (fluents) (actions) .isEmpty
 
 end
 

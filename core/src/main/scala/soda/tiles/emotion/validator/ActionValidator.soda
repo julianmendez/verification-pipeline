@@ -3,20 +3,19 @@ class ActionValidator
 
   abstract
 
-  error_unknown_action = "unknown action"
-
-  is_valid (actions : ActionSet) (all_actions : ActionSet) : Boolean =
-    actions
-      .forall (lambda x --> all_actions .contains (x) )
+  error_unknown_action = "unknown action ----> "
 
   validate (actions : ActionSet) (all_actions : ActionSet) : Seq [String] =
     actions
       .toSeq
       .filter (lambda x --> not all_actions .contains(x) )
-      .map (lambda x --> error_unknown_action + " " + x .toString)
+      .map (lambda x --> error_unknown_action + x .toString)
 
   validate_action (action : Action) (action_set : ActionSet) : Seq [String] =
     validate (Seq [Action] (action) .toSet) (action_set)
+
+  is_valid (actions : ActionSet) (all_actions : ActionSet) : Boolean =
+    validate (actions) (all_actions) .isEmpty
 
 end
 

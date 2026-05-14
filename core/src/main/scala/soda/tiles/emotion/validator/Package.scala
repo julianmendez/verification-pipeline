@@ -36,20 +36,19 @@ trait ActionValidator
 
 
 
-  lazy val error_unknown_action = "unknown action"
-
-  def is_valid (actions : ActionSet) (all_actions : ActionSet) : Boolean =
-    actions
-      .forall ( x => all_actions .contains (x) )
+  lazy val error_unknown_action = "unknown action ----> "
 
   def validate (actions : ActionSet) (all_actions : ActionSet) : Seq [String] =
     actions
       .toSeq
       .filter ( x => ! all_actions .contains(x) )
-      .map ( x => error_unknown_action + " " + x .toString)
+      .map ( x => error_unknown_action + x .toString)
 
   def validate_action (action : Action) (action_set : ActionSet) : Seq [String] =
     validate (Seq [Action] (action) .toSet) (action_set)
+
+  def is_valid (actions : ActionSet) (all_actions : ActionSet) : Boolean =
+    validate (actions) (all_actions) .isEmpty
 
 }
 
@@ -70,13 +69,6 @@ trait ConfigurationValidator
 
   lazy val tv = TrajectoryValidator .mk
 
-  def is_valid (conf : Configuration) : Boolean =
-    conf
-      .rules
-      .forall ( x =>
-        rv .is_valid (x) (conf .fluents) (conf .actions)
-      ) && tv .is_valid (conf .trajectory) (conf .fluents) (conf .actions)
-
   def validate (conf : Configuration) : Seq [String] =
     conf .rules
       .flatMap ( x =>
@@ -84,6 +76,9 @@ trait ConfigurationValidator
       ) .++ (
         tv .validate (conf .trajectory) (conf .fluents) (conf .actions)
       )
+
+  def is_valid (conf : Configuration) : Boolean =
+    validate (conf) .isEmpty
 
 }
 
@@ -100,23 +95,15 @@ trait FluentValidator
 
 
 
-  lazy val error_unknown_fluent = "unknown fluent"
+  lazy val error_unknown_fluent = "unknown fluent ----> "
 
-  lazy val error_duplicate_fluent_mapping = "duplicate fluent mapping"
-
-  def get_fluents (fluent_set : FluentSet) (fluent_map : FluentMap) : Set [FluentName] =
-    fluent_set
-      .filter ( x => fluent_map .contains (x) )
-      .map ( x => fluent_map .get (x) .get)
-
-  def is_valid (fluent_set : FluentSet) (fluent_map : FluentMap) : Boolean =
-    (get_fluents (fluent_set) (fluent_map) .size) == (fluent_set .size)
+  lazy val error_duplicate_fluent_mapping = "contradictory fluent values for ----> "
 
   def validate_keys (fluent_set : FluentSet) (fluent_map : FluentMap) : Seq [String] =
     fluent_set
       .toSeq
       .filter ( x => ! fluent_map .contains (x) )
-      .map ( x => error_unknown_fluent + " " + x .toString)
+      .map ( x => error_unknown_fluent + x .toString)
 
   def validate_fluent (fluent : FluentName) (fluent_map : FluentMap) : Seq [String] =
     validate_keys (Seq [FluentName] (fluent) .toSet) (fluent_map)
@@ -127,22 +114,21 @@ trait FluentValidator
       .filter ( x => fluent_map .contains (x) )
       .map ( x => fluent_map .get (x) .get)
 
-  private def _validate_injective_with_set (fluent_set : FluentSet) (fluent_map : FluentMap) (
-      seq : Seq [Identifier] ) (uniq : Set [Identifier] ) : Seq [String] =
-    seq
-      .filter ( x => ! uniq .contains (x) )
-      .map ( x => error_duplicate_fluent_mapping + " " + x .toString)
-
-  private def _validate_injective_with (fluent_set : FluentSet) (fluent_map : FluentMap) (seq : Seq [Identifier] )
+  def validate_injective (fluent_set : FluentSet) (fluent_map : FluentMap) (mapped : Seq [Identifier] )
       : Seq [String] =
-    _validate_injective_with_set (fluent_set) (fluent_map) (seq) (seq .toSet)
-
-  def validate_injective (fluent_set : FluentSet) (fluent_map : FluentMap) : Seq [String] =
-    _validate_injective_with (fluent_set) (fluent_map) (mapped (fluent_set) (fluent_map) )
+    mapped
+      .toSet
+      .filter ( x =>
+        mapped .count ( y => x == y) > 1 )
+      .toSeq
+      .map ( x => error_duplicate_fluent_mapping + x .toString)
 
   def validate (fluent_set : FluentSet) (fluent_map : FluentMap) : Seq [String] =
     validate_keys (fluent_set) (fluent_map) .++ (
-      validate_injective (fluent_set) (fluent_map) )
+      validate_injective (fluent_set) (fluent_map) (mapped (fluent_set) (fluent_map) ) )
+
+  def is_valid (fluent_set : FluentSet) (fluent_map : FluentMap) : Boolean =
+    validate (fluent_set) (fluent_map) .isEmpty
 
 }
 
@@ -162,36 +148,6 @@ trait RuleValidator
   lazy val fv = FluentValidator .mk
 
   lazy val av = ActionValidator .mk
-
-  def is_valid (rule : Rule) (fluent_map : FluentMap) (action_set : ActionSet) : Boolean =
-    rule match  {
-      case CausesIfRule (input , action , output) =>
-        fv .is_valid (input) (fluent_map) && fv .is_valid (output) (fluent_map) &&
-        action_set .contains (action)
-      case IfRule (input , output) =>
-        fv .is_valid (input) (fluent_map) && fv .is_valid (output) (fluent_map)
-      case TriggersRule (input , action) =>
-        fv .is_valid (input) (fluent_map) && action_set .contains (action)
-      case AllowsRule (input , action) =>
-        fv .is_valid (input) (fluent_map) && action_set .contains (action)
-      case InhibitsRule (input , action) =>
-        fv .is_valid (input) (fluent_map) && action_set .contains (action)
-      case NoConcurrencyRule (actions) =>
-        av .is_valid (actions) (action_set)
-      case DefaultRule (fluent) =>
-        fluent_map .contains (fluent)
-      case InfluencesIfRule (input , action , output) =>
-        fv .is_valid (input) (fluent_map) && fv .is_valid (output) (fluent_map) &&
-        action_set .contains (action)
-      case InfluencesRule (input , output) =>
-        fv .is_valid (input) (fluent_map) && fv .is_valid (output) (fluent_map)
-      case FacilitatesRule (input , action) =>
-        fv .is_valid (input) (fluent_map) && action_set .contains (action)
-      case ContravenesRule (input , action) =>
-        fv .is_valid (input) (fluent_map) && action_set .contains (action)
-      case ForbidsToCauseRule (input , output) =>
-        fv .is_valid (input) (fluent_map) && fv .is_valid (output) (fluent_map)
-    }
 
   def validate (rule : Rule) (fluent_map : FluentMap) (action_set : ActionSet) : Seq [String] =
     rule match  {
@@ -232,6 +188,9 @@ trait RuleValidator
         fv .validate (input) (fluent_map) .++ (
         fv .validate (output) (fluent_map) )
     }
+
+  def is_valid (rule : Rule) (fluent_map : FluentMap) (action_set : ActionSet) : Boolean =
+    validate (rule) (fluent_map) (action_set) .isEmpty
 
 }
 
@@ -296,9 +255,6 @@ trait TrajectoryValidator
       ) ValidationWindow .mk (fv .is_valid (elem) (vw .fluents) ) (! vw .even) (vw .fluents) (vw .actions) (fv .validate (elem) (vw .fluents) )
       else ValidationWindow .mk (av .is_valid (elem) (vw .actions) ) (! vw .even) (vw .fluents) (vw .actions) (av .validate (elem) (vw .actions) )
 
-  def has_valid_length (trajectory : Trajectory) : Boolean =
-    (trajectory .size >= 3) && (! (trajectory .size % 2 == 0) )
-
   def validate_length (trajectory : Trajectory) : Seq [String] =
     if ( (trajectory .size < 3)
     ) Seq [String] (error_trajectory_is_too_short)
@@ -307,14 +263,13 @@ trait TrajectoryValidator
       ) Seq [String] (error_trajectory_length_should_be_odd)
       else Seq [String] ()
 
-  def is_valid (trajectory : Trajectory) (fluents : FluentMap) (actions : ActionSet) : Boolean =
-    has_valid_length (trajectory) &&
-    foldl [IdentifierSet, ValidationWindow] (trajectory) (initial_window (fluents) (actions) ) (process_window) .valid
-
   def validate (trajectory : Trajectory) (fluents : FluentMap) (actions : ActionSet) : Seq [String] =
     validate_length (trajectory) .++ (
       foldl [IdentifierSet, ValidationWindow] (trajectory) (initial_window (fluents) (actions) ) (process_window) .errors
     )
+
+  def is_valid (trajectory : Trajectory) (fluents : FluentMap) (actions : ActionSet) : Boolean =
+    validate (trajectory) (fluents) (actions) .isEmpty
 
 }
 

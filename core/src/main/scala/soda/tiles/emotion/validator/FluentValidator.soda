@@ -3,23 +3,15 @@ class FluentValidator
 
   abstract
 
-  error_unknown_fluent = "unknown fluent"
+  error_unknown_fluent = "unknown fluent ----> "
 
-  error_duplicate_fluent_mapping = "duplicate fluent mapping"
-
-  get_fluents (fluent_set : FluentSet) (fluent_map : FluentMap) : Set [FluentName] =
-    fluent_set
-      .filter (lambda x --> fluent_map .contains (x) )
-      .map (lambda x --> fluent_map .get (x) .get)
-
-  is_valid (fluent_set : FluentSet) (fluent_map : FluentMap) : Boolean =
-    (get_fluents (fluent_set) (fluent_map) .size) == (fluent_set .size)
+  error_duplicate_fluent_mapping = "contradictory fluent values for ----> "
 
   validate_keys (fluent_set : FluentSet) (fluent_map : FluentMap) : Seq [String] =
     fluent_set
       .toSeq
       .filter (lambda x --> not fluent_map .contains (x) )
-      .map (lambda x --> error_unknown_fluent + " " + x .toString)
+      .map (lambda x --> error_unknown_fluent + x .toString)
 
   validate_fluent (fluent : FluentName) (fluent_map : FluentMap) : Seq [String] =
     validate_keys (Seq [FluentName] (fluent) .toSet) (fluent_map)
@@ -30,22 +22,21 @@ class FluentValidator
       .filter (lambda x --> fluent_map .contains (x) )
       .map (lambda x --> fluent_map .get (x) .get)
 
-  _validate_injective_with_set (fluent_set : FluentSet) (fluent_map : FluentMap) (
-      seq : Seq [Identifier] ) (uniq : Set [Identifier] ) : Seq [String] =
-    seq
-      .filter (lambda x --> not uniq .contains (x) )
-      .map (lambda x --> error_duplicate_fluent_mapping + " " + x .toString)
-
-  _validate_injective_with (fluent_set : FluentSet) (fluent_map : FluentMap) (seq : Seq [Identifier] )
+  validate_injective (fluent_set : FluentSet) (fluent_map : FluentMap) (mapped : Seq [Identifier] )
       : Seq [String] =
-    _validate_injective_with_set (fluent_set) (fluent_map) (seq) (seq .toSet)
-
-  validate_injective (fluent_set : FluentSet) (fluent_map : FluentMap) : Seq [String] =
-    _validate_injective_with (fluent_set) (fluent_map) (mapped (fluent_set) (fluent_map) )
+    mapped
+      .toSet
+      .filter (lambda x -->
+        mapped .count (lambda y --> x == y) > 1 )
+      .toSeq
+      .map (lambda x --> error_duplicate_fluent_mapping + x .toString)
 
   validate (fluent_set : FluentSet) (fluent_map : FluentMap) : Seq [String] =
     validate_keys (fluent_set) (fluent_map) .++ (
-      validate_injective (fluent_set) (fluent_map) )
+      validate_injective (fluent_set) (fluent_map) (mapped (fluent_set) (fluent_map) ) )
+
+  is_valid (fluent_set : FluentSet) (fluent_map : FluentMap) : Boolean =
+    validate (fluent_set) (fluent_map) .isEmpty
 
 end
 

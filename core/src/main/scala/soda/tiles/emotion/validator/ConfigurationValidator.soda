@@ -7,13 +7,6 @@ class ConfigurationValidator
 
   tv = TrajectoryValidator .mk
 
-  is_valid (conf : Configuration) : Boolean =
-    conf
-      .rules
-      .forall (lambda x -->
-        rv .is_valid (x) (conf .fluents) (conf .actions)
-      ) and tv .is_valid (conf .trajectory) (conf .fluents) (conf .actions)
-
   validate (conf : Configuration) : Seq [String] =
     conf .rules
       .flatMap (lambda x -->
@@ -21,6 +14,9 @@ class ConfigurationValidator
       ) .++ (
         tv .validate (conf .trajectory) (conf .fluents) (conf .actions)
       )
+
+  is_valid (conf : Configuration) : Boolean =
+    validate (conf) .isEmpty
 
 end
 
