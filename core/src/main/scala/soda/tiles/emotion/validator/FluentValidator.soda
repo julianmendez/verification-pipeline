@@ -3,6 +3,8 @@ class FluentValidator
 
   abstract
 
+  vu = ValidationUtil .mk
+
   error_unknown_fluent = "Unknown fluent: "
 
   error_duplicate_fluent_mapping = "Duplicate fluent mapping: "
@@ -45,8 +47,9 @@ class FluentValidator
     _validate_injective_with (fluent_set) (fluent_map) (mapped (fluent_set) (fluent_map) )
 
   validate (fluent_set : FluentSet) (fluent_map : FluentMap) : Option [String] =
-    validate_keys (fluent_set) (fluent_map)
-      .orElse (validate_injective (fluent_set) (fluent_map) )
+    vu .concatenate_pair (
+      validate_keys (fluent_set) (fluent_map) ) (
+      validate_injective (fluent_set) (fluent_map) )
 
 end
 

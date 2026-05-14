@@ -18,8 +18,12 @@ class ConfigurationValidator
     vu .concatenate (
       conf .rules .map (lambda x -->
         rv .validate (x) (conf .fluents) (conf .actions)
+      ) .++ (
+        Seq [Option [String] ] (
+          tv .validate (conf .trajectory) (conf .fluents) (conf .actions)
+        )
       )
-    ) .orElse (tv .validate (conf .trajectory) (conf .fluents) (conf .actions) )
+    )
 
 end
 

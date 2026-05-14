@@ -17,5 +17,15 @@ class ValidationUtil
     )
     else None
 
+  concatenate_pair (fst : Option [String] ) (snd : Option [String] ) : Option [String] =
+    concatenate (
+      Seq [Option [String] ] (fst , snd)
+    )
+
+  concatenate_triplet (fst : Option [String] ) (snd : Option [String] ) (trd : Option [String] ) : Option [String] =
+    concatenate (
+      Seq [Option [String] ] (fst , snd , trd)
+    )
+
 end
 

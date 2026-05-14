@@ -3,6 +3,8 @@ class ActionValidator
 
   abstract
 
+  vu = ValidationUtil .mk
+
   error_unknown_action = "Unknown action: "
 
   is_valid (actions : ActionSet) (all_actions : ActionSet) : Boolean =
@@ -15,9 +17,12 @@ class ActionValidator
     else Some (error_unknown_action + action.toString)
 
   validate (actions : ActionSet) (all_actions : ActionSet) : Option[String] =
-    actions
-      .find (lambda x --> not all_actions .contains(x) )
-      .map (lambda x --> error_unknown_action + x .toString)
+    vu .concatenate (
+      actions
+        .toSeq
+        .filter (lambda x --> not all_actions .contains(x) )
+        .map (lambda x --> Some (error_unknown_action + x .toString) )
+    )
 
 end
 

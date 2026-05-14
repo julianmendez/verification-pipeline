@@ -19,6 +19,8 @@ class TrajectoryValidator
 
   av = ActionValidator .mk
 
+  vu = ValidationUtil .mk
+
   error_trajectory_is_too_short = "The trajectory is too short."
 
   error_trajectory_length_should_be_odd = "The trajectory length should be an odd number."
@@ -60,8 +62,10 @@ class TrajectoryValidator
     foldl [IdentifierSet] [ValidationWindow] (trajectory) (initial_window (fluents) (actions) ) (process_window) .valid
 
   validate (trajectory : Trajectory) (fluents : FluentMap) (actions : ActionSet) : Option [String] =
-    validate_length (trajectory) .orElse
-    (foldl [IdentifierSet] [ValidationWindow] (trajectory) (initial_window (fluents) (actions) ) (process_window) .error)
+    vu .concatenate_pair (
+      validate_length (trajectory) ) (
+      foldl [IdentifierSet] [ValidationWindow] (trajectory) (initial_window (fluents) (actions) ) (process_window) .error
+    )
 
 end
 
