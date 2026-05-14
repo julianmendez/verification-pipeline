@@ -21,6 +21,10 @@ class Main
     "\n" +
     "\n"
 
+  error_undefined_result = "Undefined result - The input instance is invalid."
+
+  error_configuration_is_undefined = "Error : the instance is invalid."
+
   read_file (file_name : String) : String =
     @new String (Files .readAllBytes (Paths .get (file_name) ) )
 
@@ -30,7 +34,7 @@ class Main
 
   instance_builder = InstanceBuilder .mk
 
-  conf_validator = ConfigurationValidator .mk
+  cv = ConfigurationValidator .mk
 
   emotional_reasoning_pipeline = EmotionalReasoningPipeline .mk
 
@@ -41,33 +45,31 @@ class Main
         .build (configuration)
     ) .contents
 
-  process_maybe_configuration (maybe_conf : Option [Configuration] )
-      : Option [Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] ] =
-    if (maybe_conf .isDefined)
-    then
-      if conf_validator .is_valid (maybe_conf .get)
-      then Some (process_configuration (maybe_conf .get) )
-      else None
-    else None
+  process_instance_with (conf : Configuration) (errors : Option [String] ) : String =
+    match errors
+      case Some (error) ==> error
+      case None ==> serializer .serialize (process_configuration (conf) )
 
-  process_file (file_name : String)
-      : Option [Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] ] =
-    process_maybe_configuration (
-      yaml_parser .parse ( @new StringReader (read_file (file_name) ) )
+  process_instance (maybe_conf : Option [Configuration] ) : String =
+    match maybe_conf
+      case Some (conf) ==> process_instance_with (conf) (cv .validate (conf) )
+      case None ==> error_configuration_is_undefined
+
+  get_maybe_configuration (file_name : String) : Option [Configuration] =
+    yaml_parser .parse ( @new StringReader (read_file (file_name) ) )
+
+  process_input_file (file_name : String) : String =
+    process_instance (
+      get_maybe_configuration (file_name)
     )
-
-  serialize_output (maybe_output : Option [Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] ] )
-      : String =
-    match maybe_output
-      case Some (instance) ==> serializer .serialize (instance)
-      case None ==> "Undefined result"
 
   execute (arguments : List [String] ) : Unit =
     if (arguments .length > 0)
-    then println (serialize_output (process_file (arguments (0) ) ) )
+    then println (process_input_file (arguments (0) ) )
     else println (help)
 
   main (arguments : Array [String] ) : Unit =
     execute (arguments .toList)
 
 end
+

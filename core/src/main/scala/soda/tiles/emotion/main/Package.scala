@@ -41,6 +41,10 @@ trait Main
     "\n" +
     "\n"
 
+  lazy val error_undefined_result = "Undefined result - The input instance is invalid."
+
+  lazy val error_configuration_is_undefined = "Error : the instance is invalid."
+
   def read_file (file_name : String) : String =
     new String (Files .readAllBytes (Paths .get (file_name) ) )
 
@@ -50,7 +54,7 @@ trait Main
 
   lazy val instance_builder = InstanceBuilder .mk
 
-  lazy val conf_validator = ConfigurationValidator .mk
+  lazy val cv = ConfigurationValidator .mk
 
   lazy val emotional_reasoning_pipeline = EmotionalReasoningPipeline .mk
 
@@ -61,31 +65,29 @@ trait Main
         .build (configuration)
     ) .contents
 
-  def process_maybe_configuration (maybe_conf : Option [Configuration] )
-      : Option [Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] ] =
-    if ( (maybe_conf .isDefined)
-    )
-      if ( conf_validator .is_valid (maybe_conf .get)
-      ) Some (process_configuration (maybe_conf .get) )
-      else None
-    else None
-
-  def process_file (file_name : String)
-      : Option [Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] ] =
-    process_maybe_configuration (
-      yaml_parser .parse ( new StringReader (read_file (file_name) ) )
-    )
-
-  def serialize_output (maybe_output : Option [Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] ] )
-      : String =
-    maybe_output match  {
-      case Some (instance) => serializer .serialize (instance)
-      case None => "Undefined result"
+  def process_instance_with (conf : Configuration) (errors : Option [String] ) : String =
+    errors match  {
+      case Some (error) => error
+      case None => serializer .serialize (process_configuration (conf) )
     }
+
+  def process_instance (maybe_conf : Option [Configuration] ) : String =
+    maybe_conf match  {
+      case Some (conf) => process_instance_with (conf) (cv .validate (conf) )
+      case None => error_configuration_is_undefined
+    }
+
+  def get_maybe_configuration (file_name : String) : Option [Configuration] =
+    yaml_parser .parse ( new StringReader (read_file (file_name) ) )
+
+  def process_input_file (file_name : String) : String =
+    process_instance (
+      get_maybe_configuration (file_name)
+    )
 
   def execute (arguments : List [String] ) : Unit =
     if ( (arguments .length > 0)
-    ) println (serialize_output (process_file (arguments (0) ) ) )
+    ) println (process_input_file (arguments (0) ) )
     else println (help)
 
   def main (arguments : Array [String] ) : Unit =
