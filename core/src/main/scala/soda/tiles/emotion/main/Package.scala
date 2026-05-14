@@ -112,18 +112,13 @@ trait Serializer
 
 
 
+  lazy val error_parsing_error = "parsing error possibly caused by a misspelled rule name"
+
   def show_entry (entry : TileQuad [Transition, Rule, ActionSet, Boolean] ) : String =
     "- transition : " + entry .fst + "\n" +
     "  rule : " + entry .snd + "\n" +
     "  inhibiting_actions : " + entry .trd + "\n" +
     "  valid : " + entry .fth + "\n"
-
-  def serialize_response (seq : Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] ) : String =
-    "---" + "\n" +
-    (seq
-      .map ( x => show_entry (x) )
-      .mkString
-    ) + "\n"
 
   def serialize_errors (errors : Seq [String] ) : String =
     "---" + "\n" +
@@ -131,6 +126,16 @@ trait Serializer
       errors
         .map ( x => "  - " + x)
         .mkString ("\n")
+
+  def serialize_response (seq : Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] ) : String =
+    if ( (seq .isEmpty)
+    ) serialize_errors (Seq [String] (error_parsing_error) )
+    else
+      "---" + "\n" +
+      (seq
+        .map ( x => show_entry (x) )
+        .mkString
+      ) + "\n"
 
 }
 
