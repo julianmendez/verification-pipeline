@@ -1,0 +1,9 @@
+
+class FinalReport
+
+  abstract
+    transitions : Seq [TransitionReport]
+    errors : Seq [String]
+
+end
+

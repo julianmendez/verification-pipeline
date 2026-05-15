@@ -21,9 +21,9 @@ class Main
     "\n" +
     "\n"
 
-  error_undefined_result = "Undefined result - The input instance is invalid."
+  error_undefined_result = "undefined result because the input instance is invalid"
 
-  error_configuration_is_undefined = "Error : the instance is invalid."
+  error_configuration_is_undefined = "the input instance is invalid"
 
   read_file (file_name : String) : String =
     @new String (Files .readAllBytes (Paths .get (file_name) ) )
@@ -38,29 +38,40 @@ class Main
 
   emotional_reasoning_pipeline = EmotionalReasoningPipeline .mk
 
-  process_configuration (configuration : Configuration)
-      : Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] =
-    emotional_reasoning_pipeline .run (
-      instance_builder
-        .build (configuration)
-    ) .contents
+  get_transition_index (test_index : Int) (rule_set_size : Int) : Int =
+    if (rule_set_size > 0)
+    then test_index / rule_set_size
+    else 0
 
-  process_instance_with (conf : Configuration) (errors : Seq [String] ) : String =
+  process_configuration (configuration : Configuration) : Seq [TransitionReport] =
+    emotional_reasoning_pipeline
+      .run (
+        instance_builder .build (configuration) )
+      .contents
+      .zipWithIndex
+      .map (lambda x -->
+        TransitionReport .mk (x ._2) (get_transition_index (x ._2) (configuration .rules .size) ) (
+          x ._1 .fst) (x ._1 .snd) (x ._1 .trd) (x ._1 .fth)
+      )
+
+  process_instance_with (conf : Configuration) (errors : Seq [String] ) : FinalReport =
     if errors .isEmpty
-    then serializer .serialize_response (process_configuration (conf) )
-    else serializer .serialize_errors (errors)
+    then FinalReport .mk (process_configuration (conf) ) (errors)
+    else FinalReport .mk (Seq .empty) (errors)
 
-  process_instance (maybe_conf : Option [Configuration] ) : String =
+  process_instance (maybe_conf : Option [Configuration] ) : FinalReport =
     match maybe_conf
       case Some (conf) ==> process_instance_with (conf) (cv .validate (conf) )
-      case None ==> error_configuration_is_undefined
+      case None ==> FinalReport .mk (Seq .empty) (Seq [String] (error_configuration_is_undefined) )
 
   get_maybe_configuration (file_name : String) : Option [Configuration] =
     yaml_parser .parse ( @new StringReader (read_file (file_name) ) )
 
   process_input_file (file_name : String) : String =
-    process_instance (
-      get_maybe_configuration (file_name)
+    serializer .serialize (
+      process_instance (
+        get_maybe_configuration (file_name)
+      )
     )
 
   execute (arguments : List [String] ) : Unit =

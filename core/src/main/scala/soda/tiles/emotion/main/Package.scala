@@ -18,6 +18,22 @@ import   soda.tiles.emotion.parser.YamlParser
 import   soda.tiles.emotion.pipeline.EmotionalReasoningPipeline
 import   soda.tiles.emotion.validator.ConfigurationValidator
 
+trait FinalReport
+{
+
+  def   transitions : Seq [TransitionReport]
+  def   errors : Seq [String]
+
+}
+
+case class FinalReport_ (transitions : Seq [TransitionReport], errors : Seq [String]) extends FinalReport
+
+object FinalReport {
+  def mk (transitions : Seq [TransitionReport]) (errors : Seq [String]) : FinalReport =
+    FinalReport_ (transitions, errors)
+}
+
+
 /**
  * This is the main entry point.
  */
@@ -41,9 +57,9 @@ trait Main
     "\n" +
     "\n"
 
-  lazy val error_undefined_result = "Undefined result - The input instance is invalid."
+  lazy val error_undefined_result = "undefined result because the input instance is invalid"
 
-  lazy val error_configuration_is_undefined = "Error : the instance is invalid."
+  lazy val error_configuration_is_undefined = "the input instance is invalid"
 
   def read_file (file_name : String) : String =
     new String (Files .readAllBytes (Paths .get (file_name) ) )
@@ -58,30 +74,41 @@ trait Main
 
   lazy val emotional_reasoning_pipeline = EmotionalReasoningPipeline .mk
 
-  def process_configuration (configuration : Configuration)
-      : Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] =
-    emotional_reasoning_pipeline .run (
-      instance_builder
-        .build (configuration)
-    ) .contents
+  def get_transition_index (test_index : Int) (rule_set_size : Int) : Int =
+    if ( (rule_set_size > 0)
+    ) test_index / rule_set_size
+    else 0
 
-  def process_instance_with (conf : Configuration) (errors : Seq [String] ) : String =
+  def process_configuration (configuration : Configuration) : Seq [TransitionReport] =
+    emotional_reasoning_pipeline
+      .run (
+        instance_builder .build (configuration) )
+      .contents
+      .zipWithIndex
+      .map ( x =>
+        TransitionReport .mk (x ._2) (get_transition_index (x ._2) (configuration .rules .size) ) (
+          x ._1 .fst) (x ._1 .snd) (x ._1 .trd) (x ._1 .fth)
+      )
+
+  def process_instance_with (conf : Configuration) (errors : Seq [String] ) : FinalReport =
     if ( errors .isEmpty
-    ) serializer .serialize_response (process_configuration (conf) )
-    else serializer .serialize_errors (errors)
+    ) FinalReport .mk (process_configuration (conf) ) (errors)
+    else FinalReport .mk (Seq .empty) (errors)
 
-  def process_instance (maybe_conf : Option [Configuration] ) : String =
+  def process_instance (maybe_conf : Option [Configuration] ) : FinalReport =
     maybe_conf match  {
       case Some (conf) => process_instance_with (conf) (cv .validate (conf) )
-      case None => error_configuration_is_undefined
+      case None => FinalReport .mk (Seq .empty) (Seq [String] (error_configuration_is_undefined) )
     }
 
   def get_maybe_configuration (file_name : String) : Option [Configuration] =
     yaml_parser .parse ( new StringReader (read_file (file_name) ) )
 
   def process_input_file (file_name : String) : String =
-    process_instance (
-      get_maybe_configuration (file_name)
+    serializer .serialize (
+      process_instance (
+        get_maybe_configuration (file_name)
+      )
     )
 
   def execute (arguments : List [String] ) : Unit =
@@ -112,30 +139,52 @@ trait Serializer
 
 
 
-  lazy val error_parsing_error = "parsing error possibly caused by a misspelled rule name"
+  lazy val error_parsing_error = "parsing error possibly caused by a misspelled rule name or YAML key"
 
-  def show_entry (entry : TileQuad [Transition, Rule, ActionSet, Boolean] ) : String =
-    "- transition : " + entry .fst + "\n" +
-    "  rule : " + entry .snd + "\n" +
-    "  inhibiting_actions : " + entry .trd + "\n" +
-    "  valid : " + entry .fth + "\n"
+  def serialize_transition (entry : TransitionReport) : String =
+    "  - test_index: " + entry .test_index + "\n" +
+    "    transition_index: " + entry .transition_index + "\n" +
+    "    transition: " + entry .transition + "\n" +
+    "    rule: " + entry .rule + "\n" +
+    "    inhibiting_actions: " + entry .inhibiting_actions + "\n" +
+    "    valid: " + entry .valid + "\n"
+
+  def serialize_all_transitions (transitions : Seq [TransitionReport] ) :String =
+    if ( (transitions .nonEmpty)
+    )
+      "- all_transitions:" + "\n" +
+        transitions
+          .map ( x => serialize_transition (x) )
+          .mkString
+    else ""
+
+  def serialize_invalid_transitions (transitions : Seq [TransitionReport] ) :String =
+    if ( (transitions
+      .filter ( x => ! x .valid)
+      .nonEmpty)
+    )
+      "- invalid_transitions:" + "\n" +
+        transitions
+          .filter ( x => ! x .valid)
+          .map ( x => serialize_transition (x) )
+          .mkString
+    else ""
 
   def serialize_errors (errors : Seq [String] ) : String =
-    "---" + "\n" +
-    "- errors:" + "\n" +
-      errors
-        .map ( x => "  - " + x)
-        .mkString ("\n")
+    if ( (errors .nonEmpty)
+    )
+      "- errors:" + "\n" +
+        (errors
+          .map ( x => "  - " + x)
+          .mkString ("\n")
+        ) + "\n"
+    else ""
 
-  def serialize_response (seq : Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] ) : String =
-    if ( (seq .isEmpty)
-    ) serialize_errors (Seq [String] (error_parsing_error) )
-    else
-      "---" + "\n" +
-      (seq
-        .map ( x => show_entry (x) )
-        .mkString
-      ) + "\n"
+  def serialize (report : FinalReport) : String =
+    "---" + "\n" +
+    serialize_errors (report .errors) +
+    serialize_invalid_transitions (report .transitions) +
+    serialize_all_transitions (report .transitions)
 
 }
 
@@ -144,5 +193,25 @@ case class Serializer_ () extends Serializer
 object Serializer {
   def mk : Serializer =
     Serializer_ ()
+}
+
+
+trait TransitionReport
+{
+
+  def   test_index : Int
+  def   transition_index : Int
+  def   transition : Transition
+  def   rule : Rule
+  def   inhibiting_actions : ActionSet
+  def   valid : Boolean
+
+}
+
+case class TransitionReport_ (test_index : Int, transition_index : Int, transition : Transition, rule : Rule, inhibiting_actions : ActionSet, valid : Boolean) extends TransitionReport
+
+object TransitionReport {
+  def mk (test_index : Int) (transition_index : Int) (transition : Transition) (rule : Rule) (inhibiting_actions : ActionSet) (valid : Boolean) : TransitionReport =
+    TransitionReport_ (test_index, transition_index, transition, rule, inhibiting_actions, valid)
 }
 
