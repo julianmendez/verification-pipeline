@@ -29,7 +29,7 @@ import   soda.tiles.emotion.entity.TriggersRule
 
 
 
-trait Example1Instance
+trait ExampleInstance1
 {
 
 
@@ -226,15 +226,15 @@ trait Example1Instance
 
 }
 
-case class Example1Instance_ () extends Example1Instance
+case class ExampleInstance1_ () extends ExampleInstance1
 
-object Example1Instance {
-  def mk : Example1Instance =
-    Example1Instance_ ()
+object ExampleInstance1 {
+  def mk : ExampleInstance1 =
+    ExampleInstance1_ ()
 }
 
 
-trait Example2Instance
+trait ExampleInstance2
 {
 
 
@@ -446,15 +446,15 @@ trait Example2Instance
 
 }
 
-case class Example2Instance_ () extends Example2Instance
+case class ExampleInstance2_ () extends ExampleInstance2
 
-object Example2Instance {
-  def mk : Example2Instance =
-    Example2Instance_ ()
+object ExampleInstance2 {
+  def mk : ExampleInstance2 =
+    ExampleInstance2_ ()
 }
 
 
-trait Example3Instance
+trait ExampleInstance3
 {
 
 
@@ -536,15 +536,15 @@ trait Example3Instance
 
 }
 
-case class Example3Instance_ () extends Example3Instance
+case class ExampleInstance3_ () extends ExampleInstance3
 
-object Example3Instance {
-  def mk : Example3Instance =
-    Example3Instance_ ()
+object ExampleInstance3 {
+  def mk : ExampleInstance3 =
+    ExampleInstance3_ ()
 }
 
 
-trait Example4Instance
+trait ExampleInstance4
 {
 
 
@@ -678,11 +678,11 @@ trait Example4Instance
 
 }
 
-case class Example4Instance_ () extends Example4Instance
+case class ExampleInstance4_ () extends ExampleInstance4
 
-object Example4Instance {
-  def mk : Example4Instance =
-    Example4Instance_ ()
+object ExampleInstance4 {
+  def mk : ExampleInstance4 =
+    ExampleInstance4_ ()
 }
 
 
@@ -709,7 +709,7 @@ case class YamlParserSpec ()
 
   lazy val example1_parsed_instance = parser .parse ( new StringReader (example1_contents) )
 
-  lazy val example1_instance = Some (Example1Instance .mk .instance)
+  lazy val example1_instance = Some (ExampleInstance1 .mk .instance)
 
   lazy val example2_name = "/example/example-2.yaml"
 
@@ -717,7 +717,7 @@ case class YamlParserSpec ()
 
   lazy val example2_parsed_instance = parser .parse ( new StringReader (example2_contents) )
 
-  lazy val example2_instance = Some (Example2Instance .mk .instance)
+  lazy val example2_instance = Some (ExampleInstance2 .mk .instance)
 
   lazy val example3_name = "/example/example-3.yaml"
 
@@ -725,7 +725,7 @@ case class YamlParserSpec ()
 
   lazy val example3_parsed_instance = parser .parse ( new StringReader (example3_contents) )
 
-  lazy val example3_instance = Some (Example3Instance .mk .instance)
+  lazy val example3_instance = Some (ExampleInstance3 .mk .instance)
 
   lazy val example4_name = "/example/example-4.yaml"
 
@@ -733,7 +733,7 @@ case class YamlParserSpec ()
 
   lazy val example4_parsed_instance = parser .parse ( new StringReader (example4_contents) )
 
-  lazy val example4_instance = Some (Example4Instance .mk .instance)
+  lazy val example4_instance = Some (ExampleInstance4 .mk .instance)
 
   test ("parse example 1") (
     check (
