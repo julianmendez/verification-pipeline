@@ -6,15 +6,16 @@ package soda.tiles.emotion.main
  */
 
 import
+  java.io.StringReader
   java.nio.file.Files
   java.nio.file.Paths
-  java.io.StringReader
   scala.util.Try
   soda.tiles.emotion.entity.ActionSet
   soda.tiles.emotion.entity.Configuration
   soda.tiles.emotion.entity.InstanceBuilder
   soda.tiles.emotion.entity.Rule
   soda.tiles.emotion.entity.Transition
+  soda.tiles.emotion.io.SimpleFileReader
   soda.tiles.emotion.parser.YamlParser
   soda.tiles.emotion.pipeline.EmotionalReasoningPipeline
   soda.tiles.emotion.validator.ConfigurationValidator

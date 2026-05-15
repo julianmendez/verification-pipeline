@@ -5,15 +5,16 @@ package soda.tiles.emotion.main
  * This is the entry point when the application is executed from a terminal.
  */
 
+import   java.io.StringReader
 import   java.nio.file.Files
 import   java.nio.file.Paths
-import   java.io.StringReader
 import   scala.util.Try
 import   soda.tiles.emotion.entity.ActionSet
 import   soda.tiles.emotion.entity.Configuration
 import   soda.tiles.emotion.entity.InstanceBuilder
 import   soda.tiles.emotion.entity.Rule
 import   soda.tiles.emotion.entity.Transition
+import   soda.tiles.emotion.io.SimpleFileReader
 import   soda.tiles.emotion.parser.YamlParser
 import   soda.tiles.emotion.pipeline.EmotionalReasoningPipeline
 import   soda.tiles.emotion.validator.ConfigurationValidator
@@ -94,18 +95,13 @@ trait Main
     "\nCopyright 2026 Julian Alfredo Mendez" +
     "\nhttps://julianmendez.github.io/emotional-reasoning" +
     "\n" +
-    "\nEmotional Reasoning is a project that instantiates the Tiles framework." +
-    "\n" +
     "\nParameter: FILE_NAME" +
     "\n" +
     "\n  FILE_NAME     YAML file containing the instance" +
     "\n" +
     "\n"
 
-  def try_read_file (file_name : String) : Try [String] =
-    Try [String] (
-      new String (Files .readAllBytes (Paths .get (file_name) ) )
-    )
+  lazy val help_file : String = "/docs/help.txt"
 
   def get_maybe_configuration (maybe_content : Try [String] ) : Option [Configuration] =
     if ( maybe_content .isSuccess
@@ -116,7 +112,7 @@ trait Main
     Serializer .mk .serialize (
       InstanceProcessor .mk .process_instance (
         get_maybe_configuration (
-          try_read_file (file_name)
+          SimpleFileReader .mk .try_read_file (file_name)
         )
       )
     )
@@ -124,7 +120,12 @@ trait Main
   def execute (arguments : List [String] ) : Unit =
     if ( (arguments .length > 0)
     ) println (process_input_file (arguments (0) ) )
-    else println (help)
+    else
+      println (
+        SimpleFileReader .mk
+          .try_read_resource (help_file)
+          .getOrElse (help)
+      )
 
   def main (arguments : Array [String] ) : Unit =
     execute (arguments .toList)
