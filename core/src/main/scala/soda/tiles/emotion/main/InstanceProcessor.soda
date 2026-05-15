@@ -1,0 +1,36 @@
+
+class InstanceProcessor
+
+  abstract
+
+  error_undefined_result = "undefined result because the input instance is invalid"
+
+  error_configuration_is_undefined = "the input instance is invalid or the input file cannot be read"
+
+  get_transition_index (test_index : Int) (rule_set_size : Int) : Int =
+    if (rule_set_size > 0)
+    then test_index / rule_set_size
+    else 0
+
+  process_configuration (configuration : Configuration) : Seq [TransitionReport] =
+    EmotionalReasoningPipeline .mk
+      .run (InstanceBuilder .mk .build (configuration) )
+      .contents
+      .zipWithIndex
+      .map (lambda x -->
+        TransitionReport .mk (x ._2) (get_transition_index (x ._2) (configuration .rules .size) ) (
+          x ._1 .fst) (x ._1 .snd) (x ._1 .trd) (x ._1 .fth)
+      )
+
+  process_instance_with (conf : Configuration) (errors : Seq [String] ) : FinalReport =
+    if errors .isEmpty
+    then FinalReport .mk (process_configuration (conf) ) (errors)
+    else FinalReport .mk (Seq .empty) (errors)
+
+  process_instance (maybe_conf : Option [Configuration] ) : FinalReport =
+    match maybe_conf
+      case Some (conf) ==> process_instance_with (conf) (ConfigurationValidator .mk .validate (conf) )
+      case None ==> FinalReport .mk (Seq .empty) (Seq [String] (error_configuration_is_undefined) )
+
+end
+

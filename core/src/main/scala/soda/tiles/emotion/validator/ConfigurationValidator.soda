@@ -1,0 +1,22 @@
+
+class ConfigurationValidator
+
+  abstract
+
+  rv = RuleValidator .mk
+
+  tv = TrajectoryValidator .mk
+
+  validate (conf : Configuration) : Seq [String] =
+    conf .rules
+      .flatMap (lambda x -->
+        rv .validate (x) (conf .fluents) (conf .actions)
+      ) .++ (
+        tv .validate (conf .trajectory) (conf .fluents) (conf .actions)
+      )
+
+  is_valid (conf : Configuration) : Boolean =
+    validate (conf) .isEmpty
+
+end
+

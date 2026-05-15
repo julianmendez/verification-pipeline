@@ -539,6 +539,7 @@ trait RuleParser
          if ( (s .length == 3)
          ) parse_ForbidsToCauseRule (parse_input (s (1) ) ) (parse_output (s (2) ) )
          else None
+      case otherwise => None
     }
 
   def parse_rule_with (first : Any) (s : Seq [Any] ) : Option [Rule] =

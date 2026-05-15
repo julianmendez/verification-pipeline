@@ -167,6 +167,7 @@ class RuleParser
          if (s .length == 3)
          then parse_ForbidsToCauseRule (parse_input (s (1) ) ) (parse_output (s (2) ) )
          else None
+      case otherwise ==> None
 
   parse_rule_with (first : Any) (s : Seq [Any] ) : Option [Rule] =
     match first

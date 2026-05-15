@@ -3,18 +3,52 @@ class Serializer
 
   abstract
 
-  show_entry (entry : TileQuad [Transition] [Rule] [ActionSet] [Boolean] ) : String =
-    "- transition : " + entry .fst + "\n" +
-    "  rule : " + entry .snd + "\n" +
-    "  inhibiting_actions : " + entry .trd + "\n" +
-    "  valid : " + entry .fth + "\n"
+  error_parsing_error = "parsing error possibly caused by a misspelled rule name or YAML key"
 
-  serialize (seq : Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] ) : String =
+  serialize_transition (entry : TransitionReport) : String =
+    "  - test_index: " + entry .test_index + "\n" +
+    "    transition_index: " + entry .transition_index + "\n" +
+    "    transition: " + entry .transition + "\n" +
+    "    rule: " + entry .rule + "\n" +
+    "    inhibiting_actions: " + entry .inhibiting_actions + "\n" +
+    "    valid: " + entry .valid + "\n"
+
+  serialize_all_transitions (transitions : Seq [TransitionReport] ) :String =
+    if (transitions .nonEmpty)
+    then
+      "- all_transitions:" + "\n" +
+        transitions
+          .map (lambda x --> serialize_transition (x) )
+          .mkString
+    else ""
+
+  serialize_invalid_transitions (transitions : Seq [TransitionReport] ) :String =
+    if (transitions
+      .filter (lambda x --> not x .valid)
+      .nonEmpty)
+    then
+      "- invalid_transitions:" + "\n" +
+        transitions
+          .filter (lambda x --> not x .valid)
+          .map (lambda x --> serialize_transition (x) )
+          .mkString
+    else ""
+
+  serialize_errors (errors : Seq [String] ) : String =
+    if (errors .nonEmpty)
+    then
+      "- errors:" + "\n" +
+        (errors
+          .map (lambda x --> "  - " + x)
+          .mkString ("\n")
+        ) + "\n"
+    else ""
+
+  serialize (report : FinalReport) : String =
     "---" + "\n" +
-    (seq
-      .map (lambda x --> show_entry (x) )
-      .mkString
-    ) + "\n"
+    serialize_errors (report .errors) +
+    serialize_invalid_transitions (report .transitions) +
+    serialize_all_transitions (report .transitions)
 
 end
 
