@@ -34,6 +34,51 @@ object FinalReport {
 }
 
 
+trait InstanceProcessor
+{
+
+
+
+  lazy val error_undefined_result = "undefined result because the input instance is invalid"
+
+  lazy val error_configuration_is_undefined = "the input instance is invalid"
+
+  def get_transition_index (test_index : Int) (rule_set_size : Int) : Int =
+    if ( (rule_set_size > 0)
+    ) test_index / rule_set_size
+    else 0
+
+  def process_configuration (configuration : Configuration) : Seq [TransitionReport] =
+    EmotionalReasoningPipeline .mk
+      .run (InstanceBuilder .mk .build (configuration) )
+      .contents
+      .zipWithIndex
+      .map ( x =>
+        TransitionReport .mk (x ._2) (get_transition_index (x ._2) (configuration .rules .size) ) (
+          x ._1 .fst) (x ._1 .snd) (x ._1 .trd) (x ._1 .fth)
+      )
+
+  def process_instance_with (conf : Configuration) (errors : Seq [String] ) : FinalReport =
+    if ( errors .isEmpty
+    ) FinalReport .mk (process_configuration (conf) ) (errors)
+    else FinalReport .mk (Seq .empty) (errors)
+
+  def process_instance (maybe_conf : Option [Configuration] ) : FinalReport =
+    maybe_conf match  {
+      case Some (conf) => process_instance_with (conf) (ConfigurationValidator .mk .validate (conf) )
+      case None => FinalReport .mk (Seq .empty) (Seq [String] (error_configuration_is_undefined) )
+    }
+
+}
+
+case class InstanceProcessor_ () extends InstanceProcessor
+
+object InstanceProcessor {
+  def mk : InstanceProcessor =
+    InstanceProcessor_ ()
+}
+
+
 /**
  * This is the main entry point.
  */
@@ -57,56 +102,15 @@ trait Main
     "\n" +
     "\n"
 
-  lazy val error_undefined_result = "undefined result because the input instance is invalid"
-
-  lazy val error_configuration_is_undefined = "the input instance is invalid"
-
   def read_file (file_name : String) : String =
     new String (Files .readAllBytes (Paths .get (file_name) ) )
 
-  lazy val yaml_parser = YamlParser .mk
-
-  lazy val serializer = Serializer .mk
-
-  lazy val instance_builder = InstanceBuilder .mk
-
-  lazy val cv = ConfigurationValidator .mk
-
-  lazy val emotional_reasoning_pipeline = EmotionalReasoningPipeline .mk
-
-  def get_transition_index (test_index : Int) (rule_set_size : Int) : Int =
-    if ( (rule_set_size > 0)
-    ) test_index / rule_set_size
-    else 0
-
-  def process_configuration (configuration : Configuration) : Seq [TransitionReport] =
-    emotional_reasoning_pipeline
-      .run (
-        instance_builder .build (configuration) )
-      .contents
-      .zipWithIndex
-      .map ( x =>
-        TransitionReport .mk (x ._2) (get_transition_index (x ._2) (configuration .rules .size) ) (
-          x ._1 .fst) (x ._1 .snd) (x ._1 .trd) (x ._1 .fth)
-      )
-
-  def process_instance_with (conf : Configuration) (errors : Seq [String] ) : FinalReport =
-    if ( errors .isEmpty
-    ) FinalReport .mk (process_configuration (conf) ) (errors)
-    else FinalReport .mk (Seq .empty) (errors)
-
-  def process_instance (maybe_conf : Option [Configuration] ) : FinalReport =
-    maybe_conf match  {
-      case Some (conf) => process_instance_with (conf) (cv .validate (conf) )
-      case None => FinalReport .mk (Seq .empty) (Seq [String] (error_configuration_is_undefined) )
-    }
-
   def get_maybe_configuration (file_name : String) : Option [Configuration] =
-    yaml_parser .parse ( new StringReader (read_file (file_name) ) )
+    YamlParser .mk .parse ( new StringReader (read_file (file_name) ) )
 
   def process_input_file (file_name : String) : String =
-    serializer .serialize (
-      process_instance (
+    Serializer .mk .serialize (
+      InstanceProcessor .mk .process_instance (
         get_maybe_configuration (file_name)
       )
     )
