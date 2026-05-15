@@ -5,7 +5,7 @@ class InstanceProcessor
 
   error_undefined_result = "undefined result because the input instance is invalid"
 
-  error_configuration_is_undefined = "the input instance is invalid"
+  error_configuration_is_undefined = "the input instance is invalid or the input file cannot be read"
 
   get_transition_index (test_index : Int) (rule_set_size : Int) : Int =
     if (rule_set_size > 0)

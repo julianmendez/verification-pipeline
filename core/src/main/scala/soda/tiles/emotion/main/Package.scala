@@ -8,11 +8,11 @@ package soda.tiles.emotion.main
 import   java.nio.file.Files
 import   java.nio.file.Paths
 import   java.io.StringReader
+import   scala.util.Try
 import   soda.tiles.emotion.entity.ActionSet
 import   soda.tiles.emotion.entity.Configuration
 import   soda.tiles.emotion.entity.InstanceBuilder
 import   soda.tiles.emotion.entity.Rule
-import   soda.tiles.emotion.entity.TileQuad
 import   soda.tiles.emotion.entity.Transition
 import   soda.tiles.emotion.parser.YamlParser
 import   soda.tiles.emotion.pipeline.EmotionalReasoningPipeline
@@ -41,7 +41,7 @@ trait InstanceProcessor
 
   lazy val error_undefined_result = "undefined result because the input instance is invalid"
 
-  lazy val error_configuration_is_undefined = "the input instance is invalid"
+  lazy val error_configuration_is_undefined = "the input instance is invalid or the input file cannot be read"
 
   def get_transition_index (test_index : Int) (rule_set_size : Int) : Int =
     if ( (rule_set_size > 0)
@@ -102,16 +102,22 @@ trait Main
     "\n" +
     "\n"
 
-  def read_file (file_name : String) : String =
-    new String (Files .readAllBytes (Paths .get (file_name) ) )
+  def try_read_file (file_name : String) : Try [String] =
+    Try [String] (
+      new String (Files .readAllBytes (Paths .get (file_name) ) )
+    )
 
-  def get_maybe_configuration (file_name : String) : Option [Configuration] =
-    YamlParser .mk .parse ( new StringReader (read_file (file_name) ) )
+  def get_maybe_configuration (maybe_content : Try [String] ) : Option [Configuration] =
+    if ( maybe_content .isSuccess
+    ) YamlParser .mk .parse ( new StringReader (maybe_content .get) )
+    else None
 
   def process_input_file (file_name : String) : String =
     Serializer .mk .serialize (
       InstanceProcessor .mk .process_instance (
-        get_maybe_configuration (file_name)
+        get_maybe_configuration (
+          try_read_file (file_name)
+        )
       )
     )
 

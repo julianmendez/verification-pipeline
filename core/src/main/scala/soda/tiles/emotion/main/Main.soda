@@ -21,16 +21,22 @@ class Main
     "\n" +
     "\n"
 
-  read_file (file_name : String) : String =
-    @new String (Files .readAllBytes (Paths .get (file_name) ) )
+  try_read_file (file_name : String) : Try [String] =
+    Try [String] (
+      @new String (Files .readAllBytes (Paths .get (file_name) ) )
+    )
 
-  get_maybe_configuration (file_name : String) : Option [Configuration] =
-    YamlParser .mk .parse ( @new StringReader (read_file (file_name) ) )
+  get_maybe_configuration (maybe_content : Try [String] ) : Option [Configuration] =
+    if maybe_content .isSuccess
+    then YamlParser .mk .parse ( @new StringReader (maybe_content .get) )
+    else None
 
   process_input_file (file_name : String) : String =
     Serializer .mk .serialize (
       InstanceProcessor .mk .process_instance (
-        get_maybe_configuration (file_name)
+        get_maybe_configuration (
+          try_read_file (file_name)
+        )
       )
     )
 
