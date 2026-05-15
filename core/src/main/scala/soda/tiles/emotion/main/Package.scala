@@ -44,7 +44,9 @@ trait InstanceProcessor
 
   lazy val error_undefined_result = "undefined result because the input instance is invalid"
 
-  lazy val error_configuration_is_undefined = "the input instance is invalid or the input file cannot be read"
+  lazy val error_configuration_is_undefined = "the input file cannot be read or the instance read is invalid"
+
+  lazy val error_processing_instance = "error processing instance maybe due to a misspelled keyword"
 
   def get_transition_index (test_index : Int) (rule_set_size : Int) : Int =
     if ( (rule_set_size > 0)
@@ -65,10 +67,18 @@ trait InstanceProcessor
       reading_start : Long) (execution_start : Long) : FinalReport =
     FinalReport .mk (transitions) (errors) (execution_start - reading_start) (System .nanoTime () - execution_start)
 
+  def process_after_computation (reading_start : Long) (seq : Seq [TransitionReport] ) (errors : Seq [String] ) (
+      execution_start : Long) : FinalReport =
+    if ( seq .isEmpty
+    )
+      mk_final_report (seq) (errors .++ (Seq [String] (error_processing_instance)
+        ) ) (reading_start) (execution_start)
+    else mk_final_report (seq) (errors) (reading_start) (execution_start)
+
   def process_instance_with (reading_start : Long) (conf : Configuration) (errors : Seq [String] ) (
       execution_start : Long) : FinalReport =
     if ( errors .isEmpty
-    ) mk_final_report (process_configuration (conf) ) (errors) (reading_start) (execution_start)
+    ) process_after_computation (reading_start) (process_configuration (conf) ) (errors) (execution_start)
     else mk_final_report (Seq .empty) (errors) (reading_start) (execution_start)
 
   def process_instance (reading_start : Long) (maybe_conf : Option [Configuration] ) (execution_start : Long) : FinalReport =
