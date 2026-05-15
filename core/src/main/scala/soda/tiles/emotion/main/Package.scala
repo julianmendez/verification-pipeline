@@ -24,14 +24,16 @@ trait FinalReport
 
   def   transitions : Seq [TransitionReport]
   def   errors : Seq [String]
+  def   reading_time : Long
+  def   execution_time : Long
 
 }
 
-case class FinalReport_ (transitions : Seq [TransitionReport], errors : Seq [String]) extends FinalReport
+case class FinalReport_ (transitions : Seq [TransitionReport], errors : Seq [String], reading_time : Long, execution_time : Long) extends FinalReport
 
 object FinalReport {
-  def mk (transitions : Seq [TransitionReport]) (errors : Seq [String]) : FinalReport =
-    FinalReport_ (transitions, errors)
+  def mk (transitions : Seq [TransitionReport]) (errors : Seq [String]) (reading_time : Long) (execution_time : Long) : FinalReport =
+    FinalReport_ (transitions, errors, reading_time, execution_time)
 }
 
 
@@ -42,7 +44,9 @@ trait InstanceProcessor
 
   lazy val error_undefined_result = "undefined result because the input instance is invalid"
 
-  lazy val error_configuration_is_undefined = "the input instance is invalid or the input file cannot be read"
+  lazy val error_configuration_is_undefined = "the input file cannot be read or the instance read is invalid"
+
+  lazy val error_processing_instance = "error processing instance maybe due to a misspelled keyword"
 
   def get_transition_index (test_index : Int) (rule_set_size : Int) : Int =
     if ( (rule_set_size > 0)
@@ -59,15 +63,31 @@ trait InstanceProcessor
           x ._1 .fst) (x ._1 .snd) (x ._1 .trd) (x ._1 .fth)
       )
 
-  def process_instance_with (conf : Configuration) (errors : Seq [String] ) : FinalReport =
-    if ( errors .isEmpty
-    ) FinalReport .mk (process_configuration (conf) ) (errors)
-    else FinalReport .mk (Seq .empty) (errors)
+  def mk_final_report (transitions : Seq [TransitionReport] ) (errors : Seq [String] ) (
+      reading_start : Long) (execution_start : Long) : FinalReport =
+    FinalReport .mk (transitions) (errors) (execution_start - reading_start) (System .nanoTime () - execution_start)
 
-  def process_instance (maybe_conf : Option [Configuration] ) : FinalReport =
+  def process_after_computation (reading_start : Long) (seq : Seq [TransitionReport] ) (errors : Seq [String] ) (
+      execution_start : Long) : FinalReport =
+    if ( seq .isEmpty
+    )
+      mk_final_report (seq) (errors .++ (Seq [String] (error_processing_instance)
+        ) ) (reading_start) (execution_start)
+    else mk_final_report (seq) (errors) (reading_start) (execution_start)
+
+  def process_instance_with (reading_start : Long) (conf : Configuration) (errors : Seq [String] ) (
+      execution_start : Long) : FinalReport =
+    if ( errors .isEmpty
+    ) process_after_computation (reading_start) (process_configuration (conf) ) (errors) (execution_start)
+    else mk_final_report (Seq .empty) (errors) (reading_start) (execution_start)
+
+  def process_instance (reading_start : Long) (maybe_conf : Option [Configuration] ) (execution_start : Long) : FinalReport =
     maybe_conf match  {
-      case Some (conf) => process_instance_with (conf) (ConfigurationValidator .mk .validate (conf) )
-      case None => FinalReport .mk (Seq .empty) (Seq [String] (error_configuration_is_undefined) )
+      case Some (conf) => process_instance_with (reading_start) (conf) (ConfigurationValidator .mk .validate (conf) ) (execution_start)
+      case None =>
+        mk_final_report (Seq .empty) (
+          Seq [String] (error_configuration_is_undefined)
+        ) (reading_start) (execution_start)
     }
 
 }
@@ -110,11 +130,11 @@ trait Main
 
   def process_input_file (file_name : String) : String =
     Serializer .mk .serialize (
-      InstanceProcessor .mk .process_instance (
+      InstanceProcessor .mk .process_instance (System .nanoTime () ) (
         get_maybe_configuration (
           SimpleFileReader .mk .try_read_file (file_name)
         )
-      )
+      ) (System .nanoTime () )
     )
 
   def execute (arguments : List [String] ) : Unit =
@@ -181,6 +201,14 @@ trait Serializer
           .mkString
     else ""
 
+  def format_nanoseconds (x : Long) : String =
+    "" + (x / 1000000) + " ms"
+
+  def serialize_time_measures (reading_time : Long) (execution_time : Long) : String =
+    "- reading_time: " + format_nanoseconds(reading_time) + "\n" +
+    "- execution_time: " + format_nanoseconds(execution_time) + "\n" +
+    "- total_time: " + format_nanoseconds(reading_time + execution_time) + "\n"
+
   def serialize_errors (errors : Seq [String] ) : String =
     if ( (errors .nonEmpty)
     )
@@ -194,6 +222,7 @@ trait Serializer
   def serialize (report : FinalReport) : String =
     "---" + "\n" +
     serialize_errors (report .errors) +
+    serialize_time_measures (report .reading_time) (report .execution_time) +
     serialize_invalid_transitions (report .transitions) +
     serialize_all_transitions (report .transitions)
 
