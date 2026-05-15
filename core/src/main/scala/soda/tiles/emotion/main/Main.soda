@@ -13,18 +13,13 @@ class Main
     "\nCopyright 2026 Julian Alfredo Mendez" +
     "\nhttps://julianmendez.github.io/emotional-reasoning" +
     "\n" +
-    "\nEmotional Reasoning is a project that instantiates the Tiles framework." +
-    "\n" +
     "\nParameter: FILE_NAME" +
     "\n" +
     "\n  FILE_NAME     YAML file containing the instance" +
     "\n" +
     "\n"
 
-  try_read_file (file_name : String) : Try [String] =
-    Try [String] (
-      @new String (Files .readAllBytes (Paths .get (file_name) ) )
-    )
+  help_file : String = "/docs/help.txt"
 
   get_maybe_configuration (maybe_content : Try [String] ) : Option [Configuration] =
     if maybe_content .isSuccess
@@ -35,7 +30,7 @@ class Main
     Serializer .mk .serialize (
       InstanceProcessor .mk .process_instance (
         get_maybe_configuration (
-          try_read_file (file_name)
+          SimpleFileReader .mk .try_read_file (file_name)
         )
       )
     )
@@ -43,7 +38,12 @@ class Main
   execute (arguments : List [String] ) : Unit =
     if (arguments .length > 0)
     then println (process_input_file (arguments (0) ) )
-    else println (help)
+    else
+      println (
+        SimpleFileReader .mk
+          .try_read_resource (help_file)
+          .getOrElse (help)
+      )
 
   main (arguments : Array [String] ) : Unit =
     execute (arguments .toList)
