@@ -461,8 +461,6 @@ trait Example3Instance
 
   lazy val fluents : Map [FluentValue, FluentName] =
     Map [FluentValue, FluentName] (
-      ("honest" , "honesty") ,
-      ("dishonest" , "honesty") ,
       ("informed" , "information") ,
       ("uninformed" , "information")
     )
@@ -476,83 +474,59 @@ trait Example3Instance
     ) .toSet
 
   lazy val rules : RuleSeq = Seq [Rule] (
-
-    ForbidsToCauseRule (
+    ContravenesRule (
       Seq [FluentValue] (
         "informed"
       ) .toSet ,
-      Seq [FluentValue] (
-        "dishonest"
-      ) .toSet
-    ) ,
-
-    TriggersRule (
-      Seq [FluentValue] (
-        "dishonest"
-      ) .toSet ,
       "share_lie"
     ) ,
-
     NoConcurrencyRule (
       Seq [Action] (
         "read_truth" ,
         "read_lie"
       ) .toSet
     ) ,
-
     NoConcurrencyRule (
       Seq [Action] (
         "share_truth" ,
         "share_lie"
       ) .toSet
-    ) ,
-
-    DefaultRule (
-      "honest"
     )
   )
 
   lazy val trajectory : Seq [IdentifierSet] =
     Seq [IdentifierSet] (
-
       Seq [FluentValue] (
-        "honest" ,
         "uninformed"
       ) .toSet ,
-
       Seq [Action] (
         "read_lie"
       ) .toSet ,
-
       Seq [FluentValue] (
-        "honest" ,
         "uninformed"
       ) .toSet ,
-
-      Seq [Action] (
-        "send_lie"
-      ) .toSet ,
-
-      Seq [FluentValue] (
-        "honest" ,
-        "uninformed"
-      ) .toSet ,
-
-      Seq [Action] (
-        "read_truth"
-      ) .toSet ,
-
-      Seq [FluentValue] (
-        "honest" ,
-        "informed"
-      ) .toSet ,
-
       Seq [Action] (
         "share_lie"
       ) .toSet ,
-
       Seq [FluentValue] (
-        "honest" ,
+        "uninformed"
+      ) .toSet ,
+      Seq [Action] (
+        "read_truth"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "informed"
+      ) .toSet ,
+      Seq [Action] (
+        "read_lie"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "informed"
+      ) .toSet ,
+      Seq [Action] (
+        "share_lie"
+      ) .toSet ,
+      Seq [FluentValue] (
         "informed"
       ) .toSet
     )
