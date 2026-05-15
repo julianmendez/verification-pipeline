@@ -21,46 +21,23 @@ class Main
     "\n" +
     "\n"
 
-  error_undefined_result = "Undefined result - The input instance is invalid."
+  try_read_file (file_name : String) : Try [String] =
+    Try [String] (
+      @new String (Files .readAllBytes (Paths .get (file_name) ) )
+    )
 
-  error_configuration_is_undefined = "Error : the instance is invalid."
-
-  read_file (file_name : String) : String =
-    @new String (Files .readAllBytes (Paths .get (file_name) ) )
-
-  yaml_parser = YamlParser .mk
-
-  serializer = Serializer .mk
-
-  instance_builder = InstanceBuilder .mk
-
-  cv = ConfigurationValidator .mk
-
-  emotional_reasoning_pipeline = EmotionalReasoningPipeline .mk
-
-  process_configuration (configuration : Configuration)
-      : Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] =
-    emotional_reasoning_pipeline .run (
-      instance_builder
-        .build (configuration)
-    ) .contents
-
-  process_instance_with (conf : Configuration) (errors : Seq [String] ) : String =
-    if errors .isEmpty
-    then serializer .serialize_response (process_configuration (conf) )
-    else serializer .serialize_errors (errors)
-
-  process_instance (maybe_conf : Option [Configuration] ) : String =
-    match maybe_conf
-      case Some (conf) ==> process_instance_with (conf) (cv .validate (conf) )
-      case None ==> error_configuration_is_undefined
-
-  get_maybe_configuration (file_name : String) : Option [Configuration] =
-    yaml_parser .parse ( @new StringReader (read_file (file_name) ) )
+  get_maybe_configuration (maybe_content : Try [String] ) : Option [Configuration] =
+    if maybe_content .isSuccess
+    then YamlParser .mk .parse ( @new StringReader (maybe_content .get) )
+    else None
 
   process_input_file (file_name : String) : String =
-    process_instance (
-      get_maybe_configuration (file_name)
+    Serializer .mk .serialize (
+      InstanceProcessor .mk .process_instance (
+        get_maybe_configuration (
+          try_read_file (file_name)
+        )
+      )
     )
 
   execute (arguments : List [String] ) : Unit =

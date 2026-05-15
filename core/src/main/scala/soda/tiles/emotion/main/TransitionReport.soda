@@ -1,0 +1,13 @@
+
+class TransitionReport
+
+  abstract
+    test_index : Int
+    transition_index : Int
+    transition : Transition
+    rule : Rule
+    inhibiting_actions : ActionSet
+    valid : Boolean
+
+end
+
