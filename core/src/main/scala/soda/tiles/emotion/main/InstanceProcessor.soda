@@ -22,15 +22,23 @@ class InstanceProcessor
           x ._1 .fst) (x ._1 .snd) (x ._1 .trd) (x ._1 .fth)
       )
 
-  process_instance_with (conf : Configuration) (errors : Seq [String] ) : FinalReport =
-    if errors .isEmpty
-    then FinalReport .mk (process_configuration (conf) ) (errors)
-    else FinalReport .mk (Seq .empty) (errors)
+  mk_final_report (transitions : Seq [TransitionReport] ) (errors : Seq [String] ) (
+      reading_start : Long) (execution_start : Long) : FinalReport =
+    FinalReport .mk (transitions) (errors) (execution_start - reading_start) (System .nanoTime () - execution_start)
 
-  process_instance (maybe_conf : Option [Configuration] ) : FinalReport =
+  process_instance_with (reading_start : Long) (conf : Configuration) (errors : Seq [String] ) (
+      execution_start : Long) : FinalReport =
+    if errors .isEmpty
+    then mk_final_report (process_configuration (conf) ) (errors) (reading_start) (execution_start)
+    else mk_final_report (Seq .empty) (errors) (reading_start) (execution_start)
+
+  process_instance (reading_start : Long) (maybe_conf : Option [Configuration] ) (execution_start : Long) : FinalReport =
     match maybe_conf
-      case Some (conf) ==> process_instance_with (conf) (ConfigurationValidator .mk .validate (conf) )
-      case None ==> FinalReport .mk (Seq .empty) (Seq [String] (error_configuration_is_undefined) )
+      case Some (conf) ==> process_instance_with (reading_start) (conf) (ConfigurationValidator .mk .validate (conf) ) (execution_start)
+      case None ==>
+        mk_final_report (Seq .empty) (
+          Seq [String] (error_configuration_is_undefined)
+        ) (reading_start) (execution_start)
 
 end
 

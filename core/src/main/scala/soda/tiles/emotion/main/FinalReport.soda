@@ -4,6 +4,8 @@ class FinalReport
   abstract
     transitions : Seq [TransitionReport]
     errors : Seq [String]
+    reading_time : Long
+    execution_time : Long
 
 end
 

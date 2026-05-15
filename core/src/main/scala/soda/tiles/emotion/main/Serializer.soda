@@ -34,6 +34,14 @@ class Serializer
           .mkString
     else ""
 
+  format_nanoseconds (x : Long) : String =
+    "" + (x / 1000000) + " ms"
+
+  serialize_time_measures (reading_time : Long) (execution_time : Long) : String =
+    "- reading_time: " + format_nanoseconds(reading_time) + "\n" +
+    "- execution_time: " + format_nanoseconds(execution_time) + "\n" +
+    "- total_time: " + format_nanoseconds(reading_time + execution_time) + "\n"
+
   serialize_errors (errors : Seq [String] ) : String =
     if (errors .nonEmpty)
     then
@@ -47,6 +55,7 @@ class Serializer
   serialize (report : FinalReport) : String =
     "---" + "\n" +
     serialize_errors (report .errors) +
+    serialize_time_measures (report .reading_time) (report .execution_time) +
     serialize_invalid_transitions (report .transitions) +
     serialize_all_transitions (report .transitions)
 
