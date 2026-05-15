@@ -1,0 +1,104 @@
+---
+- fluents:
+  - fluent: honesty
+    values:
+    - honest
+    - dishonest
+  - fluent: information
+    values:
+    - informed
+    - uninformed
+  - fluent: alignment
+    values:
+    - aligned
+    - conflicted
+- actions:
+  - read_truth
+  - read_lie
+  - share_truth
+  - share_lie
+- rules:
+  - rule: ForbidsToCauseRule
+    input:
+    - informed
+    output:
+    - dishonest
+  - rule: TriggersRule
+    input:
+    - dishonest
+    action: share_lie
+  - rule: NoConcurrencyRule
+    actions:
+    - read_truth
+    - read_lie
+  - rule: NoConcurrencyRule
+    actions:
+    - share_truth
+    - share_lie
+  - rule: DefaultRule
+    input_fluent: honest
+  - rule: InfluencesIfRule
+    input:
+    - informed
+    action: share_lie
+    output:
+    - conflicted
+  - rule: InfluencesIfRule
+    input:
+    - informed
+    action: share_truth
+    output:
+    - aligned
+  - rule: FacilitatesRule
+    input:
+    - informed
+    - conflicted
+    action: share_lie
+  - rule: ContravenesRule
+    input:
+    - informed
+    - aligned
+    action: share_lie
+  - rule: InfluencesIfRule
+    input:
+    - informed
+    action: read_lie
+    output:
+    - conflicted
+  - rule: InfluencesIfRule
+    input:
+    - informed
+    action: read_truth
+    output:
+    - aligned
+  - rule: DefaultRule
+    input_fluent: aligned
+- trajectory:
+  - state:
+    - honest
+    - uninformed
+    - aligned
+  - actions:
+    - read_lie
+  - state:
+    - honest
+    - uninformed
+    - aligned
+  - actions:
+    - share_lie
+  - state:
+    - honest
+    - uninformed
+    - aligned
+  - actions:
+    - read_truth
+  - state:
+    - honest
+    - informed
+    - aligned
+  - actions:
+    - share_lie
+  - state:
+    - honest
+    - informed
+    - aligned
