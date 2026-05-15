@@ -1,9 +1,5 @@
 ---
 - fluents:
-  - fluent: honesty
-    values:
-    - honest
-    - dishonest
   - fluent: information
     values:
     - informed
@@ -14,14 +10,9 @@
   - share_truth
   - share_lie
 - rules:
-  - rule: ForbidsToCauseRule
+  - rule: ContravenesRule
     input:
     - informed
-    output:
-    - dishonest
-  - rule: TriggersRule
-    input:
-    - dishonest
     action: share_lie
   - rule: NoConcurrencyRule
     actions:
@@ -31,29 +22,26 @@
     actions:
     - share_truth
     - share_lie
-  - rule: DefaultRule
-    input_fluent: honest
 - trajectory:
   - state:
-    - honest
     - uninformed
   - actions:
     - read_lie
   - state:
-    - honest
     - uninformed
   - actions:
-    - send_lie
+    - share_lie
   - state:
-    - honest
     - uninformed
   - actions:
     - read_truth
   - state:
-    - honest
+    - informed
+  - actions:
+    - read_lie
+  - state:
     - informed
   - actions:
     - share_lie
   - state:
-    - honest
     - informed

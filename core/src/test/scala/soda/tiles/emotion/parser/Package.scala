@@ -29,7 +29,7 @@ import   soda.tiles.emotion.entity.TriggersRule
 
 
 
-trait Example1Instance
+trait ExampleInstance1
 {
 
 
@@ -226,15 +226,15 @@ trait Example1Instance
 
 }
 
-case class Example1Instance_ () extends Example1Instance
+case class ExampleInstance1_ () extends ExampleInstance1
 
-object Example1Instance {
-  def mk : Example1Instance =
-    Example1Instance_ ()
+object ExampleInstance1 {
+  def mk : ExampleInstance1 =
+    ExampleInstance1_ ()
 }
 
 
-trait Example2Instance
+trait ExampleInstance2
 {
 
 
@@ -446,23 +446,21 @@ trait Example2Instance
 
 }
 
-case class Example2Instance_ () extends Example2Instance
+case class ExampleInstance2_ () extends ExampleInstance2
 
-object Example2Instance {
-  def mk : Example2Instance =
-    Example2Instance_ ()
+object ExampleInstance2 {
+  def mk : ExampleInstance2 =
+    ExampleInstance2_ ()
 }
 
 
-trait Example3Instance
+trait ExampleInstance3
 {
 
 
 
   lazy val fluents : Map [FluentValue, FluentName] =
     Map [FluentValue, FluentName] (
-      ("honest" , "honesty") ,
-      ("dishonest" , "honesty") ,
       ("informed" , "information") ,
       ("uninformed" , "information")
     )
@@ -476,83 +474,59 @@ trait Example3Instance
     ) .toSet
 
   lazy val rules : RuleSeq = Seq [Rule] (
-
-    ForbidsToCauseRule (
+    ContravenesRule (
       Seq [FluentValue] (
         "informed"
       ) .toSet ,
-      Seq [FluentValue] (
-        "dishonest"
-      ) .toSet
-    ) ,
-
-    TriggersRule (
-      Seq [FluentValue] (
-        "dishonest"
-      ) .toSet ,
       "share_lie"
     ) ,
-
     NoConcurrencyRule (
       Seq [Action] (
         "read_truth" ,
         "read_lie"
       ) .toSet
     ) ,
-
     NoConcurrencyRule (
       Seq [Action] (
         "share_truth" ,
         "share_lie"
       ) .toSet
-    ) ,
-
-    DefaultRule (
-      "honest"
     )
   )
 
   lazy val trajectory : Seq [IdentifierSet] =
     Seq [IdentifierSet] (
-
       Seq [FluentValue] (
-        "honest" ,
         "uninformed"
       ) .toSet ,
-
       Seq [Action] (
         "read_lie"
       ) .toSet ,
-
       Seq [FluentValue] (
-        "honest" ,
         "uninformed"
       ) .toSet ,
-
-      Seq [Action] (
-        "send_lie"
-      ) .toSet ,
-
-      Seq [FluentValue] (
-        "honest" ,
-        "uninformed"
-      ) .toSet ,
-
-      Seq [Action] (
-        "read_truth"
-      ) .toSet ,
-
-      Seq [FluentValue] (
-        "honest" ,
-        "informed"
-      ) .toSet ,
-
       Seq [Action] (
         "share_lie"
       ) .toSet ,
-
       Seq [FluentValue] (
-        "honest" ,
+        "uninformed"
+      ) .toSet ,
+      Seq [Action] (
+        "read_truth"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "informed"
+      ) .toSet ,
+      Seq [Action] (
+        "read_lie"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "informed"
+      ) .toSet ,
+      Seq [Action] (
+        "share_lie"
+      ) .toSet ,
+      Seq [FluentValue] (
         "informed"
       ) .toSet
     )
@@ -562,11 +536,153 @@ trait Example3Instance
 
 }
 
-case class Example3Instance_ () extends Example3Instance
+case class ExampleInstance3_ () extends ExampleInstance3
 
-object Example3Instance {
-  def mk : Example3Instance =
-    Example3Instance_ ()
+object ExampleInstance3 {
+  def mk : ExampleInstance3 =
+    ExampleInstance3_ ()
+}
+
+
+trait ExampleInstance4
+{
+
+
+
+  lazy val fluents : Map [FluentValue, FluentName] =
+    Map [FluentValue, FluentName] (
+      ("informed" , "information") ,
+      ("uninformed" , "information") ,
+      ("aligned" , "alignment") ,
+      ("conflicted" , "alignment")
+    )
+
+  lazy val actions : ActionSet =
+    Seq [Action] (
+      "read_truth" ,
+      "read_lie" ,
+      "share_truth" ,
+      "share_lie"
+    ) .toSet
+
+  lazy val rules : RuleSeq = Seq [Rule] (
+    ContravenesRule (
+      Seq [FluentValue] (
+        "informed" ,
+        "aligned"
+      ) .toSet ,
+      "share_lie"
+    ) ,
+    NoConcurrencyRule (
+      Seq [Action] (
+        "read_truth" ,
+        "read_lie"
+      ) .toSet
+    ) ,
+    NoConcurrencyRule (
+      Seq [Action] (
+        "share_truth" ,
+        "share_lie"
+      ) .toSet
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "informed"
+      ) .toSet ,
+      "share_lie" ,
+      Seq [FluentValue] (
+        "conflicted"
+      ) .toSet
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "informed"
+      ) .toSet ,
+      "share_truth" ,
+      Seq [FluentValue] (
+        "aligned"
+      ) .toSet
+    ) ,
+    FacilitatesRule (
+      Seq [FluentValue] (
+        "informed" ,
+        "conflicted"
+      ) .toSet ,
+      "share_lie"
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "informed"
+      ) .toSet ,
+      "read_lie" ,
+      Seq [FluentValue] (
+        "conflicted"
+      ) .toSet
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "informed"
+      ) .toSet ,
+      "read_truth" ,
+      Seq [FluentValue] (
+        "aligned"
+      ) .toSet
+    )
+  )
+
+  lazy val trajectory : Seq [IdentifierSet] =
+    Seq [IdentifierSet] (
+      Seq [FluentValue] (
+        "uninformed" ,
+        "aligned"
+      ) .toSet ,
+      Seq [Action] (
+        "read_lie"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "uninformed" ,
+        "aligned"
+      ) .toSet ,
+      Seq [Action] (
+        "share_lie"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "uninformed" ,
+        "aligned"
+      ) .toSet ,
+      Seq [Action] (
+        "read_truth"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "informed" ,
+        "aligned"
+      ) .toSet ,
+      Seq [Action] (
+        "read_lie"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "informed" ,
+        "conflicted"
+      ) .toSet ,
+      Seq [Action] (
+        "share_lie"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "informed" ,
+        "conflicted"
+      ) .toSet
+    )
+
+  lazy val instance : Configuration =
+    Configuration .mk (fluents) (actions) (rules) (trajectory)
+
+}
+
+case class ExampleInstance4_ () extends ExampleInstance4
+
+object ExampleInstance4 {
+  def mk : ExampleInstance4 =
+    ExampleInstance4_ ()
 }
 
 
@@ -593,7 +709,7 @@ case class YamlParserSpec ()
 
   lazy val example1_parsed_instance = parser .parse ( new StringReader (example1_contents) )
 
-  lazy val example1_instance = Some (Example1Instance .mk .instance)
+  lazy val example1_instance = Some (ExampleInstance1 .mk .instance)
 
   lazy val example2_name = "/example/example-2.yaml"
 
@@ -601,7 +717,7 @@ case class YamlParserSpec ()
 
   lazy val example2_parsed_instance = parser .parse ( new StringReader (example2_contents) )
 
-  lazy val example2_instance = Some (Example2Instance .mk .instance)
+  lazy val example2_instance = Some (ExampleInstance2 .mk .instance)
 
   lazy val example3_name = "/example/example-3.yaml"
 
@@ -609,7 +725,15 @@ case class YamlParserSpec ()
 
   lazy val example3_parsed_instance = parser .parse ( new StringReader (example3_contents) )
 
-  lazy val example3_instance = Some (Example3Instance .mk .instance)
+  lazy val example3_instance = Some (ExampleInstance3 .mk .instance)
+
+  lazy val example4_name = "/example/example-4.yaml"
+
+  lazy val example4_contents = read_file (example4_name)
+
+  lazy val example4_parsed_instance = parser .parse ( new StringReader (example4_contents) )
+
+  lazy val example4_instance = Some (ExampleInstance4 .mk .instance)
 
   test ("parse example 1") (
     check (
@@ -632,6 +756,14 @@ case class YamlParserSpec ()
       obtained = example3_parsed_instance
     ) (
       expected = example3_instance
+    )
+  )
+
+  test ("parse example 4") (
+    check (
+      obtained = example4_parsed_instance
+    ) (
+      expected = example4_instance
     )
   )
 
