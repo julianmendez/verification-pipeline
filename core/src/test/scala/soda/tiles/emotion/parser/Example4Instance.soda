@@ -1,0 +1,134 @@
+
+class Example4Instance
+
+  abstract
+
+  fluents : Map [FluentValue] [FluentName] =
+    Map [FluentValue] [FluentName] (
+      ("informed" , "information") ,
+      ("uninformed" , "information") ,
+      ("aligned" , "alignment") ,
+      ("conflicted" , "alignment")
+    )
+
+  actions : ActionSet =
+    Seq [Action] (
+      "read_truth" ,
+      "read_lie" ,
+      "share_truth" ,
+      "share_lie"
+    ) .toSet
+
+  rules : RuleSeq = Seq [Rule] (
+    ContravenesRule (
+      Seq [FluentValue] (
+        "informed" ,
+        "aligned"
+      ) .toSet ,
+      "share_lie"
+    ) ,
+    NoConcurrencyRule (
+      Seq [Action] (
+        "read_truth" ,
+        "read_lie"
+      ) .toSet
+    ) ,
+    NoConcurrencyRule (
+      Seq [Action] (
+        "share_truth" ,
+        "share_lie"
+      ) .toSet
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "informed"
+      ) .toSet ,
+      "share_lie" ,
+      Seq [FluentValue] (
+        "conflicted"
+      ) .toSet
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "informed"
+      ) .toSet ,
+      "share_truth" ,
+      Seq [FluentValue] (
+        "aligned"
+      ) .toSet
+    ) ,
+    FacilitatesRule (
+      Seq [FluentValue] (
+        "informed" ,
+        "conflicted"
+      ) .toSet ,
+      "share_lie"
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "informed"
+      ) .toSet ,
+      "read_lie" ,
+      Seq [FluentValue] (
+        "conflicted"
+      ) .toSet
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "informed"
+      ) .toSet ,
+      "read_truth" ,
+      Seq [FluentValue] (
+        "aligned"
+      ) .toSet
+    )
+  )
+
+  trajectory : Seq [IdentifierSet] =
+    Seq [IdentifierSet] (
+      Seq [FluentValue] (
+        "uninformed" ,
+        "aligned"
+      ) .toSet ,
+      Seq [Action] (
+        "read_lie"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "uninformed" ,
+        "aligned"
+      ) .toSet ,
+      Seq [Action] (
+        "share_lie"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "uninformed" ,
+        "aligned"
+      ) .toSet ,
+      Seq [Action] (
+        "read_truth"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "informed" ,
+        "aligned"
+      ) .toSet ,
+      Seq [Action] (
+        "read_lie"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "informed" ,
+        "conflicted"
+      ) .toSet ,
+      Seq [Action] (
+        "share_lie"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "informed" ,
+        "conflicted"
+      ) .toSet
+    )
+
+  instance : Configuration =
+    Configuration .mk (fluents) (actions) (rules) (trajectory)
+
+end
+

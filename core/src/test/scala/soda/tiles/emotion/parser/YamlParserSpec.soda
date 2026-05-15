@@ -39,6 +39,14 @@ class YamlParserSpec ()
 
   example3_instance = Some (Example3Instance .mk .instance)
 
+  example4_name = "/example/example-4.yaml"
+
+  example4_contents = read_file (example4_name)
+
+  example4_parsed_instance = parser .parse ( @new StringReader (example4_contents) )
+
+  example4_instance = Some (Example4Instance .mk .instance)
+
   test ("parse example 1") (
     check (
       obtained := example1_parsed_instance
@@ -60,6 +68,14 @@ class YamlParserSpec ()
       obtained := example3_parsed_instance
     ) (
       expected := example3_instance
+    )
+  )
+
+  test ("parse example 4") (
+    check (
+      obtained := example4_parsed_instance
+    ) (
+      expected := example4_instance
     )
   )
 

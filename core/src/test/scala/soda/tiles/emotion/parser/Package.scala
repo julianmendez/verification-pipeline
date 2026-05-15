@@ -544,6 +544,148 @@ object Example3Instance {
 }
 
 
+trait Example4Instance
+{
+
+
+
+  lazy val fluents : Map [FluentValue, FluentName] =
+    Map [FluentValue, FluentName] (
+      ("informed" , "information") ,
+      ("uninformed" , "information") ,
+      ("aligned" , "alignment") ,
+      ("conflicted" , "alignment")
+    )
+
+  lazy val actions : ActionSet =
+    Seq [Action] (
+      "read_truth" ,
+      "read_lie" ,
+      "share_truth" ,
+      "share_lie"
+    ) .toSet
+
+  lazy val rules : RuleSeq = Seq [Rule] (
+    ContravenesRule (
+      Seq [FluentValue] (
+        "informed" ,
+        "aligned"
+      ) .toSet ,
+      "share_lie"
+    ) ,
+    NoConcurrencyRule (
+      Seq [Action] (
+        "read_truth" ,
+        "read_lie"
+      ) .toSet
+    ) ,
+    NoConcurrencyRule (
+      Seq [Action] (
+        "share_truth" ,
+        "share_lie"
+      ) .toSet
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "informed"
+      ) .toSet ,
+      "share_lie" ,
+      Seq [FluentValue] (
+        "conflicted"
+      ) .toSet
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "informed"
+      ) .toSet ,
+      "share_truth" ,
+      Seq [FluentValue] (
+        "aligned"
+      ) .toSet
+    ) ,
+    FacilitatesRule (
+      Seq [FluentValue] (
+        "informed" ,
+        "conflicted"
+      ) .toSet ,
+      "share_lie"
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "informed"
+      ) .toSet ,
+      "read_lie" ,
+      Seq [FluentValue] (
+        "conflicted"
+      ) .toSet
+    ) ,
+    InfluencesIfRule (
+      Seq [FluentValue] (
+        "informed"
+      ) .toSet ,
+      "read_truth" ,
+      Seq [FluentValue] (
+        "aligned"
+      ) .toSet
+    )
+  )
+
+  lazy val trajectory : Seq [IdentifierSet] =
+    Seq [IdentifierSet] (
+      Seq [FluentValue] (
+        "uninformed" ,
+        "aligned"
+      ) .toSet ,
+      Seq [Action] (
+        "read_lie"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "uninformed" ,
+        "aligned"
+      ) .toSet ,
+      Seq [Action] (
+        "share_lie"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "uninformed" ,
+        "aligned"
+      ) .toSet ,
+      Seq [Action] (
+        "read_truth"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "informed" ,
+        "aligned"
+      ) .toSet ,
+      Seq [Action] (
+        "read_lie"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "informed" ,
+        "conflicted"
+      ) .toSet ,
+      Seq [Action] (
+        "share_lie"
+      ) .toSet ,
+      Seq [FluentValue] (
+        "informed" ,
+        "conflicted"
+      ) .toSet
+    )
+
+  lazy val instance : Configuration =
+    Configuration .mk (fluents) (actions) (rules) (trajectory)
+
+}
+
+case class Example4Instance_ () extends Example4Instance
+
+object Example4Instance {
+  def mk : Example4Instance =
+    Example4Instance_ ()
+}
+
+
 case class YamlParserSpec ()
   extends
     AnyFunSuite
@@ -585,6 +727,14 @@ case class YamlParserSpec ()
 
   lazy val example3_instance = Some (Example3Instance .mk .instance)
 
+  lazy val example4_name = "/example/example-4.yaml"
+
+  lazy val example4_contents = read_file (example4_name)
+
+  lazy val example4_parsed_instance = parser .parse ( new StringReader (example4_contents) )
+
+  lazy val example4_instance = Some (Example4Instance .mk .instance)
+
   test ("parse example 1") (
     check (
       obtained = example1_parsed_instance
@@ -606,6 +756,14 @@ case class YamlParserSpec ()
       obtained = example3_parsed_instance
     ) (
       expected = example3_instance
+    )
+  )
+
+  test ("parse example 4") (
+    check (
+      obtained = example4_parsed_instance
+    ) (
+      expected = example4_instance
     )
   )
 
