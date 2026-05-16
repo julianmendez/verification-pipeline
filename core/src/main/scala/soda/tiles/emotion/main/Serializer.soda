@@ -9,8 +9,8 @@ class Serializer
     "  - test_index: " + entry .test_index + "\n" +
     "    transition_index: " + entry .transition_index + "\n" +
     "    transition: " + entry .transition + "\n" +
-    "    rule: " + entry .rule + "\n" +
     "    inhibiting_actions: " + entry .inhibiting_actions + "\n" +
+    "    rule: " + entry .rule + "\n" +
     "    valid: " + entry .valid + "\n"
 
   serialize_all_transitions (transitions : Seq [TransitionReport] ) :String =

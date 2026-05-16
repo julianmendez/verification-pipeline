@@ -10,7 +10,7 @@ class PreprocessorTile
     then empty_set .+ (action)
     else empty_set
 
-  find (transition : Transition) (rule : Rule) : ActionSet =
+  phi_inhibit (transition : Transition) (rule : Rule) : ActionSet =
     match rule
       case CausesIfRule (input_set , action , output_set) ==> empty_set
       case IfRule (input_set , output_set) ==> empty_set
@@ -25,17 +25,23 @@ class PreprocessorTile
       case ContravenesRule (input_set , action) ==> _get_actions (transition) (input_set) (action)
       case ForbidsToCauseRule (input_set , output_set) ==> empty_set
 
-  process_elem (elem : TilePair [Transition] [Rule] ) : TileTriple [Transition] [Rule] [ActionSet]  =
-    TileTriple .mk (elem .fst) (elem .snd) (find (elem .fst) (elem .snd) )
+  phi_inhibit_set (transition : Transition) (rules : RuleSeq) : ActionSet =
+    rules
+      .map (lambda rule --> TilePair .mk (transition) (rule) )
+      .flatMap (lambda pair --> phi_inhibit (pair .fst) (pair .snd) )
+      .toSet
 
-  map_tile = MapTile .mk [TilePair [Transition] [Rule] ] [TileTriple [Transition] [Rule] [ActionSet] ] (process_elem)
+  process_elem (elem : Transition) (rules : RuleSeq) : TilePair [Transition] [ActionSet]  =
+    TilePair .mk (elem) (phi_inhibit_set (elem) (rules) )
 
-  apply (message : TileMessage [Seq [TilePair [Transition] [Rule] ] ] )
-      : TileMessage [Seq [TileTriple [Transition] [Rule] [ActionSet] ] ] =
-    map_tile .apply (
+  apply (message : TileMessage [Seq [Transition] ] )
+      : TileMessage [Seq [TilePair [Transition] [ActionSet] ] ] =
+    MapTile
+      .mk [Transition] [TilePair [Transition] [ActionSet] ] (
+        lambda transition --> process_elem (transition) (message .context)
+      ) .apply (
       message
     )
 
 end
-
 

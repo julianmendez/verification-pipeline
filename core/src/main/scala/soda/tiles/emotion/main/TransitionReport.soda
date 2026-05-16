@@ -5,8 +5,8 @@ class TransitionReport
     test_index : Int
     transition_index : Int
     transition : Transition
-    rule : Rule
     inhibiting_actions : ActionSet
+    rule : Rule
     valid : Boolean
 
 end

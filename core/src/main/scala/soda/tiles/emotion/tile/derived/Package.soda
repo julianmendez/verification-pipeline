@@ -22,6 +22,7 @@ import
   soda.tiles.emotion.entity.InhibitsRule
   soda.tiles.emotion.entity.NoConcurrencyRule
   soda.tiles.emotion.entity.Rule
+  soda.tiles.emotion.entity.RuleSeq
   soda.tiles.emotion.entity.Transition
   soda.tiles.emotion.entity.TransitionSeq
   soda.tiles.emotion.entity.TileMessage
