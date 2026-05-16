@@ -47,7 +47,7 @@ trait InhibitTile
     ) empty_set .+ (action)
     else empty_set
 
-  def phi_inhibit (transition : Transition) (rule : Rule) : ActionSet =
+  def get_inhibit (transition : Transition) (rule : Rule) : ActionSet =
     rule match  {
       case CausesIfRule (input_set , action , output_set) => empty_set
       case IfRule (input_set , output_set) => empty_set
@@ -63,14 +63,13 @@ trait InhibitTile
       case ForbidsToCauseRule (input_set , output_set) => empty_set
     }
 
-  def phi_inhibit_set (transition : Transition) (rules : RuleSeq) : ActionSet =
+  def get_inhibit_set (transition : Transition) (rules : RuleSeq) : ActionSet =
     rules
-      .map ( rule => TilePair .mk (transition) (rule) )
-      .flatMap ( pair => phi_inhibit (pair .fst) (pair .snd) )
+      .flatMap ( rule => get_inhibit (transition) (rule) )
       .toSet
 
   def process_elem (elem : Transition) (rules : RuleSeq) : TilePair [Transition, ActionSet]  =
-    TilePair .mk (elem) (phi_inhibit_set (elem) (rules) )
+    TilePair .mk (elem) (get_inhibit_set (elem) (rules) )
 
   def apply (message : TileMessage [Seq [Transition] ] )
       : TileMessage [Seq [TilePair [Transition, ActionSet] ] ] =

@@ -10,7 +10,7 @@ class InhibitTile
     then empty_set .+ (action)
     else empty_set
 
-  phi_inhibit (transition : Transition) (rule : Rule) : ActionSet =
+  get_inhibit (transition : Transition) (rule : Rule) : ActionSet =
     match rule
       case CausesIfRule (input_set , action , output_set) ==> empty_set
       case IfRule (input_set , output_set) ==> empty_set
@@ -25,14 +25,13 @@ class InhibitTile
       case ContravenesRule (input_set , action) ==> _get_actions (transition) (input_set) (action)
       case ForbidsToCauseRule (input_set , output_set) ==> empty_set
 
-  phi_inhibit_set (transition : Transition) (rules : RuleSeq) : ActionSet =
+  get_inhibit_set (transition : Transition) (rules : RuleSeq) : ActionSet =
     rules
-      .map (lambda rule --> TilePair .mk (transition) (rule) )
-      .flatMap (lambda pair --> phi_inhibit (pair .fst) (pair .snd) )
+      .flatMap (lambda rule --> get_inhibit (transition) (rule) )
       .toSet
 
   process_elem (elem : Transition) (rules : RuleSeq) : TilePair [Transition] [ActionSet]  =
-    TilePair .mk (elem) (phi_inhibit_set (elem) (rules) )
+    TilePair .mk (elem) (get_inhibit_set (elem) (rules) )
 
   apply (message : TileMessage [Seq [Transition] ] )
       : TileMessage [Seq [TilePair [Transition] [ActionSet] ] ] =
