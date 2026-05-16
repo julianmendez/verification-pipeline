@@ -12,11 +12,11 @@ class EmotionalReasoningPipeline
 
   trajectory_transitions_tile = TrajectoryTransitionsTile .mk
 
-  preprocessor_cross_verifier_tile = PreprocessorCrossVerifierTile .mk
+  inhibit_cross_verifier_tile = InhibitCrossVerifierTile .mk
 
   apply (message : TileMessage [Boolean] )
       : TileMessage [Seq [TileQuad [Transition] [ActionSet] [Rule] [Boolean] ] ] =
-    preprocessor_cross_verifier_tile .apply (
+    inhibit_cross_verifier_tile .apply (
       trajectory_transitions_tile .apply (
         message
       )

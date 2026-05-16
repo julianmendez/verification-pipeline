@@ -13,19 +13,19 @@ import   soda.tiles.emotion.entity.TileQuad
 import   soda.tiles.emotion.entity.Transition
 import   soda.tiles.emotion.entity.TransitionSeq
 import   soda.tiles.emotion.tile.constant.TrajectoryTile
-import   soda.tiles.emotion.tile.derived.PreprocessorTile
+import   soda.tiles.emotion.tile.derived.InhibitTile
 import   soda.tiles.emotion.tile.derived.TransitionsTile
 import   soda.tiles.emotion.tile.derived.VerifierTile
 import   soda.tiles.emotion.tile.primitive.CrossTile
 
-trait PreprocessorCrossVerifierTile
+trait InhibitCrossVerifierTile
 {
 
 
 
   lazy val cross_tile = CrossTile .mk [TilePair [Transition, ActionSet] , Rule]
 
-  lazy val preprocessor_tile = PreprocessorTile .mk
+  lazy val inhibit_tile = InhibitTile .mk
 
   lazy val verifier_tile = VerifierTile .mk
 
@@ -33,7 +33,7 @@ trait PreprocessorCrossVerifierTile
       : TileMessage [Seq [TileQuad [Transition, ActionSet, Rule, Boolean] ] ] =
     verifier_tile .apply (
       cross_tile .apply (
-        preprocessor_tile .apply (
+        inhibit_tile .apply (
           message0
         )
       ) (
@@ -43,11 +43,11 @@ trait PreprocessorCrossVerifierTile
 
 }
 
-case class PreprocessorCrossVerifierTile_ () extends PreprocessorCrossVerifierTile
+case class InhibitCrossVerifierTile_ () extends InhibitCrossVerifierTile
 
-object PreprocessorCrossVerifierTile {
-  def mk : PreprocessorCrossVerifierTile =
-    PreprocessorCrossVerifierTile_ ()
+object InhibitCrossVerifierTile {
+  def mk : InhibitCrossVerifierTile =
+    InhibitCrossVerifierTile_ ()
 }
 
 

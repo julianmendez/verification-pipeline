@@ -1,11 +1,11 @@
 
-class PreprocessorCrossVerifierTile
+class InhibitCrossVerifierTile
 
   abstract
 
   cross_tile = CrossTile .mk [TilePair [Transition] [ActionSet] ] [Rule]
 
-  preprocessor_tile = PreprocessorTile .mk
+  inhibit_tile = InhibitTile .mk
 
   verifier_tile = VerifierTile .mk
 
@@ -13,7 +13,7 @@ class PreprocessorCrossVerifierTile
       : TileMessage [Seq [TileQuad [Transition] [ActionSet] [Rule] [Boolean] ] ] =
     verifier_tile .apply (
       cross_tile .apply (
-        preprocessor_tile .apply (
+        inhibit_tile .apply (
           message0
         )
       ) (

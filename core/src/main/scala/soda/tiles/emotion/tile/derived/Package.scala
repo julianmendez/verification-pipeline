@@ -35,7 +35,7 @@ import   soda.tiles.emotion.tile.primitive.ApplyTile
 import   soda.tiles.emotion.tile.primitive.FoldTile
 import   soda.tiles.emotion.tile.primitive.MapTile
 
-trait PreprocessorTile
+trait InhibitTile
 {
 
 
@@ -83,11 +83,11 @@ trait PreprocessorTile
 
 }
 
-case class PreprocessorTile_ () extends PreprocessorTile
+case class InhibitTile_ () extends InhibitTile
 
-object PreprocessorTile {
-  def mk : PreprocessorTile =
-    PreprocessorTile_ ()
+object InhibitTile {
+  def mk : InhibitTile =
+    InhibitTile_ ()
 }
 
 

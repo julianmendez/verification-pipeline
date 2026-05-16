@@ -9,7 +9,7 @@ import   soda.tiles.emotion.entity.Rule
 import   soda.tiles.emotion.entity.TileMessage
 import   soda.tiles.emotion.entity.TileQuad
 import   soda.tiles.emotion.entity.Transition
-import   soda.tiles.emotion.tile.composite.PreprocessorCrossVerifierTile
+import   soda.tiles.emotion.tile.composite.InhibitCrossVerifierTile
 import   soda.tiles.emotion.tile.composite.TrajectoryTransitionsTile
 import   soda.tiles.emotion.tile.constant.RulesTile
 
@@ -27,11 +27,11 @@ trait EmotionalReasoningPipeline
 
   lazy val trajectory_transitions_tile = TrajectoryTransitionsTile .mk
 
-  lazy val preprocessor_cross_verifier_tile = PreprocessorCrossVerifierTile .mk
+  lazy val inhibit_cross_verifier_tile = InhibitCrossVerifierTile .mk
 
   def apply (message : TileMessage [Boolean] )
       : TileMessage [Seq [TileQuad [Transition, ActionSet, Rule, Boolean] ] ] =
-    preprocessor_cross_verifier_tile .apply (
+    inhibit_cross_verifier_tile .apply (
       trajectory_transitions_tile .apply (
         message
       )
