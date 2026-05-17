@@ -1,0 +1,25 @@
+
+class InhibitCrossVerifierTile
+
+  abstract
+
+  cross_tile = CrossTile .mk [TilePair [Transition] [ActionSet] ] [Rule]
+
+  inhibit_tile = InhibitTile .mk
+
+  verifier_tile = VerifierTile .mk
+
+  apply (message0 : TileMessage [TransitionSeq] ) (message1 : TileMessage [RuleSeq] )
+      : TileMessage [Seq [TileQuad [Transition] [ActionSet] [Rule] [Boolean] ] ] =
+    verifier_tile .apply (
+      cross_tile .apply (
+        inhibit_tile .apply (
+          message0
+        )
+      ) (
+        message1
+      )
+    )
+
+end
+

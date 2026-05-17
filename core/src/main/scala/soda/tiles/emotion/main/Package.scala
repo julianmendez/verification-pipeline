@@ -176,8 +176,8 @@ trait Serializer
     "  - test_index: " + entry .test_index + "\n" +
     "    transition_index: " + entry .transition_index + "\n" +
     "    transition: " + entry .transition + "\n" +
-    "    rule: " + entry .rule + "\n" +
     "    inhibiting_actions: " + entry .inhibiting_actions + "\n" +
+    "    rule: " + entry .rule + "\n" +
     "    valid: " + entry .valid + "\n"
 
   def serialize_all_transitions (transitions : Seq [TransitionReport] ) :String =
@@ -242,16 +242,16 @@ trait TransitionReport
   def   test_index : Int
   def   transition_index : Int
   def   transition : Transition
-  def   rule : Rule
   def   inhibiting_actions : ActionSet
+  def   rule : Rule
   def   valid : Boolean
 
 }
 
-case class TransitionReport_ (test_index : Int, transition_index : Int, transition : Transition, rule : Rule, inhibiting_actions : ActionSet, valid : Boolean) extends TransitionReport
+case class TransitionReport_ (test_index : Int, transition_index : Int, transition : Transition, inhibiting_actions : ActionSet, rule : Rule, valid : Boolean) extends TransitionReport
 
 object TransitionReport {
-  def mk (test_index : Int) (transition_index : Int) (transition : Transition) (rule : Rule) (inhibiting_actions : ActionSet) (valid : Boolean) : TransitionReport =
-    TransitionReport_ (test_index, transition_index, transition, rule, inhibiting_actions, valid)
+  def mk (test_index : Int) (transition_index : Int) (transition : Transition) (inhibiting_actions : ActionSet) (rule : Rule) (valid : Boolean) : TransitionReport =
+    TransitionReport_ (test_index, transition_index, transition, inhibiting_actions, rule, valid)
 }
 

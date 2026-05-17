@@ -44,7 +44,7 @@ class VerifierTile
     then (output .forall (lambda fluent --> not transition .output .contains (fluent) ) )
     else true
 
-  verify_transition (transition : Transition) (rule : Rule) (inhibited : ActionSet) : Boolean =
+  verify_transition (transition : Transition) (inhibited : ActionSet) (rule : Rule) : Boolean =
     match rule
       case CausesIfRule (input_set , action , output_set) ==> verify_CausesIfRule (transition) (inhibited) (input_set) (action) (output_set)
       case IfRule (input_set , output_set) ==> verify_IfRule (transition) (input_set) (output_set)
@@ -59,16 +59,16 @@ class VerifierTile
       case ContravenesRule (input_set , action) ==> verify_InhibitsRule (transition) (input_set) (action)
       case ForbidsToCauseRule (input_set , output_set) ==> verify_ForbidsToCauseRule (transition) (input_set) (output_set)
 
-  verify_elem (elem : TileTriple [Transition] [Rule] [ActionSet] )
-      : TileQuad [Transition] [Rule] [ActionSet] [Boolean] =
-    TileQuad .mk (elem .fst) (elem .snd) (elem .trd) (
-      verify_transition (elem .fst) (elem .snd) (elem .trd)
+  verify_elem (elem : TilePair [TilePair [Transition] [ActionSet] ] [Rule] )
+      : TileQuad [Transition] [ActionSet] [Rule] [Boolean] =
+    TileQuad .mk (elem .fst .fst) (elem .fst .snd) (elem .snd) (
+      verify_transition (elem .fst .fst) (elem .fst .snd) (elem .snd)
     )
 
-  map_tile = MapTile .mk [TileTriple [Transition] [Rule] [ActionSet] ] [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] (verify_elem)
+  map_tile = MapTile .mk [TilePair [TilePair [Transition] [ActionSet] ] [Rule] ] [TileQuad [Transition] [ActionSet] [Rule] [Boolean] ] (verify_elem)
 
-  apply (message : TileMessage [Seq [TileTriple [Transition] [Rule] [ActionSet] ] ] )
-      : TileMessage [Seq [TileQuad [Transition] [Rule] [ActionSet] [Boolean] ] ] =
+  apply (message : TileMessage [Seq [TilePair [TilePair [Transition] [ActionSet] ] [Rule] ] ] )
+      : TileMessage [Seq [TileQuad [Transition] [ActionSet] [Rule] [Boolean] ] ] =
     map_tile .apply (
       message
     )

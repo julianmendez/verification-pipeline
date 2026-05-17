@@ -10,7 +10,7 @@ import
   soda.tiles.emotion.entity.TileMessage
   soda.tiles.emotion.entity.TileQuad
   soda.tiles.emotion.entity.Transition
-  soda.tiles.emotion.tile.composite.CrossPreprocessorVerifierTile
+  soda.tiles.emotion.tile.composite.InhibitCrossVerifierTile
   soda.tiles.emotion.tile.composite.TrajectoryTransitionsTile
   soda.tiles.emotion.tile.constant.RulesTile
 

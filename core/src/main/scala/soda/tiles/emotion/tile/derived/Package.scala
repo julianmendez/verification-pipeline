@@ -21,6 +21,7 @@ import   soda.tiles.emotion.entity.InfluencesRule
 import   soda.tiles.emotion.entity.InhibitsRule
 import   soda.tiles.emotion.entity.NoConcurrencyRule
 import   soda.tiles.emotion.entity.Rule
+import   soda.tiles.emotion.entity.RuleSeq
 import   soda.tiles.emotion.entity.Transition
 import   soda.tiles.emotion.entity.TransitionSeq
 import   soda.tiles.emotion.entity.TileMessage
@@ -34,7 +35,7 @@ import   soda.tiles.emotion.tile.primitive.ApplyTile
 import   soda.tiles.emotion.tile.primitive.FoldTile
 import   soda.tiles.emotion.tile.primitive.MapTile
 
-trait PreprocessorTile
+trait InhibitTile
 {
 
 
@@ -46,7 +47,7 @@ trait PreprocessorTile
     ) empty_set .+ (action)
     else empty_set
 
-  def find (transition : Transition) (rule : Rule) : ActionSet =
+  def get_inhibit (transition : Transition) (rule : Rule) : ActionSet =
     rule match  {
       case CausesIfRule (input_set , action , output_set) => empty_set
       case IfRule (input_set , output_set) => empty_set
@@ -62,27 +63,31 @@ trait PreprocessorTile
       case ForbidsToCauseRule (input_set , output_set) => empty_set
     }
 
-  def process_elem (elem : TilePair [Transition, Rule] ) : TileTriple [Transition, Rule, ActionSet]  =
-    TileTriple .mk (elem .fst) (elem .snd) (find (elem .fst) (elem .snd) )
+  def get_inhibit_set (transition : Transition) (rules : RuleSeq) : ActionSet =
+    rules
+      .flatMap ( rule => get_inhibit (transition) (rule) )
+      .toSet
 
-  lazy val map_tile = MapTile .mk [TilePair [Transition, Rule] , TileTriple [Transition, Rule, ActionSet] ] (process_elem)
+  def process_elem (elem : Transition) (rules : RuleSeq) : TilePair [Transition, ActionSet]  =
+    TilePair .mk (elem) (get_inhibit_set (elem) (rules) )
 
-  def apply (message : TileMessage [Seq [TilePair [Transition, Rule] ] ] )
-      : TileMessage [Seq [TileTriple [Transition, Rule, ActionSet] ] ] =
-    map_tile .apply (
+  def apply (message : TileMessage [Seq [Transition] ] )
+      : TileMessage [Seq [TilePair [Transition, ActionSet] ] ] =
+    MapTile
+      .mk [Transition, TilePair [Transition, ActionSet] ] (
+         transition => process_elem (transition) (message .context)
+      ) .apply (
       message
     )
 
 }
 
-case class PreprocessorTile_ () extends PreprocessorTile
+case class InhibitTile_ () extends InhibitTile
 
-object PreprocessorTile {
-  def mk : PreprocessorTile =
-    PreprocessorTile_ ()
+object InhibitTile {
+  def mk : InhibitTile =
+    InhibitTile_ ()
 }
-
-
 
 
 
@@ -205,7 +210,7 @@ trait VerifierTile
     ) (output .forall ( fluent => ! transition .output .contains (fluent) ) )
     else true
 
-  def verify_transition (transition : Transition) (rule : Rule) (inhibited : ActionSet) : Boolean =
+  def verify_transition (transition : Transition) (inhibited : ActionSet) (rule : Rule) : Boolean =
     rule match  {
       case CausesIfRule (input_set , action , output_set) => verify_CausesIfRule (transition) (inhibited) (input_set) (action) (output_set)
       case IfRule (input_set , output_set) => verify_IfRule (transition) (input_set) (output_set)
@@ -221,16 +226,16 @@ trait VerifierTile
       case ForbidsToCauseRule (input_set , output_set) => verify_ForbidsToCauseRule (transition) (input_set) (output_set)
     }
 
-  def verify_elem (elem : TileTriple [Transition, Rule, ActionSet] )
-      : TileQuad [Transition, Rule, ActionSet, Boolean] =
-    TileQuad .mk (elem .fst) (elem .snd) (elem .trd) (
-      verify_transition (elem .fst) (elem .snd) (elem .trd)
+  def verify_elem (elem : TilePair [TilePair [Transition, ActionSet] , Rule] )
+      : TileQuad [Transition, ActionSet, Rule, Boolean] =
+    TileQuad .mk (elem .fst .fst) (elem .fst .snd) (elem .snd) (
+      verify_transition (elem .fst .fst) (elem .fst .snd) (elem .snd)
     )
 
-  lazy val map_tile = MapTile .mk [TileTriple [Transition, Rule, ActionSet] , TileQuad [Transition, Rule, ActionSet, Boolean] ] (verify_elem)
+  lazy val map_tile = MapTile .mk [TilePair [TilePair [Transition, ActionSet] , Rule] , TileQuad [Transition, ActionSet, Rule, Boolean] ] (verify_elem)
 
-  def apply (message : TileMessage [Seq [TileTriple [Transition, Rule, ActionSet] ] ] )
-      : TileMessage [Seq [TileQuad [Transition, Rule, ActionSet, Boolean] ] ] =
+  def apply (message : TileMessage [Seq [TilePair [TilePair [Transition, ActionSet] , Rule] ] ] )
+      : TileMessage [Seq [TileQuad [Transition, ActionSet, Rule, Boolean] ] ] =
     map_tile .apply (
       message
     )
