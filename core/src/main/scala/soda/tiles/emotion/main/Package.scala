@@ -13,6 +13,7 @@ import   soda.tiles.emotion.entity.ActionSet
 import   soda.tiles.emotion.entity.Configuration
 import   soda.tiles.emotion.entity.InstanceBuilder
 import   soda.tiles.emotion.entity.Rule
+import   soda.tiles.emotion.entity.Trajectory
 import   soda.tiles.emotion.entity.Transition
 import   soda.tiles.emotion.io.SimpleFileReader
 import   soda.tiles.emotion.parser.YamlParser
@@ -22,6 +23,7 @@ import   soda.tiles.emotion.validator.ConfigurationValidator
 trait FinalReport
 {
 
+  def   iterations : Int
   def   transitions : Seq [TransitionReport]
   def   errors : Seq [String]
   def   reading_time : Long
@@ -29,11 +31,11 @@ trait FinalReport
 
 }
 
-case class FinalReport_ (transitions : Seq [TransitionReport], errors : Seq [String], reading_time : Long, execution_time : Long) extends FinalReport
+case class FinalReport_ (iterations : Int, transitions : Seq [TransitionReport], errors : Seq [String], reading_time : Long, execution_time : Long) extends FinalReport
 
 object FinalReport {
-  def mk (transitions : Seq [TransitionReport]) (errors : Seq [String]) (reading_time : Long) (execution_time : Long) : FinalReport =
-    FinalReport_ (transitions, errors, reading_time, execution_time)
+  def mk (iterations : Int) (transitions : Seq [TransitionReport]) (errors : Seq [String]) (reading_time : Long) (execution_time : Long) : FinalReport =
+    FinalReport_ (iterations, transitions, errors, reading_time, execution_time)
 }
 
 
@@ -47,6 +49,23 @@ trait InstanceProcessor
   lazy val error_configuration_is_undefined = "the input file cannot be read or the instance read is invalid"
 
   lazy val error_processing_instance = "error processing instance maybe due to a misspelled keyword"
+
+  def get_extended_trajectory (trajectory : Trajectory) (iterations : Int) : Trajectory =
+    if ( (trajectory .size >= 3) && (! (trajectory .size % 2 == 0) )
+    )
+      Seq
+        .fill (iterations) (trajectory .tail)
+        .iterator
+        .flatten
+        .toSeq
+        .+: (trajectory .head)
+    else
+      trajectory
+
+  def get_extended_configuration (conf : Configuration) (iterations : Int) : Configuration =
+    Configuration .mk (conf .fluents) (conf .actions) (conf .rules) (
+      get_extended_trajectory (conf .trajectory) (iterations)
+    )
 
   def get_transition_index (test_index : Int) (rule_set_size : Int) : Int =
     if ( (rule_set_size > 0)
@@ -63,29 +82,39 @@ trait InstanceProcessor
           x ._1 .fst) (x ._1 .snd) (x ._1 .trd) (x ._1 .fth)
       )
 
-  def mk_final_report (transitions : Seq [TransitionReport] ) (errors : Seq [String] ) (
+  def mk_final_report (iterations : Int) (transitions : Seq [TransitionReport] ) (errors : Seq [String] ) (
       reading_start : Long) (execution_start : Long) : FinalReport =
-    FinalReport .mk (transitions) (errors) (execution_start - reading_start) (System .nanoTime () - execution_start)
+    FinalReport .mk (iterations) (transitions) (errors) (execution_start - reading_start) (System .nanoTime () - execution_start)
 
   def process_after_computation (reading_start : Long) (seq : Seq [TransitionReport] ) (errors : Seq [String] ) (
-      execution_start : Long) : FinalReport =
+      iterations : Int) (execution_start : Long) : FinalReport =
     if ( seq .isEmpty
     )
-      mk_final_report (seq) (errors .++ (Seq [String] (error_processing_instance)
-        ) ) (reading_start) (execution_start)
-    else mk_final_report (seq) (errors) (reading_start) (execution_start)
+      mk_final_report (iterations) (seq) (
+        errors .++ (Seq [String] (error_processing_instance) )
+      ) (reading_start) (execution_start)
+    else mk_final_report (iterations) (seq) (errors) (reading_start) (execution_start)
 
   def process_instance_with (reading_start : Long) (conf : Configuration) (errors : Seq [String] ) (
-      execution_start : Long) : FinalReport =
+      iterations : Int) (execution_start : Long) : FinalReport =
     if ( errors .isEmpty
-    ) process_after_computation (reading_start) (process_configuration (conf) ) (errors) (execution_start)
-    else mk_final_report (Seq .empty) (errors) (reading_start) (execution_start)
+    )
+      process_after_computation (reading_start) (
+        process_configuration (
+          get_extended_configuration (conf) (iterations)
+        )
+      ) (errors) (iterations) (execution_start)
+    else mk_final_report (iterations) (Seq .empty) (errors) (reading_start) (execution_start)
 
-  def process_instance (reading_start : Long) (maybe_conf : Option [Configuration] ) (execution_start : Long) : FinalReport =
+  def process_instance (reading_start : Long) (maybe_conf : Option [Configuration] ) (iterations : Int) (execution_start : Long)
+      : FinalReport =
     maybe_conf match  {
-      case Some (conf) => process_instance_with (reading_start) (conf) (ConfigurationValidator .mk .validate (conf) ) (execution_start)
+      case Some (conf) =>
+        process_instance_with (reading_start) (conf) (
+          ConfigurationValidator .mk .validate (conf)
+        ) (iterations) (execution_start)
       case None =>
-        mk_final_report (Seq .empty) (
+        mk_final_report (iterations) (Seq .empty) (
           Seq [String] (error_configuration_is_undefined)
         ) (reading_start) (execution_start)
     }
@@ -115,9 +144,10 @@ trait Main
     "\nCopyright 2026 Julian Alfredo Mendez" +
     "\nhttps://julianmendez.github.io/emotional-reasoning" +
     "\n" +
-    "\nParameter: FILE_NAME" +
+    "\nParameters:  FILE_NAME  [ITERATIONS]" +
     "\n" +
     "\n  FILE_NAME     YAML file containing the instance" +
+    "\n  ITERATIONS    (optional) number of iterations; its default value is 1." +
     "\n" +
     "\n"
 
@@ -128,18 +158,25 @@ trait Main
     ) YamlParser .mk .parse ( new StringReader (maybe_content .get) )
     else None
 
-  def process_input_file (file_name : String) : String =
+  def process_input_file (file_name : String) (iterations : Int) : String =
     Serializer .mk .serialize (
       InstanceProcessor .mk .process_instance (System .nanoTime () ) (
         get_maybe_configuration (
           SimpleFileReader .mk .try_read_file (file_name)
         )
-      ) (System .nanoTime () )
+      ) (iterations) (System .nanoTime () )
     )
 
   def execute (arguments : List [String] ) : Unit =
     if ( (arguments .length > 0)
-    ) println (process_input_file (arguments (0) ) )
+    )
+      println (
+        process_input_file  (arguments (0) ) (
+          if ( arguments .length > 1
+          ) (arguments (1) ) .toIntOption .getOrElse (0)
+          else 1
+        )
+      )
     else
       println (
         SimpleFileReader .mk
@@ -219,9 +256,13 @@ trait Serializer
         ) + "\n"
     else ""
 
+  def serialize_iterations (iterations : Int) : String =
+    "- iterations: " + iterations + "\n"
+
   def serialize (report : FinalReport) : String =
     "---" + "\n" +
     serialize_errors (report .errors) +
+    serialize_iterations (report .iterations) +
     serialize_time_measures (report .reading_time) (report .execution_time) +
     serialize_invalid_transitions (report .transitions) +
     serialize_all_transitions (report .transitions)

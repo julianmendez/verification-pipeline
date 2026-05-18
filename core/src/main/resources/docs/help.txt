@@ -12,9 +12,10 @@ the [Soda][soda] language. It checks whether emotional constraints
 hold across state-action trajectories.
 
 
-Parameter: FILE_NAME
+Parameters:  FILE_NAME  [ITERATIONS]
 
    FILE_NAME     YAML file containing the instance
+   ITERATIONS    (optional) number of iterations; its default value is 1
 
 
 [tiles]: https://julianmendez.github.io/tiles

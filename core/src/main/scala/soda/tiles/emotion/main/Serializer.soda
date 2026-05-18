@@ -52,9 +52,13 @@ class Serializer
         ) + "\n"
     else ""
 
+  serialize_iterations (iterations : Int) : String =
+    "- iterations: " + iterations + "\n"
+
   serialize (report : FinalReport) : String =
     "---" + "\n" +
     serialize_errors (report .errors) +
+    serialize_iterations (report .iterations) +
     serialize_time_measures (report .reading_time) (report .execution_time) +
     serialize_invalid_transitions (report .transitions) +
     serialize_all_transitions (report .transitions)

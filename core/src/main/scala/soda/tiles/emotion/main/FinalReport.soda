@@ -2,6 +2,7 @@
 class FinalReport
 
   abstract
+    iterations : Int
     transitions : Seq [TransitionReport]
     errors : Seq [String]
     reading_time : Long

@@ -9,6 +9,23 @@ class InstanceProcessor
 
   error_processing_instance = "error processing instance maybe due to a misspelled keyword"
 
+  get_extended_trajectory (trajectory : Trajectory) (iterations : Int) : Trajectory =
+    if (trajectory .size >= 3) and (not (trajectory .size % 2 == 0) )
+    then
+      Seq
+        .fill (iterations) (trajectory .tail)
+        .iterator
+        .flatten
+        .toSeq
+        .+: (trajectory .head)
+    else
+      trajectory
+
+  get_extended_configuration (conf : Configuration) (iterations : Int) : Configuration =
+    Configuration .mk (conf .fluents) (conf .actions) (conf .rules) (
+      get_extended_trajectory (conf .trajectory) (iterations)
+    )
+
   get_transition_index (test_index : Int) (rule_set_size : Int) : Int =
     if (rule_set_size > 0)
     then test_index / rule_set_size
@@ -24,29 +41,39 @@ class InstanceProcessor
           x ._1 .fst) (x ._1 .snd) (x ._1 .trd) (x ._1 .fth)
       )
 
-  mk_final_report (transitions : Seq [TransitionReport] ) (errors : Seq [String] ) (
+  mk_final_report (iterations : Int) (transitions : Seq [TransitionReport] ) (errors : Seq [String] ) (
       reading_start : Long) (execution_start : Long) : FinalReport =
-    FinalReport .mk (transitions) (errors) (execution_start - reading_start) (System .nanoTime () - execution_start)
+    FinalReport .mk (iterations) (transitions) (errors) (execution_start - reading_start) (System .nanoTime () - execution_start)
 
   process_after_computation (reading_start : Long) (seq : Seq [TransitionReport] ) (errors : Seq [String] ) (
-      execution_start : Long) : FinalReport =
+      iterations : Int) (execution_start : Long) : FinalReport =
     if seq .isEmpty
     then
-      mk_final_report (seq) (errors .++ (Seq [String] (error_processing_instance)
-        ) ) (reading_start) (execution_start)
-    else mk_final_report (seq) (errors) (reading_start) (execution_start)
+      mk_final_report (iterations) (seq) (
+        errors .++ (Seq [String] (error_processing_instance) )
+      ) (reading_start) (execution_start)
+    else mk_final_report (iterations) (seq) (errors) (reading_start) (execution_start)
 
   process_instance_with (reading_start : Long) (conf : Configuration) (errors : Seq [String] ) (
-      execution_start : Long) : FinalReport =
+      iterations : Int) (execution_start : Long) : FinalReport =
     if errors .isEmpty
-    then process_after_computation (reading_start) (process_configuration (conf) ) (errors) (execution_start)
-    else mk_final_report (Seq .empty) (errors) (reading_start) (execution_start)
+    then
+      process_after_computation (reading_start) (
+        process_configuration (
+          get_extended_configuration (conf) (iterations)
+        )
+      ) (errors) (iterations) (execution_start)
+    else mk_final_report (iterations) (Seq .empty) (errors) (reading_start) (execution_start)
 
-  process_instance (reading_start : Long) (maybe_conf : Option [Configuration] ) (execution_start : Long) : FinalReport =
+  process_instance (reading_start : Long) (maybe_conf : Option [Configuration] ) (iterations : Int) (execution_start : Long)
+      : FinalReport =
     match maybe_conf
-      case Some (conf) ==> process_instance_with (reading_start) (conf) (ConfigurationValidator .mk .validate (conf) ) (execution_start)
+      case Some (conf) ==>
+        process_instance_with (reading_start) (conf) (
+          ConfigurationValidator .mk .validate (conf)
+        ) (iterations) (execution_start)
       case None ==>
-        mk_final_report (Seq .empty) (
+        mk_final_report (iterations) (Seq .empty) (
           Seq [String] (error_configuration_is_undefined)
         ) (reading_start) (execution_start)
 
