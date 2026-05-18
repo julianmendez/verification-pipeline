@@ -14,6 +14,7 @@ import
   soda.tiles.emotion.entity.Configuration
   soda.tiles.emotion.entity.InstanceBuilder
   soda.tiles.emotion.entity.Rule
+  soda.tiles.emotion.entity.Trajectory
   soda.tiles.emotion.entity.Transition
   soda.tiles.emotion.io.SimpleFileReader
   soda.tiles.emotion.parser.YamlParser

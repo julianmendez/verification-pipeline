@@ -13,9 +13,10 @@ class Main
     "\nCopyright 2026 Julian Alfredo Mendez" +
     "\nhttps://julianmendez.github.io/emotional-reasoning" +
     "\n" +
-    "\nParameter: FILE_NAME" +
+    "\nParameters:  FILE_NAME  [ITERATIONS]" +
     "\n" +
     "\n  FILE_NAME     YAML file containing the instance" +
+    "\n  ITERATIONS    (optional) number of iterations; its default value is 1." +
     "\n" +
     "\n"
 
@@ -26,18 +27,25 @@ class Main
     then YamlParser .mk .parse ( @new StringReader (maybe_content .get) )
     else None
 
-  process_input_file (file_name : String) : String =
+  process_input_file (file_name : String) (iterations : Int) : String =
     Serializer .mk .serialize (
       InstanceProcessor .mk .process_instance (System .nanoTime () ) (
         get_maybe_configuration (
           SimpleFileReader .mk .try_read_file (file_name)
         )
-      ) (System .nanoTime () )
+      ) (iterations) (System .nanoTime () )
     )
 
   execute (arguments : List [String] ) : Unit =
     if (arguments .length > 0)
-    then println (process_input_file (arguments (0) ) )
+    then
+      println (
+        process_input_file  (arguments (0) ) (
+          if arguments .length > 1
+          then (arguments (1) ) .toIntOption .getOrElse (0)
+          else 1
+        )
+      )
     else
       println (
         SimpleFileReader .mk
