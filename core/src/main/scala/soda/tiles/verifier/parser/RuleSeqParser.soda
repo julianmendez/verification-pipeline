@@ -10,7 +10,7 @@ class RuleSeqParser
   convert_to_map (s : Seq [Option [Rule] ] ) : Option [RuleSeq] =
     if (s .contains (None) )
     then None
-    else Some (s .flatten)
+    else Some (s .flatten .distinct)
 
   parse_sequence (part : Any) : Option [RuleSeq] =
     match part

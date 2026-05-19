@@ -585,7 +585,7 @@ trait RuleSeqParser
   def convert_to_map (s : Seq [Option [Rule] ] ) : Option [RuleSeq] =
     if ( (s .contains (None) )
     ) None
-    else Some (s .flatten)
+    else Some (s .flatten .distinct)
 
   def parse_sequence (part : Any) : Option [RuleSeq] =
     part match  {
