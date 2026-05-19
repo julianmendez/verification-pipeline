@@ -20,13 +20,17 @@ cat ${mainJarFile} >>${mainBinaryFile}
 chmod u+x ${mainBinaryFile}
 
 
-# Copy an example
+# Prepare directory for benchmarks
 
-exampleFile="core/src/test/resources/example/example-4.yaml"
-localExampleFile="example.yaml"
+benchmarkDirectory="target/benchmarks/"
+benchmarkScript="core/src/main/bash/run_benchmarks.sh"
+exampleFile="core/src/test/resources/example/example.yaml"
 
-if [ ! -f ${localExampleFile} ]; then
-  cp -p ${exampleFile} ${localExampleFile}
+if [ ! -d ${benchmarkDirectory} ]; then
+  mkdir -p ${benchmarkDirectory}
 fi
 
+cp -p ${mainBinaryFile} ${benchmarkDirectory}
+cp -p ${exampleFile} ${benchmarkDirectory}
+cp -p ${benchmarkScript} ${benchmarkDirectory}
 
