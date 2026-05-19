@@ -1,9 +1,9 @@
-# [Emotional Reasoning](https://julianmendez.github.io/emotional-reasoning/)
+# [Verification Pipeline](https://julianmendez.github.io/verification-pipeline/)
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)][license]
 [![build](https://github.com/julianmendez/tiles/workflows/Scala%20CI/badge.svg)][build-status]
 
-**Emotional Reasoning** is an instantiation of the Tiles framework. Its classes are written in [Soda][soda]
+**Verification Pipeline** is an instantiation of the Tiles framework. Its classes are written in [Soda][soda]
 and grouped in packages translated to [Scala][scala].
 
 
