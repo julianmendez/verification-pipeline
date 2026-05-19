@@ -1,7 +1,0 @@
-package soda.tiles.emotion.validator
-
-import
-  org.scalatest.funsuite.AnyFunSuite
-  soda.tiles.emotion.entity.FluentMap
-  soda.tiles.emotion.entity.FluentSet
-

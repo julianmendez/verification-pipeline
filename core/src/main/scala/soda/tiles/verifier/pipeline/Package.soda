@@ -1,0 +1,17 @@
+package soda.tiles.verifier.pipeline
+
+/*
+ * This package contains classes to model pipelines.
+ */
+
+import
+  soda.tiles.verifier.entity.ActionSet
+  soda.tiles.verifier.entity.Rule
+  soda.tiles.verifier.entity.TileMessage
+  soda.tiles.verifier.entity.TileQuad
+  soda.tiles.verifier.entity.Transition
+  soda.tiles.verifier.tile.composite.InhibitCrossVerifierTile
+  soda.tiles.verifier.tile.composite.TrajectoryTransitionsTile
+  soda.tiles.verifier.tile.constant.RulesTile
+
+

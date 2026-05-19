@@ -12,7 +12,7 @@ lean_lib «Soda» where
   -- add library configuration options here
 
 @[default_target]
-lean_exe «emotion» where
-  root := `Soda.tiles.emotion.main.Main
+lean_exe «verify» where
+  root := `Soda.tiles.verifier.main.Main
 
 

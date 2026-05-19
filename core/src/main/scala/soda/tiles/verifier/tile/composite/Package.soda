@@ -1,0 +1,20 @@
+package soda.tiles.verifier.tile.composite
+
+/*
+ * This package contains classes to model composite tiles.
+ */
+
+import
+  soda.tiles.verifier.entity.ActionSet
+  soda.tiles.verifier.entity.Rule
+  soda.tiles.verifier.entity.RuleSeq
+  soda.tiles.verifier.entity.TileMessage
+  soda.tiles.verifier.entity.TilePair
+  soda.tiles.verifier.entity.TileQuad
+  soda.tiles.verifier.entity.Transition
+  soda.tiles.verifier.entity.TransitionSeq
+  soda.tiles.verifier.tile.constant.TrajectoryTile
+  soda.tiles.verifier.tile.derived.InhibitTile
+  soda.tiles.verifier.tile.derived.TransitionsTile
+  soda.tiles.verifier.tile.derived.VerifierTile
+  soda.tiles.verifier.tile.primitive.CrossTile

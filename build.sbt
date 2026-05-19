@@ -69,7 +69,7 @@ lazy val root =
     .dependsOn(docs, core)
     .settings(
       commonSettings,
-      assembly / mainClass := Some("soda.tiles.emotion.main.EntryPoint"),
+      assembly / mainClass := Some("soda.tiles.verifier.main.EntryPoint"),
       assembly / assemblyJarName := "verifier-" + version.value + ".jar"
     )
 

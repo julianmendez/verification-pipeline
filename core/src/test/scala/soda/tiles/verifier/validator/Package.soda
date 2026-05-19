@@ -1,0 +1,7 @@
+package soda.tiles.verifier.validator
+
+import
+  org.scalatest.funsuite.AnyFunSuite
+  soda.tiles.verifier.entity.FluentMap
+  soda.tiles.verifier.entity.FluentSet
+

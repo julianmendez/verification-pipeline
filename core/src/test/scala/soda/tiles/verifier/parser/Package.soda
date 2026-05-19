@@ -1,0 +1,29 @@
+
+package soda.tiles.verifier.parser
+
+import
+  org.scalatest.funsuite.AnyFunSuite
+  java.nio.file.Files
+  java.nio.file.Paths
+  java.io.StringReader
+  soda.tiles.verifier.entity.Action
+  soda.tiles.verifier.entity.ActionSet
+  soda.tiles.verifier.entity.AllowsRule
+  soda.tiles.verifier.entity.CausesIfRule
+  soda.tiles.verifier.entity.Configuration
+  soda.tiles.verifier.entity.ContravenesRule
+  soda.tiles.verifier.entity.DefaultRule
+  soda.tiles.verifier.entity.FacilitatesRule
+  soda.tiles.verifier.entity.FluentName
+  soda.tiles.verifier.entity.FluentValue
+  soda.tiles.verifier.entity.ForbidsToCauseRule
+  soda.tiles.verifier.entity.IdentifierSet
+  soda.tiles.verifier.entity.IfRule
+  soda.tiles.verifier.entity.InfluencesIfRule
+  soda.tiles.verifier.entity.InfluencesRule
+  soda.tiles.verifier.entity.InhibitsRule
+  soda.tiles.verifier.entity.NoConcurrencyRule
+  soda.tiles.verifier.entity.Rule
+  soda.tiles.verifier.entity.RuleSeq
+  soda.tiles.verifier.entity.TriggersRule
+

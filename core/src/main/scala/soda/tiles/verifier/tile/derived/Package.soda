@@ -1,0 +1,39 @@
+package soda.tiles.verifier.tile.derived
+
+/*
+ * This package contains classes to model the blocks.
+ */
+
+import
+  soda.tiles.verifier.entity.Action
+  soda.tiles.verifier.entity.ActionSet
+  soda.tiles.verifier.entity.AllowsRule
+  soda.tiles.verifier.entity.CausesIfRule
+  soda.tiles.verifier.entity.ContravenesRule
+  soda.tiles.verifier.entity.DefaultRule
+  soda.tiles.verifier.entity.FacilitatesRule
+  soda.tiles.verifier.entity.FluentSet
+  soda.tiles.verifier.entity.FluentValue
+  soda.tiles.verifier.entity.ForbidsToCauseRule
+  soda.tiles.verifier.entity.IdentifierSet
+  soda.tiles.verifier.entity.IfRule
+  soda.tiles.verifier.entity.InfluencesIfRule
+  soda.tiles.verifier.entity.InfluencesRule
+  soda.tiles.verifier.entity.InhibitsRule
+  soda.tiles.verifier.entity.NoConcurrencyRule
+  soda.tiles.verifier.entity.Rule
+  soda.tiles.verifier.entity.RuleSeq
+  soda.tiles.verifier.entity.Transition
+  soda.tiles.verifier.entity.TransitionSeq
+  soda.tiles.verifier.entity.TileMessage
+  soda.tiles.verifier.entity.TileMessageBuilder
+  soda.tiles.verifier.entity.TilePair
+  soda.tiles.verifier.entity.TileTriple
+  soda.tiles.verifier.entity.TileQuad
+  soda.tiles.verifier.entity.Trajectory
+  soda.tiles.verifier.entity.TriggersRule
+  soda.tiles.verifier.tile.primitive.ApplyTile
+  soda.tiles.verifier.tile.primitive.FoldTile
+  soda.tiles.verifier.tile.primitive.MapTile
+
+
