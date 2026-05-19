@@ -37,10 +37,11 @@ class Serializer
   format_nanoseconds (x : Long) : String =
     "" + (x / 1000000) + " ms"
 
-  serialize_time_measures (reading_time : Long) (execution_time : Long) : String =
+  serialize_time_measures (reading_time : Long) (validation_time : Long) (execution_time : Long) : String =
     "- reading_time: " + format_nanoseconds(reading_time) + "\n" +
+    "- validation_time: " + format_nanoseconds(validation_time) + "\n" +
     "- execution_time: " + format_nanoseconds(execution_time) + "\n" +
-    "- total_time: " + format_nanoseconds(reading_time + execution_time) + "\n"
+    "- total_time: " + format_nanoseconds(reading_time + validation_time + execution_time) + "\n"
 
   serialize_errors (errors : Seq [String] ) : String =
     if (errors .nonEmpty)
@@ -59,7 +60,7 @@ class Serializer
     "---" + "\n" +
     serialize_errors (report .errors) +
     serialize_iterations (report .iterations) +
-    serialize_time_measures (report .reading_time) (report .execution_time) +
+    serialize_time_measures (report .reading_time) (report .validation_time) (report .execution_time) +
     serialize_invalid_transitions (report .transitions) +
     serialize_all_transitions (report .transitions)
 

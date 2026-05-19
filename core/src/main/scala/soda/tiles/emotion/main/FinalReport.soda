@@ -6,6 +6,7 @@ class FinalReport
     transitions : Seq [TransitionReport]
     errors : Seq [String]
     reading_time : Long
+    validation_time : Long
     execution_time : Long
 
 end

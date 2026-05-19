@@ -27,15 +27,16 @@ trait FinalReport
   def   transitions : Seq [TransitionReport]
   def   errors : Seq [String]
   def   reading_time : Long
+  def   validation_time : Long
   def   execution_time : Long
 
 }
 
-case class FinalReport_ (iterations : Int, transitions : Seq [TransitionReport], errors : Seq [String], reading_time : Long, execution_time : Long) extends FinalReport
+case class FinalReport_ (iterations : Int, transitions : Seq [TransitionReport], errors : Seq [String], reading_time : Long, validation_time : Long, execution_time : Long) extends FinalReport
 
 object FinalReport {
-  def mk (iterations : Int) (transitions : Seq [TransitionReport]) (errors : Seq [String]) (reading_time : Long) (execution_time : Long) : FinalReport =
-    FinalReport_ (iterations, transitions, errors, reading_time, execution_time)
+  def mk (iterations : Int) (transitions : Seq [TransitionReport]) (errors : Seq [String]) (reading_time : Long) (validation_time : Long) (execution_time : Long) : FinalReport =
+    FinalReport_ (iterations, transitions, errors, reading_time, validation_time, execution_time)
 }
 
 
@@ -83,40 +84,51 @@ trait InstanceProcessor
       )
 
   def mk_final_report (iterations : Int) (transitions : Seq [TransitionReport] ) (errors : Seq [String] ) (
-      reading_start : Long) (execution_start : Long) : FinalReport =
-    FinalReport .mk (iterations) (transitions) (errors) (execution_start - reading_start) (System .nanoTime () - execution_start)
+      reading_start : Long) (validation_start : Long) (execution_start : Long) : FinalReport =
+    FinalReport .mk (
+      iterations) (
+      transitions) (
+      errors) (
+      validation_start - reading_start) (
+      execution_start - validation_start) (
+      System .nanoTime () - execution_start
+    )
 
-  def process_after_computation (reading_start : Long) (seq : Seq [TransitionReport] ) (errors : Seq [String] ) (
-      iterations : Int) (execution_start : Long) : FinalReport =
+  def process_after_computation (seq : Seq [TransitionReport] ) (errors : Seq [String] ) (iterations : Int) (
+      reading_start : Long) (validation_start : Long) (execution_start : Long) : FinalReport =
     if ( seq .isEmpty
     )
       mk_final_report (iterations) (seq) (
         errors .++ (Seq [String] (error_processing_instance) )
-      ) (reading_start) (execution_start)
-    else mk_final_report (iterations) (seq) (errors) (reading_start) (execution_start)
+      ) (reading_start) (validation_start) (execution_start)
+    else mk_final_report (iterations) (seq) (errors) (reading_start) (validation_start) (execution_start)
 
-  def process_instance_with (reading_start : Long) (conf : Configuration) (errors : Seq [String] ) (
-      iterations : Int) (execution_start : Long) : FinalReport =
+  def process_validated_instance (conf : Configuration) (errors : Seq [String] ) (iterations : Int) (
+      reading_start : Long) (validation_start : Long) (execution_start : Long) : FinalReport =
     if ( errors .isEmpty
     )
-      process_after_computation (reading_start) (
-        process_configuration (
-          get_extended_configuration (conf) (iterations)
-        )
-      ) (errors) (iterations) (execution_start)
-    else mk_final_report (iterations) (Seq .empty) (errors) (reading_start) (execution_start)
+      process_after_computation (
+        process_configuration (conf)
+      ) (errors) (iterations) (reading_start) (validation_start) (execution_start)
+    else mk_final_report (iterations) (Seq .empty) (errors) (reading_start) (validation_start) (execution_start)
 
-  def process_instance (reading_start : Long) (maybe_conf : Option [Configuration] ) (iterations : Int) (execution_start : Long)
+  def process_instance (reading_start : Long) (conf : Configuration) (iterations : Int) (validation_start : Long)
       : FinalReport =
+    process_validated_instance (conf) (
+      ConfigurationValidator .mk .validate (conf)
+    ) (iterations) (reading_start) (validation_start) (System .nanoTime () )
+
+  def process_maybe_instance (reading_start : Long) (maybe_conf : Option [Configuration] ) (
+      iterations : Int) (validation_start : Long) : FinalReport =
     maybe_conf match  {
       case Some (conf) =>
-        process_instance_with (reading_start) (conf) (
-          ConfigurationValidator .mk .validate (conf)
-        ) (iterations) (execution_start)
+        process_instance (reading_start) (
+          get_extended_configuration (conf) (iterations)
+        ) (iterations) (validation_start)
       case None =>
         mk_final_report (iterations) (Seq .empty) (
           Seq [String] (error_configuration_is_undefined)
-        ) (reading_start) (execution_start)
+        ) (reading_start) (validation_start) (System .nanoTime () )
     }
 
 }
@@ -160,7 +172,7 @@ trait Main
 
   def process_input_file (file_name : String) (iterations : Int) : String =
     Serializer .mk .serialize (
-      InstanceProcessor .mk .process_instance (System .nanoTime () ) (
+      InstanceProcessor .mk .process_maybe_instance (System .nanoTime () ) (
         get_maybe_configuration (
           SimpleFileReader .mk .try_read_file (file_name)
         )
@@ -241,10 +253,11 @@ trait Serializer
   def format_nanoseconds (x : Long) : String =
     "" + (x / 1000000) + " ms"
 
-  def serialize_time_measures (reading_time : Long) (execution_time : Long) : String =
+  def serialize_time_measures (reading_time : Long) (validation_time : Long) (execution_time : Long) : String =
     "- reading_time: " + format_nanoseconds(reading_time) + "\n" +
+    "- validation_time: " + format_nanoseconds(validation_time) + "\n" +
     "- execution_time: " + format_nanoseconds(execution_time) + "\n" +
-    "- total_time: " + format_nanoseconds(reading_time + execution_time) + "\n"
+    "- total_time: " + format_nanoseconds(reading_time + validation_time + execution_time) + "\n"
 
   def serialize_errors (errors : Seq [String] ) : String =
     if ( (errors .nonEmpty)
@@ -263,7 +276,7 @@ trait Serializer
     "---" + "\n" +
     serialize_errors (report .errors) +
     serialize_iterations (report .iterations) +
-    serialize_time_measures (report .reading_time) (report .execution_time) +
+    serialize_time_measures (report .reading_time) (report .validation_time) (report .execution_time) +
     serialize_invalid_transitions (report .transitions) +
     serialize_all_transitions (report .transitions)
 
