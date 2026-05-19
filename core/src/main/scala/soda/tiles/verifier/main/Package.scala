@@ -269,6 +269,9 @@ trait ReportWriter
       .map ( x => write (writer) (
         sr .serialize_time_measures (report .reading_time) (report .validation_time) (report .execution_time) )
       )
+      .map ( x => write (writer) (
+        sr .serialize_valid_trajectory (report .transitions) )
+      )
       .map ( x => write_invalid_transitions (writer) (report .transitions) )
       .map ( x => write_all_transitions (writer) (report .transitions) )
       .map ( x => writer .flush () )
@@ -292,13 +295,11 @@ trait Serializer
 
   lazy val error_parsing_error = "parsing error possibly caused by a misspelled rule name or YAML key"
 
-  lazy val key_all_transitions = "- all_transitions:"
-
-  lazy val key_invalid_transitions = "- invalid_transitions:"
-
-  lazy val key_iterations = "- iterations: "
+  lazy val file_separator = "---"
 
   lazy val key_errors = "- errors:"
+
+  lazy val key_iterations = "- iterations: "
 
   lazy val key_reading_time = "- reading_time: "
 
@@ -308,7 +309,11 @@ trait Serializer
 
   lazy val key_total_time = "- total_time: "
 
-  lazy val file_separator = "---"
+  lazy val key_valid_trajectory = "- valid_trajectory: "
+
+  lazy val key_invalid_transitions = "- invalid_transitions:"
+
+  lazy val key_all_transitions = "- all_transitions:"
 
   def serialize_transition (entry : TransitionReport) : String =
     "  - test_index: " + entry .test_index + "\n" +
@@ -339,6 +344,14 @@ trait Serializer
           .mkString
     else ""
 
+  def serialize_valid_trajectory (transitions : Seq [TransitionReport] ) : String =
+    key_valid_trajectory + (
+      transitions .nonEmpty &&
+      transitions
+        .filter ( x => ! x .valid)
+        .isEmpty
+    ) + "\n"
+
   def format_nanoseconds (x : Long) : String =
     "" + (x / 1000000) + " ms"
 
@@ -366,6 +379,7 @@ trait Serializer
     serialize_errors (report .errors) +
     serialize_iterations (report .iterations) +
     serialize_time_measures (report .reading_time) (report .validation_time) (report .execution_time) +
+    serialize_valid_trajectory (report .transitions) +
     serialize_invalid_transitions (report .transitions) +
     serialize_all_transitions (report .transitions)
 

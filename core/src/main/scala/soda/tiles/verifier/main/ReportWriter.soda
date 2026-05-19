@@ -53,6 +53,9 @@ class ReportWriter
       .map (lambda x --> write (writer) (
         sr .serialize_time_measures (report .reading_time) (report .validation_time) (report .execution_time) )
       )
+      .map (lambda x --> write (writer) (
+        sr .serialize_valid_trajectory (report .transitions) )
+      )
       .map (lambda x --> write_invalid_transitions (writer) (report .transitions) )
       .map (lambda x --> write_all_transitions (writer) (report .transitions) )
       .map (lambda x --> writer .flush () )

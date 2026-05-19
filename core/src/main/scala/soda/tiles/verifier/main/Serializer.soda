@@ -5,13 +5,11 @@ class Serializer
 
   error_parsing_error = "parsing error possibly caused by a misspelled rule name or YAML key"
 
-  key_all_transitions = "- all_transitions:"
-
-  key_invalid_transitions = "- invalid_transitions:"
-
-  key_iterations = "- iterations: "
+  file_separator = "---"
 
   key_errors = "- errors:"
+
+  key_iterations = "- iterations: "
 
   key_reading_time = "- reading_time: "
 
@@ -21,7 +19,11 @@ class Serializer
 
   key_total_time = "- total_time: "
 
-  file_separator = "---"
+  key_valid_trajectory = "- valid_trajectory: "
+
+  key_invalid_transitions = "- invalid_transitions:"
+
+  key_all_transitions = "- all_transitions:"
 
   serialize_transition (entry : TransitionReport) : String =
     "  - test_index: " + entry .test_index + "\n" +
@@ -52,6 +54,14 @@ class Serializer
           .mkString
     else ""
 
+  serialize_valid_trajectory (transitions : Seq [TransitionReport] ) : String =
+    key_valid_trajectory + (
+      transitions .nonEmpty and
+      transitions
+        .filter (lambda x --> not x .valid)
+        .isEmpty
+    ) + "\n"
+
   format_nanoseconds (x : Long) : String =
     "" + (x / 1000000) + " ms"
 
@@ -79,6 +89,7 @@ class Serializer
     serialize_errors (report .errors) +
     serialize_iterations (report .iterations) +
     serialize_time_measures (report .reading_time) (report .validation_time) (report .execution_time) +
+    serialize_valid_trajectory (report .transitions) +
     serialize_invalid_transitions (report .transitions) +
     serialize_all_transitions (report .transitions)
 
