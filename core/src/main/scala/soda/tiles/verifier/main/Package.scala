@@ -151,10 +151,10 @@ trait Main
 
 
   lazy val help = "" +
-    "\nEmotional Reasoning" +
+    "\nVerification Pipeline" +
     "\n" +
     "\nCopyright 2026 Julian Alfredo Mendez" +
-    "\nhttps://julianmendez.github.io/emotional-reasoning" +
+    "\nhttps://julianmendez.github.io/verification-pipeline" +
     "\n" +
     "\nParameters:  FILE_NAME  [ITERATIONS]" +
     "\n" +
@@ -163,7 +163,7 @@ trait Main
     "\n" +
     "\n"
 
-  lazy val help_file : String = "/docs/help.txt"
+  lazy val help_file : String = "/docs/help.md"
 
   def get_maybe_configuration (maybe_content : Try [String] ) : Option [Configuration] =
     if ( maybe_content .isSuccess

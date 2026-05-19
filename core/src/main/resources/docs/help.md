@@ -1,22 +1,21 @@
 
-# Emotional Reasoning
+
+# Verification Pipeline
 
 Copyright 2026 Julian Alfredo Mendez
-https://julianmendez.github.io/emotional-reasoning
+https://julianmendez.github.io/verification-pipeline
 
-Emotional Reasoning is a tool that provides a modular way
+Verification Pipeline is a tool that provides a modular way
 to model how emotions change in intelligent systems.
 It does this by composing functions into pipelines
 using the [Tiles][tiles] framework, specifying behavior in
 the [Soda][soda] language. It checks whether emotional constraints
 hold across state-action trajectories.
 
-
 Parameters:  FILE_NAME  [ITERATIONS]
 
    FILE_NAME     YAML file containing the instance
    ITERATIONS    (optional) number of iterations; its default value is 1
-
 
 [tiles]: https://julianmendez.github.io/tiles
 
@@ -74,7 +73,6 @@ The available rules are:
   - rule: ForbidsToCauseRule
     input: FLUENTS
     output: FLUENTS
-
 
 where
   FLUENT is a fluent value
