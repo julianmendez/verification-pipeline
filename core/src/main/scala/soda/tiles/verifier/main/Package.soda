@@ -1,0 +1,22 @@
+package soda.tiles.verifier.main
+
+/*
+ * This package is for the main class.
+ * This is the entry point when the application is executed from a terminal.
+ */
+
+import
+  java.io.StringReader
+  java.nio.file.Files
+  java.nio.file.Paths
+  scala.util.Try
+  soda.tiles.verifier.entity.ActionSet
+  soda.tiles.verifier.entity.Configuration
+  soda.tiles.verifier.entity.InstanceBuilder
+  soda.tiles.verifier.entity.Rule
+  soda.tiles.verifier.entity.Trajectory
+  soda.tiles.verifier.entity.Transition
+  soda.tiles.verifier.io.SimpleFileReader
+  soda.tiles.verifier.parser.YamlParser
+  soda.tiles.verifier.pipeline.VerificationPipeline
+  soda.tiles.verifier.validator.ConfigurationValidator

@@ -1,0 +1,12 @@
+package soda.tiles.verifier.tile.primitive
+
+/*
+ * This package contains classes to model the primitive tiles.
+ */
+
+import
+  soda.tiles.verifier.entity.TileMessage
+  soda.tiles.verifier.entity.TileMessageBuilder
+  soda.tiles.verifier.entity.TilePair
+  soda.tiles.verifier.entity.TileTriple
+

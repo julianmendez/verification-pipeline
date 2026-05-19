@@ -1,0 +1,19 @@
+package soda.tiles.verifier.tile.primitive
+
+/*
+ * This package contains tests for the primitive tiles.
+ */
+
+import
+  org.scalatest.funsuite.AnyFunSuite
+  soda.tiles.verifier.entity.Action
+  soda.tiles.verifier.entity.FluentValue
+  soda.tiles.verifier.entity.IdentifierSet
+  soda.tiles.verifier.entity.IfRule
+  soda.tiles.verifier.entity.InhibitsRule
+  soda.tiles.verifier.entity.NoConcurrencyRule
+  soda.tiles.verifier.entity.Rule
+  soda.tiles.verifier.entity.TileMessage
+  soda.tiles.verifier.entity.TileMessageBuilder
+  soda.tiles.verifier.entity.TilePair
+

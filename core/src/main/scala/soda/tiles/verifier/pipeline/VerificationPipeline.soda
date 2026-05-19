@@ -1,0 +1,34 @@
+
+/**
+ * This pipeline returns a sequence of Boolean values with the transitions,
+ * where 'true' means that the transition was correct, and 'false' means that the transition was wrong.
+ */
+
+class VerificationPipeline
+
+  abstract
+
+  rules_tile = RulesTile .mk
+
+  trajectory_transitions_tile = TrajectoryTransitionsTile .mk
+
+  inhibit_cross_verifier_tile = InhibitCrossVerifierTile .mk
+
+  apply (message : TileMessage [Boolean] )
+      : TileMessage [Seq [TileQuad [Transition] [ActionSet] [Rule] [Boolean] ] ] =
+    inhibit_cross_verifier_tile .apply (
+      trajectory_transitions_tile .apply (
+        message
+      )
+    ) (
+      rules_tile .apply (
+        message
+      )
+    )
+
+  run (message : TileMessage [Boolean] )
+    : TileMessage [Seq [TileQuad [Transition] [ActionSet] [Rule] [Boolean] ] ] =
+    apply (message)
+
+end
+

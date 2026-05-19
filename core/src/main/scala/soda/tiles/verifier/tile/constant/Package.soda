@@ -1,0 +1,12 @@
+package soda.tiles.verifier.tile.constant
+
+/*
+ * This package contains classes to model the tiles.
+ */
+
+import
+  soda.tiles.verifier.entity.Context
+  soda.tiles.verifier.entity.Instance
+  soda.tiles.verifier.entity.TileMessage
+  soda.tiles.verifier.entity.TileMessageBuilder
+
