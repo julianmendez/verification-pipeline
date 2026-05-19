@@ -22,29 +22,29 @@ class Main
 
   help_file : String = "/docs/help.md"
 
+  output = @new PrintWriter (System .out)
+
   get_maybe_configuration (maybe_content : Try [String] ) : Option [Configuration] =
     if maybe_content .isSuccess
     then YamlParser .mk .parse ( @new StringReader (maybe_content .get) )
     else None
 
-  process_input_file (file_name : String) (iterations : Int) : String =
-    Serializer .mk .serialize (
+  process_input_file (file_name : String) (iterations : Int) : Boolean =
+    ReportWriter .mk .write (
       InstanceProcessor .mk .process_maybe_instance (System .nanoTime () ) (
         get_maybe_configuration (
           SimpleFileReader .mk .try_read_file (file_name)
         )
       ) (iterations) (System .nanoTime () )
-    )
+    ) (output)
 
   execute (arguments : List [String] ) : Unit =
     if (arguments .length > 0)
     then
-      println (
-        process_input_file  (arguments (0) ) (
-          if arguments .length > 1
-          then (arguments (1) ) .toIntOption .getOrElse (0)
-          else 1
-        )
+      process_input_file  (arguments (0) ) (
+        if arguments .length > 1
+        then (arguments (1) ) .toIntOption .getOrElse (0)
+        else 1
       )
     else
       println (

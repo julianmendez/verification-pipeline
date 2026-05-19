@@ -6,8 +6,8 @@ package soda.tiles.verifier.main
  */
 
 import   java.io.StringReader
-import   java.nio.file.Files
-import   java.nio.file.Paths
+import   java.io.PrintWriter
+import   java.io.Writer
 import   scala.util.Try
 import   soda.tiles.verifier.entity.ActionSet
 import   soda.tiles.verifier.entity.Configuration
@@ -165,29 +165,29 @@ trait Main
 
   lazy val help_file : String = "/docs/help.md"
 
+  lazy val output = new PrintWriter (System .out)
+
   def get_maybe_configuration (maybe_content : Try [String] ) : Option [Configuration] =
     if ( maybe_content .isSuccess
     ) YamlParser .mk .parse ( new StringReader (maybe_content .get) )
     else None
 
-  def process_input_file (file_name : String) (iterations : Int) : String =
-    Serializer .mk .serialize (
+  def process_input_file (file_name : String) (iterations : Int) : Boolean =
+    ReportWriter .mk .write (
       InstanceProcessor .mk .process_maybe_instance (System .nanoTime () ) (
         get_maybe_configuration (
           SimpleFileReader .mk .try_read_file (file_name)
         )
       ) (iterations) (System .nanoTime () )
-    )
+    ) (output)
 
   def execute (arguments : List [String] ) : Unit =
     if ( (arguments .length > 0)
     )
-      println (
-        process_input_file  (arguments (0) ) (
-          if ( arguments .length > 1
-          ) (arguments (1) ) .toIntOption .getOrElse (0)
-          else 1
-        )
+      process_input_file  (arguments (0) ) (
+        if ( arguments .length > 1
+        ) (arguments (1) ) .toIntOption .getOrElse (0)
+        else 1
       )
     else
       println (
@@ -214,12 +214,106 @@ object Main {
 }
 
 
+trait ReportWriter
+{
+
+
+
+  lazy val sr = Serializer .mk
+
+  def write (writer : Writer) (content : String) : Boolean =
+    Some [Boolean] (true)
+      .map ( x => writer .write (content) )
+      .map ( x => true)
+      .getOrElse (false)
+
+  def write_all_transitions (writer : Writer) (transitions : Seq [TransitionReport] ) : Boolean =
+    if ( (transitions .nonEmpty)
+    )
+      Some (true)
+        .map ( x => write (writer) (sr .key_all_transitions + "\n") )
+        .map ( x =>
+          transitions
+            .map ( x => write (writer) (sr .serialize_transition (x) ) )
+        )
+        .map ( x => true)
+        .getOrElse (false)
+    else false
+
+  def write_invalid_transitions(writer : Writer)  (transitions : Seq [TransitionReport] ) : Boolean =
+    if ( (transitions
+      .filter ( x => ! x .valid)
+      .nonEmpty)
+    )
+      Some (true)
+        .map ( x => write (writer) (sr .key_invalid_transitions + "\n") )
+        .map ( x =>
+          transitions
+            .filter ( x => ! x .valid)
+            .map ( x => write (writer) (sr .serialize_transition (x) ) )
+        )
+        .map ( x => true)
+        .getOrElse (false)
+    else false
+
+  def write (report : FinalReport) (writer : Writer) : Boolean =
+    Some [Boolean] (true)
+      .map ( x => write (writer) (sr .file_separator + "\n")
+      )
+      .map ( x => write (writer) (
+        sr .serialize_errors (report .errors) )
+      )
+      .map ( x => write (writer) (
+        sr .serialize_iterations (report .iterations) )
+      )
+      .map ( x => write (writer) (
+        sr .serialize_time_measures (report .reading_time) (report .validation_time) (report .execution_time) )
+      )
+      .map ( x => write (writer) (
+        sr .serialize_valid_trajectory (report .transitions) )
+      )
+      .map ( x => write_invalid_transitions (writer) (report .transitions) )
+      .map ( x => write_all_transitions (writer) (report .transitions) )
+      .map ( x => writer .flush () )
+      .map ( x => true)
+      .getOrElse (false)
+
+}
+
+case class ReportWriter_ () extends ReportWriter
+
+object ReportWriter {
+  def mk : ReportWriter =
+    ReportWriter_ ()
+}
+
+
 trait Serializer
 {
 
 
 
   lazy val error_parsing_error = "parsing error possibly caused by a misspelled rule name or YAML key"
+
+  lazy val file_separator = "---"
+
+  lazy val key_errors = "- errors:"
+
+  lazy val key_iterations = "- iterations: "
+
+  lazy val key_reading_time = "- reading_time: "
+
+  lazy val key_validation_time = "- validation_time: "
+
+  lazy val key_execution_time = "- execution_time: "
+
+  lazy val key_total_time = "- total_time: "
+
+  lazy val key_valid_trajectory = "- valid_trajectory: "
+
+  lazy val key_invalid_transitions = "- invalid_transitions:"
+
+  lazy val key_all_transitions = "- all_transitions:"
 
   def serialize_transition (entry : TransitionReport) : String =
     "  - test_index: " + entry .test_index + "\n" +
@@ -229,40 +323,48 @@ trait Serializer
     "    rule: " + entry .rule + "\n" +
     "    valid: " + entry .valid + "\n"
 
-  def serialize_all_transitions (transitions : Seq [TransitionReport] ) :String =
+  def serialize_all_transitions (transitions : Seq [TransitionReport] ) : String =
     if ( (transitions .nonEmpty)
     )
-      "- all_transitions:" + "\n" +
+        key_all_transitions + "\n" +
         transitions
           .map ( x => serialize_transition (x) )
           .mkString
     else ""
 
-  def serialize_invalid_transitions (transitions : Seq [TransitionReport] ) :String =
+  def serialize_invalid_transitions (transitions : Seq [TransitionReport] ) : String =
     if ( (transitions
       .filter ( x => ! x .valid)
       .nonEmpty)
     )
-      "- invalid_transitions:" + "\n" +
+       key_invalid_transitions + "\n" +
         transitions
           .filter ( x => ! x .valid)
           .map ( x => serialize_transition (x) )
           .mkString
     else ""
 
+  def serialize_valid_trajectory (transitions : Seq [TransitionReport] ) : String =
+    key_valid_trajectory + (
+      transitions .nonEmpty &&
+      transitions
+        .filter ( x => ! x .valid)
+        .isEmpty
+    ) + "\n"
+
   def format_nanoseconds (x : Long) : String =
     "" + (x / 1000000) + " ms"
 
   def serialize_time_measures (reading_time : Long) (validation_time : Long) (execution_time : Long) : String =
-    "- reading_time: " + format_nanoseconds(reading_time) + "\n" +
-    "- validation_time: " + format_nanoseconds(validation_time) + "\n" +
-    "- execution_time: " + format_nanoseconds(execution_time) + "\n" +
-    "- total_time: " + format_nanoseconds(reading_time + validation_time + execution_time) + "\n"
+    key_reading_time + format_nanoseconds(reading_time) + "\n" +
+    key_validation_time + format_nanoseconds(validation_time) + "\n" +
+    key_execution_time + format_nanoseconds(execution_time) + "\n" +
+    key_total_time + format_nanoseconds(reading_time + validation_time + execution_time) + "\n"
 
   def serialize_errors (errors : Seq [String] ) : String =
     if ( (errors .nonEmpty)
     )
-      "- errors:" + "\n" +
+      key_errors + "\n" +
         (errors
           .map ( x => "  - " + x)
           .mkString ("\n")
@@ -270,13 +372,14 @@ trait Serializer
     else ""
 
   def serialize_iterations (iterations : Int) : String =
-    "- iterations: " + iterations + "\n"
+    key_iterations + iterations + "\n"
 
   def serialize (report : FinalReport) : String =
-    "---" + "\n" +
+    file_separator + "\n" +
     serialize_errors (report .errors) +
     serialize_iterations (report .iterations) +
     serialize_time_measures (report .reading_time) (report .validation_time) (report .execution_time) +
+    serialize_valid_trajectory (report .transitions) +
     serialize_invalid_transitions (report .transitions) +
     serialize_all_transitions (report .transitions)
 
