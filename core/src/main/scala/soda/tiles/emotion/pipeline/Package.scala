@@ -18,7 +18,7 @@ import   soda.tiles.emotion.tile.constant.RulesTile
  * where 'true' means that the transition was correct, and 'false' means that the transition was wrong.
  */
 
-trait EmotionalReasoningPipeline
+trait VerificationPipeline
 {
 
 
@@ -47,10 +47,10 @@ trait EmotionalReasoningPipeline
 
 }
 
-case class EmotionalReasoningPipeline_ () extends EmotionalReasoningPipeline
+case class VerificationPipeline_ () extends VerificationPipeline
 
-object EmotionalReasoningPipeline {
-  def mk : EmotionalReasoningPipeline =
-    EmotionalReasoningPipeline_ ()
+object VerificationPipeline {
+  def mk : VerificationPipeline =
+    VerificationPipeline_ ()
 }
 

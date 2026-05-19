@@ -17,7 +17,7 @@ import   soda.tiles.emotion.entity.Trajectory
 import   soda.tiles.emotion.entity.Transition
 import   soda.tiles.emotion.io.SimpleFileReader
 import   soda.tiles.emotion.parser.YamlParser
-import   soda.tiles.emotion.pipeline.EmotionalReasoningPipeline
+import   soda.tiles.emotion.pipeline.VerificationPipeline
 import   soda.tiles.emotion.validator.ConfigurationValidator
 
 trait FinalReport
@@ -74,7 +74,7 @@ trait InstanceProcessor
     else 0
 
   def process_configuration (configuration : Configuration) : Seq [TransitionReport] =
-    EmotionalReasoningPipeline .mk
+    VerificationPipeline .mk
       .run (InstanceBuilder .mk .build (configuration) )
       .contents
       .zipWithIndex

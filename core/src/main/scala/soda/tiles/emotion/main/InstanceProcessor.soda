@@ -32,7 +32,7 @@ class InstanceProcessor
     else 0
 
   process_configuration (configuration : Configuration) : Seq [TransitionReport] =
-    EmotionalReasoningPipeline .mk
+    VerificationPipeline .mk
       .run (InstanceBuilder .mk .build (configuration) )
       .contents
       .zipWithIndex

@@ -18,5 +18,5 @@ import
   soda.tiles.emotion.entity.Transition
   soda.tiles.emotion.io.SimpleFileReader
   soda.tiles.emotion.parser.YamlParser
-  soda.tiles.emotion.pipeline.EmotionalReasoningPipeline
+  soda.tiles.emotion.pipeline.VerificationPipeline
   soda.tiles.emotion.validator.ConfigurationValidator

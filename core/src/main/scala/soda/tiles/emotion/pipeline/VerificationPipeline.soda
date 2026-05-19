@@ -4,7 +4,7 @@
  * where 'true' means that the transition was correct, and 'false' means that the transition was wrong.
  */
 
-class EmotionalReasoningPipeline
+class VerificationPipeline
 
   abstract
 
