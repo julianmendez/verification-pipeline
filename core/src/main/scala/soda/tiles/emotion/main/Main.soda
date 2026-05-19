@@ -29,7 +29,7 @@ class Main
 
   process_input_file (file_name : String) (iterations : Int) : String =
     Serializer .mk .serialize (
-      InstanceProcessor .mk .process_instance (System .nanoTime () ) (
+      InstanceProcessor .mk .process_maybe_instance (System .nanoTime () ) (
         get_maybe_configuration (
           SimpleFileReader .mk .try_read_file (file_name)
         )
