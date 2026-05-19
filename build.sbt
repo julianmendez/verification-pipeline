@@ -8,8 +8,8 @@ lazy val commonSettings =
   Seq(
     organization := "se.umu.cs.tiles",
     version := "0.1.0",
-    description := "Instance of the Tiles framework to model emotional reasoning",
-    homepage := Some(url("https://julianmendez.github.io/emotional-reasoning/")),
+    description := "A verification pipeline based on the Tiles framework",
+    homepage := Some(url("https://julianmendez.github.io/verification-pipeline/")),
     startYear := Some(2023),
     licenses := Seq("Apache License Version 2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.txt")),
     organizationName := "Umea University",
@@ -63,13 +63,13 @@ lazy val core =
 
 lazy val root =
   project
-    .withId("emotion")
+    .withId("verifier")
     .in(file("."))
     .aggregate(docs, core)
     .dependsOn(docs, core)
     .settings(
       commonSettings,
       assembly / mainClass := Some("soda.tiles.emotion.main.EntryPoint"),
-      assembly / assemblyJarName := "emotion-" + version.value + ".jar"
+      assembly / assemblyJarName := "verifier-" + version.value + ".jar"
     )
 
