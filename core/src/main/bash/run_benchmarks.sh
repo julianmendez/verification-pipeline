@@ -9,7 +9,7 @@
 start=100
 increment=100
 repetitions=10
-application="emotion"
+application="verify"
 defaultInput="example.yaml"
 pattern="execution_time:"
 milliseconds="ms"

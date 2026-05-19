@@ -12,8 +12,8 @@ sbt scalaVersion sbtVersion version clean compile test package assembly
 
 # Build the main binary file
 
-mainBinaryFile="emotion"
-mainJarFile="target/scala-${scalaVersion}/${mainBinaryFile}-*.jar"
+mainBinaryFile="verify"
+mainJarFile="target/scala-${scalaVersion}/verifier-*.jar"
 
 echo ${executableStub} >${mainBinaryFile}
 cat ${mainJarFile} >>${mainBinaryFile}
@@ -22,8 +22,8 @@ chmod u+x ${mainBinaryFile}
 
 # Copy an example
 
-exampleFile="core/src/test/resources/example/example-1.yaml"
-localExampleFile="example-1.yaml"
+exampleFile="core/src/test/resources/example/example-4.yaml"
+localExampleFile="example.yaml"
 
 if [ ! -f ${localExampleFile} ]; then
   cp -p ${exampleFile} ${localExampleFile}
