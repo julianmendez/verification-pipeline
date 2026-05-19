@@ -7,8 +7,8 @@ package soda.tiles.verifier.main
 
 import
   java.io.StringReader
-  java.nio.file.Files
-  java.nio.file.Paths
+  java.io.PrintWriter
+  java.io.Writer
   scala.util.Try
   soda.tiles.verifier.entity.ActionSet
   soda.tiles.verifier.entity.Configuration

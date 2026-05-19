@@ -1,0 +1,63 @@
+
+class ReportWriter
+
+  abstract
+
+  sr = Serializer .mk
+
+  write (writer : Writer) (content : String) : Boolean =
+    Some [Boolean] (true)
+      .map (lambda x --> writer .write (content) )
+      .map (lambda x --> true)
+      .getOrElse (false)
+
+  write_all_transitions (writer : Writer) (transitions : Seq [TransitionReport] ) : Boolean =
+    if (transitions .nonEmpty)
+    then
+      Some (true)
+        .map (lambda x --> write (writer) (sr .key_all_transitions + "\n") )
+        .map (lambda x -->
+          transitions
+            .map (lambda x --> write (writer) (sr .serialize_transition (x) ) )
+        )
+        .map (lambda x --> true)
+        .getOrElse (false)
+    else false
+
+  write_invalid_transitions(writer : Writer)  (transitions : Seq [TransitionReport] ) : Boolean =
+    if (transitions
+      .filter (lambda x --> not x .valid)
+      .nonEmpty)
+    then
+      Some (true)
+        .map (lambda x --> write (writer) (sr .key_invalid_transitions + "\n") )
+        .map (lambda x -->
+          transitions
+            .filter (lambda x --> not x .valid)
+            .map (lambda x --> write (writer) (sr .serialize_transition (x) ) )
+        )
+        .map (lambda x --> true)
+        .getOrElse (false)
+    else false
+
+  write (report : FinalReport) (writer : Writer) : Boolean =
+    Some [Boolean] (true)
+      .map (lambda x --> write (writer) (sr .file_separator + "\n")
+      )
+      .map (lambda x --> write (writer) (
+        sr .serialize_errors (report .errors) )
+      )
+      .map (lambda x --> write (writer) (
+        sr .serialize_iterations (report .iterations) )
+      )
+      .map (lambda x --> write (writer) (
+        sr .serialize_time_measures (report .reading_time) (report .validation_time) (report .execution_time) )
+      )
+      .map (lambda x --> write_invalid_transitions (writer) (report .transitions) )
+      .map (lambda x --> write_all_transitions (writer) (report .transitions) )
+      .map (lambda x --> writer .flush () )
+      .map (lambda x --> true)
+      .getOrElse (false)
+
+end
+

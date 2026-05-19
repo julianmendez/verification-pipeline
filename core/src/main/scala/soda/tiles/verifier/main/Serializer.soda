@@ -5,6 +5,24 @@ class Serializer
 
   error_parsing_error = "parsing error possibly caused by a misspelled rule name or YAML key"
 
+  key_all_transitions = "- all_transitions:"
+
+  key_invalid_transitions = "- invalid_transitions:"
+
+  key_iterations = "- iterations: "
+
+  key_errors = "- errors:"
+
+  key_reading_time = "- reading_time: "
+
+  key_validation_time = "- validation_time: "
+
+  key_execution_time = "- execution_time: "
+
+  key_total_time = "- total_time: "
+
+  file_separator = "---"
+
   serialize_transition (entry : TransitionReport) : String =
     "  - test_index: " + entry .test_index + "\n" +
     "    transition_index: " + entry .transition_index + "\n" +
@@ -13,21 +31,21 @@ class Serializer
     "    rule: " + entry .rule + "\n" +
     "    valid: " + entry .valid + "\n"
 
-  serialize_all_transitions (transitions : Seq [TransitionReport] ) :String =
+  serialize_all_transitions (transitions : Seq [TransitionReport] ) : String =
     if (transitions .nonEmpty)
     then
-      "- all_transitions:" + "\n" +
+        key_all_transitions + "\n" +
         transitions
           .map (lambda x --> serialize_transition (x) )
           .mkString
     else ""
 
-  serialize_invalid_transitions (transitions : Seq [TransitionReport] ) :String =
+  serialize_invalid_transitions (transitions : Seq [TransitionReport] ) : String =
     if (transitions
       .filter (lambda x --> not x .valid)
       .nonEmpty)
     then
-      "- invalid_transitions:" + "\n" +
+       key_invalid_transitions + "\n" +
         transitions
           .filter (lambda x --> not x .valid)
           .map (lambda x --> serialize_transition (x) )
@@ -38,15 +56,15 @@ class Serializer
     "" + (x / 1000000) + " ms"
 
   serialize_time_measures (reading_time : Long) (validation_time : Long) (execution_time : Long) : String =
-    "- reading_time: " + format_nanoseconds(reading_time) + "\n" +
-    "- validation_time: " + format_nanoseconds(validation_time) + "\n" +
-    "- execution_time: " + format_nanoseconds(execution_time) + "\n" +
-    "- total_time: " + format_nanoseconds(reading_time + validation_time + execution_time) + "\n"
+    key_reading_time + format_nanoseconds(reading_time) + "\n" +
+    key_validation_time + format_nanoseconds(validation_time) + "\n" +
+    key_execution_time + format_nanoseconds(execution_time) + "\n" +
+    key_total_time + format_nanoseconds(reading_time + validation_time + execution_time) + "\n"
 
   serialize_errors (errors : Seq [String] ) : String =
     if (errors .nonEmpty)
     then
-      "- errors:" + "\n" +
+      key_errors + "\n" +
         (errors
           .map (lambda x --> "  - " + x)
           .mkString ("\n")
@@ -54,10 +72,10 @@ class Serializer
     else ""
 
   serialize_iterations (iterations : Int) : String =
-    "- iterations: " + iterations + "\n"
+    key_iterations + iterations + "\n"
 
   serialize (report : FinalReport) : String =
-    "---" + "\n" +
+    file_separator + "\n" +
     serialize_errors (report .errors) +
     serialize_iterations (report .iterations) +
     serialize_time_measures (report .reading_time) (report .validation_time) (report .execution_time) +
