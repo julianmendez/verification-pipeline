@@ -71,7 +71,7 @@ These are some of the implemented fairness tiles for the scenario:
 
 [TransitionsTile]: https://github.com/julianmendez/verification-pipeline/blob/master/core/src/main/scala/soda/tiles/verifier/tile/derived/TransitionsTile.soda
 
-[VerificationPipeline]: https://github.com/julianmendez/verification-pipeline/blob/master/core/src/main/scala/soda/tiles/verifier/tile/pipeline/VerificationPipeline.soda
+[VerificationPipeline]: https://github.com/julianmendez/verification-pipeline/blob/master/core/src/main/scala/soda/tiles/verifier/pipeline/VerificationPipeline.soda
 
 [VerifierTile]: https://github.com/julianmendez/verification-pipeline/blob/master/core/src/main/scala/soda/tiles/verifier/tile/derived/VerifierTile.soda
 
