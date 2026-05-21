@@ -1,5 +1,6 @@
 
 
+
 # Verification Pipeline
 
 Copyright 2026 Julian Alfredo Mendez
@@ -85,6 +86,7 @@ where
 
 This is an example of a valid YAML input file that contains invalid transitions.
 
+```yaml
 ---
 - fluents:
   - fluent: fluent_name
@@ -118,5 +120,7 @@ This is an example of a valid YAML input file that contains invalid transitions.
     - action_1
   - state:
     - fluent_value_0
+
+```
 
 

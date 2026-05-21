@@ -24,6 +24,8 @@ example to
 run the program.
 Note that recompiling the project will delete the content of that directory to reset the conditions for new benchmarks.
 
+More details on the input file can be found at the [input file details][about-input-file].
+
 
 ## Pipeline
 
@@ -80,6 +82,8 @@ These are some of the implemented fairness tiles for the scenario:
 [build-status]: https://github.com/julianmendez/tiles/actions
 
 [git-scm]: https://git-scm.com/install/windows
+
+[about-input-file]: input.html
 
 [java]: https://www.oracle.com/java/
 
