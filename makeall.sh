@@ -8,7 +8,14 @@
 scalaVersion="3.3.7"
 executableStub="exec java -jar \$0 \"\$@\" ; exit"
 
-sbt scalaVersion sbtVersion version clean compile test package assembly
+executableSbt="sbt"
+
+# If sbt is not present, download
+# https://github.com/dwijnand/sbt-extras/blob/master/sbt
+# and make it executable. Then, include the following line.
+# executableSbt="./sbt"
+
+${executableSbt} scalaVersion sbtVersion version clean compile test package assembly
 
 # Build the main binary file
 
@@ -22,8 +29,9 @@ chmod u+x ${mainBinaryFile}
 
 # Prepare directory for benchmarks
 
+benchmarkScript="run_benchmarks.sh"
 benchmarkDirectory="target/benchmarks/"
-benchmarkScript="core/src/main/bash/run_benchmarks.sh"
+benchmarkScriptSource="core/src/main/bash/${benchmarkScript}"
 exampleFile="core/src/test/resources/example/example.yaml"
 
 if [ ! -d ${benchmarkDirectory} ]; then
@@ -32,5 +40,6 @@ fi
 
 cp -p ${mainBinaryFile} ${benchmarkDirectory}
 cp -p ${exampleFile} ${benchmarkDirectory}
-cp -p ${benchmarkScript} ${benchmarkDirectory}
+cp -p ${benchmarkScriptSource} ${benchmarkDirectory}
+chmod u+x ${benchmarkDirectory}/${benchmarkScript}
 
