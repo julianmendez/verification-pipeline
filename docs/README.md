@@ -93,7 +93,7 @@ These are some of the implemented fairness tiles for the scenario:
 
 [git-scm]: https://git-scm.com/install/windows
 
-[about-input-file]: input.html
+[about-input-file]: https://julianmendez.github.io/verification-pipeline/input.html
 
 [java]: https://www.oracle.com/java/
 
