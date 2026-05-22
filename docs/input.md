@@ -5,37 +5,37 @@ This is an example of a YAML input file
 ```yaml
 ---
 - fluents:
-    - fluent: fluent_name
-      values:
-        - fluent_value_0
-        - fluent_value_1
+  - fluent: fluent_name
+    values:
+    - fluent_value_0
+    - fluent_value_1
 - actions:
+  - action_0
+  - action_1
+- rules:
+  - rule: CausesIfRule
+    input:
+    - fluent_value_0
+    action: action_0
+    output:
+    - fluent_value_1
+  - rule: NoConcurrencyRule
+    actions:
     - action_0
     - action_1
-- rules:
-    - rule: CausesIfRule
-      input:
-        - fluent_value_0
-      action: action_0
-      output:
-        - fluent_value_1
-    - rule: NoConcurrencyRule
-      actions:
-        - action_0
-        - action_1
-    - rule: DefaultRule
-      input_fluent: fluent_value_0
+  - rule: DefaultRule
+    input_fluent: fluent_value_0
 - trajectory:
-    - state:
-        - fluent_value_0
-    - actions:
-        - action_0
-    - state:
-        - fluent_value_1
-    - actions:
-        - action_1
-    - state:
-        - fluent_value_0
+  - state:
+    - fluent_value_0
+  - actions:
+    - action_0
+  - state:
+    - fluent_value_1
+  - actions:
+    - action_1
+  - state:
+    - fluent_value_0
 ```
 
 The available rules are:
