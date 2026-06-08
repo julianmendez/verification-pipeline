@@ -428,3 +428,163 @@ case class RuleValidatorSpec ()
 
 }
 
+
+case class TrajectoryValidatorSpec ()
+  extends
+    AnyFunSuite
+{
+
+  def check [A ] (obtained : A) (expected : A) : org.scalatest.compatible.Assertion =
+    assert (obtained == expected)
+
+  lazy val tv = TrajectoryValidator .mk
+
+  lazy val fluent_map_ok : FluentMap =
+    Seq (
+      ("f1" , "F1"),
+      ("f2" , "F2"),
+      ("f3" , "F3")
+    ) .toMap
+
+  lazy val fluent_map_bad : FluentMap =
+    Seq (
+      ("f1" , "F1")
+    ) .toMap
+
+  lazy val action_set_ok : ActionSet =
+    Seq ("a1" , "a2") .toSet
+
+  lazy val action_set_bad : ActionSet =
+    Seq ("aX") .toSet
+
+  test ("trajectory too short (< 3) produces error") (
+    check (
+      obtained = tv .validate (
+        Seq (Seq ("f1") .toSet , Seq ("a1") .toSet)
+      ) (fluent_map_ok) (action_set_ok)
+    ) (
+      expected = Seq (TrajectoryValidator .mk .error_trajectory_is_too_short)
+    )
+  )
+
+  test ("trajectory of even length produces error") (
+    check (
+      obtained = tv .validate (
+        Seq (
+          Seq ("f1") .toSet,
+          Seq ("a1") .toSet,
+          Seq ("f2") .toSet,
+          Seq ("a2") .toSet
+        )
+      ) (fluent_map_ok) (action_set_ok)
+    ) (
+      expected = Seq (TrajectoryValidator .mk .error_trajectory_length_should_be_odd)
+    )
+  )
+
+  test ("valid trajectory with correct fluents and actions returns empty error list") (
+    check (
+      obtained = tv .validate (
+        Seq (
+          Seq ("f1") .toSet,   // fluents
+          Seq ("a1") .toSet,   // actions
+          Seq ("f2") .toSet    // fluents
+        )
+      ) (fluent_map_ok) (action_set_ok)
+    ) (
+      expected = Seq .empty
+    )
+  )
+
+  test ("is_valid returns true for valid trajectory") (
+    check (
+      obtained = tv .is_valid (
+        Seq (
+          Seq ("f1") .toSet,
+          Seq ("a1") .toSet,
+          Seq ("f2") .toSet
+        )
+      ) (fluent_map_ok) (action_set_ok)
+    ) (
+      expected = true
+    )
+  )
+
+  test ("invalid fluent in fluent window produces fluent error") (
+    check (
+      obtained = tv .validate (
+        Seq (
+          Seq ("badF") .toSet,
+          Seq ("a1") .toSet,
+          Seq ("f1") .toSet
+        )
+      ) (fluent_map_ok) (action_set_ok)
+    ) (
+      expected = Seq (
+        FluentValidator .mk .error_unknown_fluent + "badF"
+      )
+    )
+  )
+
+  test ("invalid action in action window produces action error") (
+    check (
+      obtained = tv .validate (
+        Seq (
+          Seq ("f1") .toSet,
+          Seq ("badA") .toSet,
+          Seq ("f2") .toSet
+        )
+      ) (fluent_map_ok) (action_set_ok)
+    ) (
+      expected = Seq (
+        ActionValidator .mk .error_unknown_action + "badA"
+      )
+    )
+  )
+
+  test ("trajectory stops accumulating errors after first invalid window") (
+    check (
+      obtained = tv .validate (
+        Seq (
+          Seq ("badF") .toSet,   // invalid fluent
+          Seq ("badA") .toSet,   // would be invalid action, but should be ignored
+          Seq ("badF2") .toSet   // ignored
+        )
+      ) (fluent_map_ok) (action_set_ok)
+    ) (
+      expected = Seq (
+        FluentValidator .mk .error_unknown_fluent + "badF"
+      )
+    )
+  )
+
+  test ("is_valid returns false when any fluent window invalid") (
+    check (
+      obtained = tv .is_valid (
+        Seq (
+          Seq ("badF") .toSet,
+          Seq ("a1") .toSet,
+          Seq ("f1") .toSet
+        )
+      ) (fluent_map_ok) (action_set_ok)
+    ) (
+      expected = false
+    )
+  )
+
+  test ("is_valid returns false when any action window invalid") (
+    check (
+      obtained = tv .is_valid (
+        Seq (
+          Seq ("f1") .toSet,
+          Seq ("badA") .toSet,
+          Seq ("f2") .toSet
+        )
+      ) (fluent_map_ok) (action_set_ok)
+    ) (
+      expected = false
+    )
+  )
+
+}
+
