@@ -21,6 +21,100 @@ import   soda.tiles.verifier.entity.TriggersRule
 
 
 
+case class ActionValidatorSpec ()
+  extends
+    AnyFunSuite
+{
+
+  def check [A ] (obtained : A) (expected : A) : org.scalatest.compatible.Assertion =
+    assert (obtained == expected)
+
+  lazy val av = ActionValidator .mk
+
+  lazy val action_set_ok : ActionSet =
+    Seq ("a1" , "a2" , "a3") .toSet
+
+  lazy val action_set_small : ActionSet =
+    Seq ("a1") .toSet
+
+  test ("validate_action returns empty when action exists") (
+    check (
+      obtained = av .validate_action ("a1") (action_set_ok)
+    ) (
+      expected = Seq .empty
+    )
+  )
+
+  test ("validate_action returns error when action missing") (
+    check (
+      obtained = av .validate_action ("missing") (action_set_ok)
+    ) (
+      expected = Seq (ActionValidator .mk .error_unknown_action + "missing")
+    )
+  )
+
+  test ("validate returns empty when all actions exist") (
+    check (
+      obtained = av .validate (Seq ("a1" , "a2") .toSet) (action_set_ok)
+    ) (
+      expected = Seq .empty
+    )
+  )
+
+  test ("validate returns errors for each missing action") (
+    check (
+      obtained = av .validate (Seq ("a1" , "bad1" , "bad2") .toSet) (action_set_ok)
+    ) (
+      expected = Seq (
+        ActionValidator .mk .error_unknown_action + "bad1",
+        ActionValidator .mk .error_unknown_action + "bad2"
+      )
+    )
+  )
+
+  test ("is_valid returns true when all actions exist") (
+    check (
+      obtained = av .is_valid (Seq ("a1") .toSet) (action_set_ok)
+    ) (
+      expected = true
+    )
+  )
+
+  test ("is_valid returns false when any action missing") (
+    check (
+      obtained = av .is_valid (Seq ("a1" , "missing") .toSet) (action_set_ok)
+    ) (
+      expected = false
+    )
+  )
+
+  test ("validate on empty action set returns empty") (
+    check (
+      obtained = av .validate (Seq .empty .toSet) (action_set_ok)
+    ) (
+      expected = Seq .empty
+    )
+  )
+
+  test ("is_valid on empty action set returns true") (
+    check (
+      obtained = av .is_valid (Seq .empty .toSet) (action_set_ok)
+    ) (
+      expected = true
+    )
+  )
+
+  test ("validate_action fails when action_set is empty") (
+    check (
+      obtained = av .validate_action ("a1") (Seq .empty .toSet)
+    ) (
+      expected = Seq (ActionValidator .mk .error_unknown_action + "a1")
+    )
+  )
+
+}
+
+
 case class FluentValidatorSpec ()
   extends
     AnyFunSuite
