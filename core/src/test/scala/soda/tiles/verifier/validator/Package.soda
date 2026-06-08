@@ -5,6 +5,7 @@ import
   soda.tiles.verifier.entity.ActionSet
   soda.tiles.verifier.entity.AllowsRule
   soda.tiles.verifier.entity.CausesIfRule
+  soda.tiles.verifier.entity.Configuration
   soda.tiles.verifier.entity.ContravenesRule
   soda.tiles.verifier.entity.DefaultRule
   soda.tiles.verifier.entity.FacilitatesRule
@@ -16,5 +17,6 @@ import
   soda.tiles.verifier.entity.InfluencesRule
   soda.tiles.verifier.entity.InhibitsRule
   soda.tiles.verifier.entity.NoConcurrencyRule
+  soda.tiles.verifier.entity.Trajectory
   soda.tiles.verifier.entity.TriggersRule
 
