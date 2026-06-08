@@ -2,6 +2,21 @@ package soda.tiles.verifier.validator
 
 import
   org.scalatest.funsuite.AnyFunSuite
+  soda.tiles.verifier.entity.ActionSet
+  soda.tiles.verifier.entity.AllowsRule
+  soda.tiles.verifier.entity.CausesIfRule
+  soda.tiles.verifier.entity.Configuration
+  soda.tiles.verifier.entity.ContravenesRule
+  soda.tiles.verifier.entity.DefaultRule
+  soda.tiles.verifier.entity.FacilitatesRule
   soda.tiles.verifier.entity.FluentMap
   soda.tiles.verifier.entity.FluentSet
+  soda.tiles.verifier.entity.ForbidsToCauseRule
+  soda.tiles.verifier.entity.IfRule
+  soda.tiles.verifier.entity.InfluencesIfRule
+  soda.tiles.verifier.entity.InfluencesRule
+  soda.tiles.verifier.entity.InhibitsRule
+  soda.tiles.verifier.entity.NoConcurrencyRule
+  soda.tiles.verifier.entity.Trajectory
+  soda.tiles.verifier.entity.TriggersRule
 
