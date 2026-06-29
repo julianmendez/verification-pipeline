@@ -5,7 +5,7 @@
 # It requires `sbt` [https://www.scala-sbt.org/].
 #
 
-scalaVersion="3.3.7"
+scalaVersion="3.3.8"
 executableStub="exec java -jar \$0 \"\$@\" ; exit"
 
 executableSbt="sbt"
@@ -42,4 +42,5 @@ cp -p ${mainBinaryFile} ${benchmarkDirectory}
 cp -p ${exampleFile} ${benchmarkDirectory}
 cp -p ${benchmarkScriptSource} ${benchmarkDirectory}
 chmod u+x ${benchmarkDirectory}/${benchmarkScript}
+
 

@@ -1,0 +1,15 @@
+package soda.tiles.verifier.tile.composite
+
+/*
+ * This package contains test classes to model the blocks.
+ */
+
+import
+  org.scalatest.funsuite.AnyFunSuite
+  soda.tiles.verifier.entity.Identifier
+  soda.tiles.verifier.entity.IdentifierSet
+  soda.tiles.verifier.entity.Transition
+  soda.tiles.verifier.entity.TileMessage
+  soda.tiles.verifier.entity.TileMessageBuilder
+  soda.tiles.verifier.tile.primitive.ScenarioExample
+
