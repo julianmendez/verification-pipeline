@@ -3,7 +3,7 @@ directive lean
 import soda.tiles.verifier.entity.TileMessage
 
 /**
- * This takes a transformation function and applies it to each element of the sequence,
+ * This tile applies a transformation function to each element of the sequence,
  * producing a new sequence with the transformed elements, preserving the original order.
  */
 
@@ -12,9 +12,14 @@ class MapTile [A : Type] [B : Type]
   abstract
     phi : A -> B
 
+  bind_phi (x : A) : Seq [B] =
+    Seq [B] (phi (x) )
+
+  bind_tile = BindTile .mk (bind_phi)
+
   apply (message : TileMessage [Seq [A] ] ) : TileMessage [Seq [B] ] =
-    TileMessageBuilder .mk .build (message .context) (message .instance) (
-      (message .contents) .map (phi)
+    bind_tile .apply (
+      message
     )
 
 end

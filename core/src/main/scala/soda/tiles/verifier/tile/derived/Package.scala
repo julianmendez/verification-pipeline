@@ -32,8 +32,45 @@ import   soda.tiles.verifier.entity.TileQuad
 import   soda.tiles.verifier.entity.Trajectory
 import   soda.tiles.verifier.entity.TriggersRule
 import   soda.tiles.verifier.tile.primitive.ApplyTile
+import   soda.tiles.verifier.tile.primitive.BindTile
 import   soda.tiles.verifier.tile.primitive.FoldTile
-import   soda.tiles.verifier.tile.primitive.MapTile
+
+/*
+directive lean
+import soda.tiles.verifier.entity.TileMessage
+*/
+
+/**
+ * This takes a condition (predicate) and passes through only those elements that satisfy it, discarding all others
+ * while preserving the original order.
+ */
+
+trait FilterTile [A ]
+{
+
+  def   phi : A => Boolean
+
+  def filter (elem : A) : Seq [A] =
+    if ( (phi (elem) )
+    ) Seq [A] (elem)
+    else Seq [A] ()
+
+  lazy val bind_tile = BindTile .mk (filter)
+
+  def apply (message : TileMessage [Seq [A] ] ) : TileMessage [Seq [A] ] =
+    bind_tile .apply (
+      message
+    )
+
+}
+
+case class FilterTile_ [A] (phi : A => Boolean) extends FilterTile [A]
+
+object FilterTile {
+  def mk [A] (phi : A => Boolean) : FilterTile [A] =
+    FilterTile_ [A] (phi)
+}
+
 
 trait InhibitTile
 {
@@ -87,6 +124,77 @@ case class InhibitTile_ () extends InhibitTile
 object InhibitTile {
   def mk : InhibitTile =
     InhibitTile_ ()
+}
+
+
+/*
+directive lean
+import soda.tiles.verifier.entity.TileMessage
+*/
+
+/**
+ * This tile applies a transformation function to each element of the sequence,
+ * producing a new sequence with the transformed elements, preserving the original order.
+ */
+
+trait MapTile [A , B ]
+{
+
+  def   phi : A => B
+
+  def bind_phi (x : A) : Seq [B] =
+    Seq [B] (phi (x) )
+
+  lazy val bind_tile = BindTile .mk (bind_phi)
+
+  def apply (message : TileMessage [Seq [A] ] ) : TileMessage [Seq [B] ] =
+    bind_tile .apply (
+      message
+    )
+
+}
+
+case class MapTile_ [A, B] (phi : A => B) extends MapTile [A, B]
+
+object MapTile {
+  def mk [A, B] (phi : A => B) : MapTile [A, B] =
+    MapTile_ [A, B] (phi)
+}
+
+
+/*
+directive lean
+import soda.tiles.verifier.entity.TileMessage
+*/
+
+/**
+ * This tile reverses a collection.
+ */
+
+trait ReverseTile [A ]
+{
+
+
+
+  lazy val zero : Seq [A] = Seq [A] ()
+
+  def prepend (acc : Seq [A] ) (elem : A) : Seq [A] =
+    acc .+: (elem)
+
+  lazy val fold_tile = FoldTile .mk [A, Seq [A] ] (zero) (prepend)
+
+  def apply (message : TileMessage [Seq [A] ] ) : TileMessage [Seq [A] ] =
+    fold_tile .apply (
+      message
+    )
+
+}
+
+case class ReverseTile_ [A] () extends ReverseTile [A]
+
+object ReverseTile {
+  def mk [A] : ReverseTile [A] =
+    ReverseTile_ [A] ()
 }
 
 

@@ -33,7 +33,7 @@ import
   soda.tiles.verifier.entity.Trajectory
   soda.tiles.verifier.entity.TriggersRule
   soda.tiles.verifier.tile.primitive.ApplyTile
+  soda.tiles.verifier.tile.primitive.BindTile
   soda.tiles.verifier.tile.primitive.FoldTile
-  soda.tiles.verifier.tile.primitive.MapTile
 
 

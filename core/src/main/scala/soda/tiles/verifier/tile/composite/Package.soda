@@ -15,6 +15,9 @@ import
   soda.tiles.verifier.entity.TransitionSeq
   soda.tiles.verifier.tile.constant.TrajectoryTile
   soda.tiles.verifier.tile.derived.InhibitTile
+  soda.tiles.verifier.tile.derived.ReverseTile
   soda.tiles.verifier.tile.derived.TransitionsTile
   soda.tiles.verifier.tile.derived.VerifierTile
   soda.tiles.verifier.tile.primitive.CrossTile
+  soda.tiles.verifier.tile.primitive.FoldTile
+
