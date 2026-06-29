@@ -69,7 +69,7 @@ These are some of the implemented fairness tiles for the scenario:
 
 [InhibitCrossVerifierTile]: https://github.com/julianmendez/verification-pipeline/blob/master/core/src/main/scala/soda/tiles/verifier/tile/composite/InhibitCrossVerifierTile.soda
 
-[MapTile]: https://github.com/julianmendez/verification-pipeline/blob/master/core/src/main/scala/soda/tiles/verifier/tile/primitive/MapTile.soda
+[MapTile]: https://github.com/julianmendez/verification-pipeline/blob/master/core/src/main/scala/soda/tiles/verifier/tile/derived/MapTile.soda
 
 [RulesTile]: https://github.com/julianmendez/verification-pipeline/blob/master/core/src/main/scala/soda/tiles/verifier/tile/constant/RulesTile.soda
 
